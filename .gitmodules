@@ -1,0 +1,3 @@
+[submodule "vendor/speakeasy2"]
+	path = vendor/speakeasy2
+	url = https://github.com/SpeakEasy-2/libspeakeasy2
