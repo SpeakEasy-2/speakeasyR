@@ -1,0 +1,11 @@
+Package: speakeasyr
+Title: R bindings for the SpeakEasy 2 clustering algorithm.
+Version: 0.1.0
+Authors@R:
+    person("David", "Connell", , "davidconnell12@gmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "https://orcid.org/0000-0002-4841-6756"))
+Description: This package provides an entry point for R to use the SpeakEasy 2 (SE2) graph clustering algorithm. SE2 is an efficient algorithm for clustering large graphs into communities at multiple scales.
+License: GPL (>= 3)
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
