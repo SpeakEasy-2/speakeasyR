@@ -1,5 +1,5 @@
 Package: speakeasyr
-Title: R bindings for the SpeakEasy 2 clustering algorithm.
+Title: Fast and robust multiscale graph clustering
 Version: 0.0.9
 Authors@R: c(
     person("David", "Connell", "david32@dcon.addy.io",
@@ -20,6 +20,16 @@ Authors@R: c(
     person("Daniel", "Noom", role = "cph",
     	   comment = "Author of igraph C library dependency.")
 )
+Description: A graph community detection algorithm that aims to be performant
+    on large graphs and robust, returning consistent results across runs.
+    Provides the 'SpeakEasy 2' (SE2) algorithm for use in R. The core algorithm
+    is written in C, providing speed and keeping the memory requirments low.
+    This implementation can take advantage of multiple computing cores without
+    increasing memory usage. SE2 can detect community structure across scales,
+    making it a good choice for biological data, which is often has hierchical
+    structure. Graphs can be passed to the algorithm as adjacency matrices
+    using the 'Matrix' library, 'igraph' graphs, or any data that can coreced
+    into a matrix.
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
