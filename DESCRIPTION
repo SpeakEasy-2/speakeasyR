@@ -1,10 +1,25 @@
 Package: speakeasyr
 Title: R bindings for the SpeakEasy 2 clustering algorithm.
 Version: 0.0.9
-Authors@R:
-    person("David", "Connell", , "davidconnell12@gmail.com", role = c("aut", "cre"),
-           comment = c(ORCID = "https://orcid.org/0000-0002-4841-6756"))
-Description: This package provides an entry point for R to use the SpeakEasy 2 (SE2) graph clustering algorithm. SE2 is an efficient algorithm for clustering large graphs into communities at multiple scales.
+Authors@R: c(
+    person("David", "Connell", "david32@dcon.addy.io",
+	   role = c("aut", "cre", "cph"),
+           comment = c(ORCID = "https://orcid.org/0000-0002-4841-6756")),
+    person("Chris", "Gaiteri", role = "cph",
+    	   comment = "Author of original SpeakEasy 2 algorithm.")
+    person("Gábor", "Csárdi", role = "cph",
+    	   comment = "Author of igraph C library dependency.")
+    person("Tamás", "Nepusz", role = "cph",
+    	   comment = "Author of igraph C library dependency.")
+    person("Szabolcs", "Horvát", role = "cph",
+    	   comment = "Author of igraph C library dependency.")
+    person("Vincent", "Traag", role = "cph",
+    	   comment = "Author of igraph C library dependency.")
+    person("Fabio", "Zanini", role = "cph",
+    	   comment = "Author of igraph C library dependency.")
+    person("Daniel", "Noom", role = "cph",
+    	   comment = "Author of igraph C library dependency.")
+)
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

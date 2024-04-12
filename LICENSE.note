@@ -1,0 +1,5 @@
+The speakeasyr package as a whole is distributed under the GPLv3+ license. Two
+external C libraries are used to build the package.
+
+* igraph: GPLv2
+* SpeakEasy2: GPLv3+
