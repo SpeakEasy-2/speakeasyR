@@ -1,6 +1,7 @@
 ^LICENSE\.md$
 ^LICENSE$
 ^\.astylerc$
-^vendor
 ^\.github
 ^build
+^\.ccls-cache
+^tools
