@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+ROOT=$(
+    cd "$(dirname "$0")"
+    pwd
+)
+
+PREFIX="${ROOT}/src"
+SE2="${ROOT}/tools/se2"
+IGRAPH="${SE2}/vendor/igraph"
+
+if test -z "${R_HOME}"; then
+    echo "could not determine R_HOME"
+    exit 1
+fi
+
+CC=$("${R_HOME}/bin/R" CMD config CC)
+CFLAGS=$("${R_HOME}/bin/R" CMD config CFLAGS)
+CPPFLAGS=$("${R_HOME}/bin/R" CMD config CPPFLAGS)
+LDFLAGS=$("${R_HOME}/bin/R" CMD config LDFLAGS)
+
+if [ "$(which ninja)" ]; then
+    GENERATOR="Ninja"
+else
+    GENERATOR="Unix Makefiles"
+fi
+
+mv "${ROOT}/IGRAPH_VERSION" "${IGRAPH}"
+mv "${ROOT}/SE2_VERSION" "${SE2}"
+
+[ -d ../build ] || cmake \
+    -B build \
+    -DCMAKE_PACKAGE_VERSION="$(cat "${SE2}/SE2_VERSION")" \
+    -G "$GENERATOR" \
+    --install-prefix="$PREFIX" .
+
+cmake --build build --target install
+ar rs "${PREFIX}/lib64/libse2.a" "${PREFIX}"/objects/SpeakEasy2/*.o
+
+cat <<_EOF_ >"${PREFIX}/Makevars"
+PKG_CPPFLAGS = -I${PREFIX}/include/igraph -I${PREFIX}/include/ -I${ROOT}/tools/speakeasy2/include
+PKG_LIBS = ${PREFIX}/lib64/libse2.a ${PREFIX}/lib64/libigraph.a
+_EOF_
