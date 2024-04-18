@@ -41,3 +41,5 @@ Imports:
     Matrix
 Suggests:
     igraph
+URL: https://github.com/SpeakEasy-2/r-speakeasy2
+BugReports: https://github.com/SpeakEasy-2/r-speakeasy2/issues
