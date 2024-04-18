@@ -21,6 +21,13 @@ include_directories(${R_INCLUDE} ${R_LIBRARIES_INCLUDES})
 add_compile_definitions(USING_R)
 add_subdirectory(tools/se2)
 
+# To create compile_commands.json. Not otherwise needed as R will handle
+# compiling. Specify -DDEVELOP=1 when configuring.
+if ("${DEVELOP}")
+  add_library(RSE2 src/speakeasy2.c)
+  target_link_libraries(RSE2 SpeakEasy2)
+endif()
+
 target_sources(SpeakEasy2 PUBLIC FILE_SET HEADERS
   BASE_DIRS ${PROJECT_SOURCE_DIR}/tools/se2/include
   FILES ${PROJECT_SOURCE_DIR}/tools/se2/include/speak_easy_2.h)

@@ -1,3 +1,5 @@
 *.Rcheck
 *.tar.gz
 build/
+man/
+.RData
