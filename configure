@@ -5,7 +5,7 @@ ROOT=$(
     pwd
 )
 
-PREFIX="${ROOT}/src"
+PREFIX="${ROOT}/src/build"
 SE2="${ROOT}/tools/se2"
 IGRAPH="${SE2}/vendor/igraph"
 
@@ -14,10 +14,13 @@ if test -z "${R_HOME}"; then
     exit 1
 fi
 
-CC=$("${R_HOME}/bin/R" CMD config CC)
-CFLAGS=$("${R_HOME}/bin/R" CMD config CFLAGS)
-CPPFLAGS=$("${R_HOME}/bin/R" CMD config CPPFLAGS)
-LDFLAGS=$("${R_HOME}/bin/R" CMD config LDFLAGS)
+# Otherwise, R will echo a warning about ignoring R_HOME that gets included in
+# the variable assignment.
+R="${R_HOME}/bin/R"
+unset R_HOME
+
+i_CMAKE_CC=$("$R" CMD config CC)
+i_CMAKE_CFLAGS=$("$R" CMD config CFLAGS)
 
 if [ "$(which ninja)" ]; then
     GENERATOR="Ninja"
@@ -25,12 +28,14 @@ else
     GENERATOR="Unix Makefiles"
 fi
 
-mv "${ROOT}/IGRAPH_VERSION" "${IGRAPH}"
-mv "${ROOT}/SE2_VERSION" "${SE2}"
+mv "${ROOT}/tools/IGRAPH_VERSION" "${IGRAPH}"
+mv "${ROOT}/tools/SE2_VERSION" "${SE2}"
 
 [ -d ../build ] || cmake \
     -B build \
-    -DCMAKE_PACKAGE_VERSION="$(cat "${SE2}/SE2_VERSION")" \
+    -D CMAKE_PACKAGE_VERSION="$(cat "${SE2}/SE2_VERSION")" \
+    -D CMAKE_C_COMPILER="$i_CMAKE_CC" \
+    -D CMAKE_C_FLAGS="$i_CMAKE_CFLAGS" \
     -G "$GENERATOR" \
     --install-prefix="$PREFIX" .
 
@@ -38,6 +43,6 @@ cmake --build build --target install
 ar rs "${PREFIX}/lib64/libse2.a" "${PREFIX}"/objects/SpeakEasy2/*.o
 
 cat <<_EOF_ >"${PREFIX}/Makevars"
-PKG_CPPFLAGS = -I${PREFIX}/include/igraph -I${PREFIX}/include/ -I${ROOT}/tools/speakeasy2/include
+PKG_CPPFLAGS = -I${PREFIX}/include/igraph -I${PREFIX}/include
 PKG_LIBS = ${PREFIX}/lib64/libse2.a ${PREFIX}/lib64/libigraph.a
 _EOF_

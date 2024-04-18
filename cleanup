@@ -5,18 +5,12 @@ ROOT=$(
     pwd
 )
 
-PREFIX="${ROOT}/src"
+PREFIX="${ROOT}/src/build"
 SE2="${ROOT}/tools/se2"
 IGRAPH="${SE2}/vendor/igraph"
 
-generated_dirs=("objects" "lib64" "lib" "include")
-for d in "${generated_dirs[@]}"; do
-    tmp_dir="${PREFIX}/$d"
-    [ -d "$tmp_dir" ] && rm -r "${tmp_dir}"
-done
-
 [ -f "${SE2}/SE2_VERSION" ] && rm "${SE2}/SE2_VERSION"
 [ -f "${IGRAPH}/IGRAPH_VERSION" ] && rm "${IGRAPH}/IGRAPH_VERSION"
-[ -f "${PREFIX}/Makevars" ] && rm "${PREFIX}/Makevars"
 
+[ -d "${PREFIX}" ] && rm -rf "${PREFIX}"
 [ -d "${ROOT}/build" ] && rm -rf "${ROOT}/build"
