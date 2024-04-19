@@ -9,9 +9,17 @@ PREFIX="${ROOT}/src/build"
 SE2="${ROOT}/tools/se2"
 IGRAPH="${SE2}/vendor/igraph"
 
-if test -z "${R_HOME}"; then
+if [ -z "$R_HOME" ]; then
     echo "could not determine R_HOME"
     exit 1
+fi
+
+if [ -z "$AR" ]; then
+    AR="ar"
+fi
+
+if [ -z "$RANLIB" ]; then
+    RANLIB="ranlib"
 fi
 
 # Otherwise, R will echo a warning about ignoring R_HOME that gets included in
@@ -20,7 +28,7 @@ R="${R_HOME}/bin/R"
 unset R_HOME
 
 i_CMAKE_CC=$("$R" CMD config CC)
-i_CMAKE_CFLAGS=$("$R" CMD config CFLAGS)
+i_CMAKE_CFLAGS="$("$R" CMD config CFLAGS) $("$R" CMD config CPICFLAGS)"
 
 if [ "$(which ninja)" ]; then
     GENERATOR="Ninja"
@@ -28,8 +36,8 @@ else
     GENERATOR="Unix Makefiles"
 fi
 
-mv "${ROOT}/tools/IGRAPH_VERSION" "${IGRAPH}"
-mv "${ROOT}/tools/SE2_VERSION" "${SE2}"
+cp "${ROOT}/tools/IGRAPH_VERSION" "${IGRAPH}"
+cp "${ROOT}/tools/SE2_VERSION" "${SE2}"
 
 [ -d ../build ] || cmake \
     -B build \
@@ -40,9 +48,10 @@ mv "${ROOT}/tools/SE2_VERSION" "${SE2}"
     --install-prefix="$PREFIX" .
 
 cmake --build build --target install
-ar rs "${PREFIX}/lib64/libse2.a" "${PREFIX}"/objects/SpeakEasy2/*.o
+"$AR" -cr "${PREFIX}/lib64/libse2.a" "${PREFIX}"/objects/SpeakEasy2/*.o
+"$RANLIB" "${PREFIX}/lib64/libse2.a"
 
-cat <<_EOF_ >"${PREFIX}/Makevars"
+cat <<_EOF_ >"${ROOT}/src/Makevars"
 PKG_CPPFLAGS = -I${PREFIX}/include/igraph -I${PREFIX}/include
 PKG_LIBS = ${PREFIX}/lib64/libse2.a ${PREFIX}/lib64/libigraph.a
 _EOF_

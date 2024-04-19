@@ -12,5 +12,5 @@ IGRAPH="${SE2}/vendor/igraph"
 [ -f "${SE2}/SE2_VERSION" ] && rm "${SE2}/SE2_VERSION"
 [ -f "${IGRAPH}/IGRAPH_VERSION" ] && rm "${IGRAPH}/IGRAPH_VERSION"
 
+[ -f "${ROOT}/src/Makevars" ] && rm "${ROOT}/src/Makevars"
 [ -d "${PREFIX}" ] && rm -rf "${PREFIX}"
-[ -d "${ROOT}/build" ] && rm -rf "${ROOT}/build"
