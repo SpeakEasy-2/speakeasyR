@@ -1,4 +1,7 @@
 #include "R.h"
+#include "Rinternals.h"
+#include "R_ext/Visibility.h"
+
 #include "igraph.h"
 #include "speak_easy_2.h"
 
@@ -68,4 +71,16 @@ void speakeasyr_speakeasy2(double* matrix, int* n_nodes,
   igraph_matrix_int_destroy(&membership_i);
   igraph_vector_destroy(&weights);
   igraph_destroy(&graph);
+}
+
+static const R_CallMethodDef callMethods[] = {
+  {"speakeasy2", (DL_FUNC) &call_speakeasy2, 9},
+  {NULL, NULL, 0}
+};
+
+void attribute_visible R_init_speakeasyr(DllInfo* info)
+{
+  R_registerRoutines(info, NULL, callMethods, NULL, NULL);
+  R_useDynamicSymbols(info, FALSE);
+  R_forceSymbols(info, TRUE);
 }

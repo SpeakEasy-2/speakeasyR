@@ -1,0 +1,3 @@
+LIBRARY speakeasyr.dll
+EXPORTS
+ R_init_speakeasyr

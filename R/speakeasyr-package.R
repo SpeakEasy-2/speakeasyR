@@ -1,2 +1,2 @@
-#' @useDynLib speakeasyr, .registration = TRUE
+#' @useDynLib speakeasyr, .registration = TRUE, .fixes = "C_"
 NULL

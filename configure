@@ -52,6 +52,7 @@ cmake --build build --target install
 "$RANLIB" "${PREFIX}/lib64/libse2.a"
 
 cat <<_EOF_ >"${ROOT}/src/Makevars"
+PKG_CFLAGS = \$(C_VISIBILITY)
 PKG_CPPFLAGS = -I${PREFIX}/include/igraph -I${PREFIX}/include
 PKG_LIBS = ${PREFIX}/lib64/libse2.a ${PREFIX}/lib64/libigraph.a
 _EOF_
