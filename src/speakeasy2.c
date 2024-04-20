@@ -1,6 +1,7 @@
-#include "R.h"
-#include "Rinternals.h"
-#include "R_ext/Visibility.h"
+#include <R.h>
+#include <Rinternals.h>
+#include <R_ext/Visibility.h>
+#include <Matrix.h>
 
 #include "igraph.h"
 #include "speak_easy_2.h"

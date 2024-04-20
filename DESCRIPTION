@@ -37,9 +37,8 @@ License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
-Imports:
-    Matrix
 Suggests:
-    igraph
-URL: https://github.com/SpeakEasy-2/r-speakeasy2
-BugReports: https://github.com/SpeakEasy-2/r-speakeasy2/issues
+    igraph,
+LinkingTo: Matrix
+URL: https://github.com/SpeakEasy-2/speakeasyr
+BugReports: https://github.com/SpeakEasy-2/speakeasyr/issues
