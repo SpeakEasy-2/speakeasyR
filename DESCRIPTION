@@ -39,6 +39,11 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Suggests:
     igraph,
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
 LinkingTo: Matrix
 URL: https://github.com/SpeakEasy-2/speakeasyr
 BugReports: https://github.com/SpeakEasy-2/speakeasyr/issues
+VignetteBuilder: knitr
+Config/testthat/edition: 3
