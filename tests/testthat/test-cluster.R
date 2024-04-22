@@ -7,17 +7,17 @@ expected_membership <- matrix(c(
 
 test_that("matrix works", {
   graph_i <- as.matrix(as.matrix(graph))
-  actual <- speakeasyr::speakeasy2(graph_i, seed = seed)
+  actual <- speakeasyr::cluster(graph_i, seed = seed)
   expect_equal(actual, expected_membership)
 })
 
 test_that("sparse matrix works", {
   graph_i <- as.matrix(graph)
-  actual <- speakeasyr::speakeasy2(graph_i, seed = seed)
+  actual <- speakeasyr::cluster(graph_i, seed = seed)
   expect_equal(actual, expected_membership)
 })
 
 test_that("igraph works", {
-  actual <- speakeasyr::speakeasy2(graph, seed = seed)
+  actual <- speakeasyr::cluster(graph, seed = seed)
   expect_equal(actual, expected_membership)
 })

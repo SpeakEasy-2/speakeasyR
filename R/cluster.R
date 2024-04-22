@@ -35,12 +35,12 @@ is_matrix_i <- function(obj) {
 #' @examples
 #' if (require("igraph")) {
 #'   graph <- igraph::graph.famous("zachary")
-#'   memb <- speakeasy2(graph)
+#'   memb <- cluster(graph)
 #' }
-speakeasy2 <- function(graph, discard_transient = 3, independent_runs = 10,
-                       max_threads = 0, seed = 0, target_clusters = 0,
-                       target_partitions = 5, subcluster = 1, min_clust = 5,
-                       verbose = FALSE, is_directed = "detect") {
+cluster <- function(graph, discard_transient = 3, independent_runs = 10,
+                    max_threads = 0, seed = 0, target_clusters = 0,
+                    target_partitions = 5, subcluster = 1, min_clust = 5,
+                    verbose = FALSE, is_directed = "detect") {
   if (!is_matrix_i(graph)) {
     graph <- as.matrix(graph)
   }
