@@ -20,7 +20,7 @@ add_subdirectory(tools/se2)
 # To create compile_commands.json. Not otherwise needed as R will handle
 # compiling. Specify -DDEVELOP=1 when configuring.
 if ("${DEVELOP}")
-  add_library(RSE2 src/speakeasy2.c)
+  add_library(RSE2 src/speakeasyr.c)
   target_link_libraries(RSE2 SpeakEasy2)
 endif()
 

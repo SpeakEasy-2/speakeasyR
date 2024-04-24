@@ -1,7 +1,3 @@
-is_matrix_i <- function(obj) {
-  class(obj)[[1]] %in% c("dgCMatrix", "matrix")
-}
-
 #' SpeakEasy2 community detection
 #'
 #' @param graph A graph or adjacency matrix in a form that can be converted to
@@ -41,23 +37,7 @@ cluster <- function(graph, discard_transient = 3, independent_runs = 10,
                     max_threads = 0, seed = 0, target_clusters = 0,
                     target_partitions = 5, subcluster = 1, min_clust = 5,
                     verbose = FALSE, is_directed = "detect") {
-  if (!is_matrix_i(graph)) {
-    graph <- as.matrix(graph)
-  }
-
-  if (!is_matrix_i(graph)) {
-    stop(paste0(
-      "Could not convert graph to an appropriate type. ",
-      "'as.matrix' converted graph to \"", class(graph)[[0]],
-      "\". Currently implemented classes are c(\"matrix\", \"dgCMatrix\"). ",
-      "Please open an issue on github to add support for new types."
-    ))
-  }
-
-  if (nrow(graph) != ncol(graph)) {
-    stop("Graph adjacency matrix must be square.")
-  }
-
+  graph <- se2_as_matrix_i(graph)
   if (is_directed == "detect") {
     is_directed <- !Matrix::isSymmetric(graph)
   }

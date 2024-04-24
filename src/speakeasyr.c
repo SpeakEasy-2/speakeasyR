@@ -25,10 +25,10 @@ static bool se2_is_sparse(SEXP mat)
   return R_check_class_etc(mat, Matrix_valid_Csparse) >= 0;
 }
 
-// Convert a matrix to an igraph graph. Returns n_nodes.
-static int se2_matrix_to_igraph(SEXP mat, igraph_t* graph,
-                                igraph_vector_t* weights,
-                                igraph_bool_t is_directed)
+// Convert a matrix to an igraph graph.
+static void se2_matrix_to_igraph(SEXP mat, igraph_t* graph,
+                                 igraph_vector_t* weights,
+                                 igraph_bool_t is_directed)
 {
   mat = PROTECT(coerceVector(mat, REALSXP));
 
@@ -59,8 +59,6 @@ static int se2_matrix_to_igraph(SEXP mat, igraph_t* graph,
 
   igraph_create(graph, &edges, n_nodes, is_directed);
   igraph_vector_int_destroy(&edges);
-
-  return n_nodes;
 }
 
 /* Convert a sparse matrix to an igraph graph. Returns n_nodes.
@@ -73,9 +71,9 @@ Currently assumes:
 
 SE2 only works on real graph so xtype should have to be real. The others
 assumptions will need to be removed. */
-static int se2_spmatrix_to_igraph(SEXP mat, igraph_t* graph,
-                                  igraph_vector_t* weights,
-                                  igraph_bool_t is_directed)
+static void se2_spmatrix_to_igraph(SEXP mat, igraph_t* graph,
+                                   igraph_vector_t* weights,
+                                   igraph_bool_t is_directed)
 {
   CHM_SP mat_i = AS_CHM_SP(mat);
 
@@ -100,8 +98,52 @@ static int se2_spmatrix_to_igraph(SEXP mat, igraph_t* graph,
 
   igraph_create(graph, &edges, n_nodes, is_directed);
   igraph_vector_int_destroy(&edges);
+}
 
-  return n_nodes;
+static void se2_R_adj_to_igraph(SEXP adj, igraph_t* graph,
+                                igraph_vector_t* weights, SEXP is_directed)
+{
+  if (se2_is_sparse(adj)) {
+    se2_spmatrix_to_igraph(adj, graph, weights,
+                           (igraph_bool_t)asLogical(is_directed));
+  } else {
+    se2_matrix_to_igraph(adj, graph, weights,
+                         (igraph_bool_t)asLogical(is_directed));
+  }
+}
+
+static void se2_R_mat_int_to_igraph(SEXP mat_R,
+                                    igraph_matrix_int_t* mat_igraph, bool shift_idx)
+{
+  int n_levels = nrows(mat_R);
+  int n_nodes = ncols(mat_R);
+
+  mat_R = PROTECT(coerceVector(mat_R, INTSXP));
+
+  igraph_matrix_int_init(mat_igraph, n_levels, n_nodes);
+  for (int i = 0; i < n_levels; i++) {
+    for (int j = 0; j < n_nodes; j++) {
+      MATRIX(*mat_igraph, i, j) = INTEGER(mat_R)[i + (j * n_levels)] -
+                                  (int)shift_idx;
+    }
+  }
+
+  UNPROTECT(1);
+}
+
+static void se2_igraph_int_to_R_mat(igraph_matrix_int_t* mat_igraph,
+                                    SEXP* mat_R, bool shift_idx)
+{
+  igraph_integer_t n_levels = igraph_matrix_int_nrow(mat_igraph);
+  igraph_integer_t n_nodes = igraph_matrix_int_ncol(mat_igraph);
+
+  PROTECT(*mat_R = allocMatrix(INTSXP, n_levels, n_nodes));
+  for (int i = 0; i < n_levels; i++) {
+    for (int j = 0; j < n_nodes; j++) {
+      INTEGER(*mat_R)[i + (j * n_levels)] = MATRIX(*mat_igraph, i, j) + shift_idx;
+    }
+  }
+  UNPROTECT(1);
 }
 
 SEXP call_speakeasy2(SEXP adj, SEXP discard_transient, SEXP independent_runs,
@@ -112,9 +154,7 @@ SEXP call_speakeasy2(SEXP adj, SEXP discard_transient, SEXP independent_runs,
   igraph_t graph;
   igraph_vector_t weights;
   igraph_matrix_int_t membership_i;
-  int n_nodes = 0;
-  int n_levels = asInteger(subcluster);
-  SEXP membership;
+  SEXP membership = NULL;
 
   se2_options opts = {
     .discard_transient = asInteger(discard_transient),
@@ -128,23 +168,9 @@ SEXP call_speakeasy2(SEXP adj, SEXP discard_transient, SEXP independent_runs,
     .verbose = asLogical(verbose)
   };
 
-  if (se2_is_sparse(adj)) {
-    n_nodes = se2_spmatrix_to_igraph(adj, &graph, &weights,
-                                     asLogical(is_directed));
-  } else {
-    n_nodes = se2_matrix_to_igraph(adj, &graph, &weights,
-                                   asLogical(is_directed));
-  }
-
-  speak_easy_2(&graph, NULL, &opts, &membership_i);
-
-  PROTECT(membership = allocMatrix(INTSXP, n_levels, n_nodes));
-  for (int i = 0; i < n_levels; i++) {
-    for (int j = 0; j < n_nodes; j++) {
-      INTEGER(membership)[i + (j * n_levels)] = MATRIX(membership_i, i, j);
-    }
-  }
-  UNPROTECT(1);
+  se2_R_adj_to_igraph(adj, &graph, &weights, is_directed);
+  speak_easy_2(&graph, &weights, &opts, &membership_i);
+  se2_igraph_int_to_R_mat(&membership_i, &membership, /* inc index */ true);
 
   igraph_matrix_int_destroy(&membership_i);
   igraph_vector_destroy(&weights);
@@ -152,9 +178,30 @@ SEXP call_speakeasy2(SEXP adj, SEXP discard_transient, SEXP independent_runs,
 
   return membership;
 }
+SEXP call_order_nodes(SEXP adj, SEXP membership, SEXP is_directed)
+{
+  igraph_t graph;
+  igraph_vector_t weights;
+  igraph_matrix_int_t membership_i;
+  igraph_matrix_int_t ordering_i;
+  SEXP ordering = NULL;
+
+  se2_R_mat_int_to_igraph(membership, &membership_i, /* dec idx */ true);
+  se2_R_adj_to_igraph(adj, &graph, &weights, is_directed);
+  se2_order_nodes(&graph, &weights, &membership_i, &ordering_i);
+  se2_igraph_int_to_R_mat(&ordering_i, &ordering, /* ind idx */ true);
+
+  igraph_matrix_int_destroy(&membership_i);
+  igraph_matrix_int_destroy(&ordering_i);
+  igraph_vector_destroy(&weights);
+  igraph_destroy(&graph);
+
+  return ordering;
+}
 
 static const R_CallMethodDef callMethods[] = {
   {"speakeasy2", (DL_FUNC) &call_speakeasy2, 11},
+  {"order_nodes", (DL_FUNC) &call_order_nodes, 3},
   {NULL, NULL, 0}
 };
 
