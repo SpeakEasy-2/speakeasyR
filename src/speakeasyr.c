@@ -201,6 +201,103 @@ SEXP call_order_nodes(SEXP adj, SEXP membership, SEXP is_directed)
   return ordering;
 }
 
+static R_INLINE double se2_euclidean_dist(int const i, int const j,
+    double* mat, int const n_rows)
+{
+  double out = 0;
+  double* col_i = mat + (i * n_rows);
+  double* col_j = mat + (j * n_rows);
+  for (int k = 0; k < n_rows; k++) {
+    double el = col_i[k] - col_j[k];
+    out += (el * el);
+  }
+
+  return out;
+}
+
+static R_INLINE void se2_insert_dist(double const d, double* distances,
+                                     int const idx, int* rows, int const k)
+{
+  if (k == 1) {
+    distances[0] = d;
+    rows[0] = idx;
+    return;
+  }
+
+  int bounds[2] = {0, k};
+  int pos = (k - 1) / 2;
+  while (!((pos == (k - 1)) ||
+           ((d <= distances[pos]) && (d > distances[pos + 1])))) {
+    if (d > distances[pos]) {
+      bounds[1] = pos;
+    } else {
+      bounds[0] = pos;
+    }
+    pos = (bounds[1] + bounds[0]) / 2;
+  }
+
+  for (int i = 0; i < pos; i++) {
+    distances[i] = distances[i + 1];
+    rows[i] = rows[i + 1];
+  }
+  distances[pos] = d;
+  rows[pos] = idx;
+}
+
+static int se2_row_comp(void const* a, void const* b)
+{
+  return *(int*)a > *(int*)b ? 1 : -1;
+}
+
+static void se2_closest_k(int const col, int const k, int const n_nodes,
+                          int const n_rows, double* mat, int* rows)
+{
+  double* distances = R_Calloc(k, double);
+  for (int i = 0; i < k; i++) {
+    distances[i] = R_PosInf;
+  }
+
+  for (int i = 0; i < n_nodes; i++) {
+    if (i == col) {
+      continue;
+    }
+
+    double d = se2_euclidean_dist(col, i, mat, n_rows);
+    if (d < distances[0]) {
+      se2_insert_dist(d, distances, i, rows, k);
+    }
+  }
+  R_Free(distances);
+
+  qsort(rows, k, sizeof(k), se2_row_comp);
+}
+
+void c_knn_graph(double* mat, int* k, int* n_nodes, int* n_rows, int* sp_p,
+                 int* sp_i)
+{
+  if (*k < 1) {
+    Rf_error("The k must be at least 1.");
+  }
+
+  if (*k > *n_nodes) {
+    Rf_error("The k must be less than the number of nodes.");
+  }
+
+  for (int i = 0; i <= *n_nodes; i++) {
+    sp_p[i] = i * *k;
+  }
+
+  for (int i = 0; i < *n_nodes; i++) {
+    R_CheckUserInterrupt();
+    se2_closest_k(i, *k, *n_nodes, *n_rows, mat, sp_i + sp_p[i]);
+  }
+}
+
+static const R_CMethodDef cMethods[] = {
+  {"knn_graph", (DL_FUNC) &c_knn_graph, 6, NULL},
+  {NULL, NULL, 0}
+};
+
 static const R_CallMethodDef callMethods[] = {
   {"speakeasy2", (DL_FUNC) &call_speakeasy2, 11},
   {"order_nodes", (DL_FUNC) &call_order_nodes, 3},
@@ -209,7 +306,7 @@ static const R_CallMethodDef callMethods[] = {
 
 void attribute_visible R_init_speakeasyr(DllInfo* info)
 {
-  R_registerRoutines(info, NULL, callMethods, NULL, NULL);
+  R_registerRoutines(info, cMethods, callMethods, NULL, NULL);
   R_useDynamicSymbols(info, FALSE);
   R_forceSymbols(info, TRUE);
 }
