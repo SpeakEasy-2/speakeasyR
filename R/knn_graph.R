@@ -2,6 +2,8 @@
 #'
 #' @param mat a matrix to be compared column-by-column.
 #' @param k how many nearest neighbors to collect.
+#' @param weighted whether to return a weighted graph instead of a binary
+#'   graph.
 #'
 #' @return A directed sparse adjacency matrix with `k * ncol(mat)` nonzero
 #'   edges. Each column has k edges connected to the k closest columns (not
@@ -29,20 +31,37 @@
 #'
 #'   adj <- speakeasyr::knn_graph(counts_norm, k)
 #' }
-knn_graph <- function(mat, k) {
+knn_graph <- function(mat, k, weighted = FALSE) {
   if (!is.matrix(mat)) {
     stop("Matrix must be of type matrix.")
   }
 
+  if (weighted) {
+    sp_x <- double(ncol(mat) * k)
+  } else {
+    sp_x <- as.double(-1)
+  }
+
   components <- .C(C_knn_graph, as.double(mat), as.integer(k),
     as.integer(ncol(mat)), as.integer(nrow(mat)),
-    sp_p = integer(ncol(mat) + 1), sp_i = integer(ncol(mat) * k)
+    sp_p = integer(ncol(mat) + 1), sp_i = integer(ncol(mat) * k),
+    sp_x = sp_x
   )
 
-  Matrix::sparseMatrix(
-    i = components$sp_i, p = components$sp_p,
-    dims = c(ncol(mat), ncol(mat)),
-    dimnames = list(colnames(mat), colnames(mat)),
-    index1 = FALSE, repr = "C"
-  )
+  if (weighted) {
+    Matrix::sparseMatrix(
+      i = components$sp_i, p = components$sp_p,
+      x = components$sp_x,
+      dims = c(ncol(mat), ncol(mat)),
+      dimnames = list(colnames(mat), colnames(mat)),
+      index1 = FALSE, repr = "C"
+    )
+  } else {
+    Matrix::sparseMatrix(
+      i = components$sp_i, p = components$sp_p,
+      dims = c(ncol(mat), ncol(mat)),
+      dimnames = list(colnames(mat), colnames(mat)),
+      index1 = FALSE, repr = "C"
+    )
+  }
 }
