@@ -12,6 +12,8 @@
 #' the first level community, but each first level community is reorganized
 #' into the second level communities.
 #'
+#' See vignette for a multilevel example.
+#'
 #' @param graph The graph or adjacency matrix the membership vector was created
 #'   for.
 #' @param membership A vector or matrix listing node communities. The output
@@ -26,9 +28,17 @@
 #'
 #' @examples
 #' if (require("igraph")) {
-#'   graph <- igraph::graph.famous("zachary")
-#'   memb <- speakeasyr::cluster(graph)
-#'   index <- speakeasyr::order_nodes(graph, memb)
+#'   n_nodes <- 1000
+#'   n_types <- 10
+#'   mu <- 0.3 # Mixing parameter (likelihood an edge is between communities).
+#'   pref <- matrix(mu, n_types, n_types)
+#'   diag(pref) <- 1 - mu
+#'   g <- igraph::preference.game(n_nodes, types = n_types, pref.matrix = pref)
+#'   # Use a dense matrix representation to easily apply index.
+#'   adj <- as(g[], "matrix")
+#'   memb <- speakeasyr::cluster(adj, seed = 222)
+#'   ordering <- speakeasyr::order_nodes(adj, memb)
+#'   heatmap(adj[ordering, ordering], scale = "none", Rowv = NA, Colv = NA)
 #' }
 order_nodes <- function(graph, membership, is_directed = "detect") {
   graph <- se2_as_matrix_i(graph)
