@@ -1,5 +1,5 @@
 se2_is_matrix_i <- function(obj) {
-  class(obj)[[1]] %in% c("dgCMatrix", "matrix")
+  class(obj)[[1]] %in% c("dgCMatrix", "ngCMatrix", "matrix")
 }
 
 se2_as_matrix_i <- function(adj_like) {

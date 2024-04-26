@@ -1,27 +1,26 @@
 #include <R.h>
 #include <Rinternals.h>
 #include <R_ext/Visibility.h>
-#include <Matrix.h>
+#include <Matrix/Matrix.h>
 
 #include "igraph.h"
 #include "speak_easy_2.h"
 
 #define R_MATRIX(mat, i, j, vcount) REAL((mat))[(i) + ((j) * (vcount))]
 
-// From Matrix_stubs.c. It's not exported which causes AS_CHM_SP to fail.
-CHM_SP M_as_cholmod_sparse(CHM_SP ans, SEXP x,
-                           Rboolean check_Udiag, Rboolean sort_in_place)
+R_MATRIX_INLINE CHM_SP M_sexp_as_cholmod_sparse(CHM_SP A, SEXP from,
+    Rboolean checkUnit, Rboolean sortInPlace)
 {
-  static CHM_SP(*fun)(CHM_SP, SEXP, Rboolean, Rboolean) = NULL;
-  if (fun == NULL)
-    fun = (CHM_SP(*)(CHM_SP, SEXP, Rboolean, Rboolean))
-          R_GetCCallable("Matrix", "as_cholmod_sparse");
-  return fun(ans, x, check_Udiag, sort_in_place);
+  static CHM_SP(*fn)(CHM_SP, SEXP, Rboolean, Rboolean) = NULL;
+  if (!fn)
+    fn = (CHM_SP(*)(CHM_SP, SEXP, Rboolean, Rboolean))
+         R_GetCCallable("Matrix", "sexp_as_cholmod_sparse");
+  return fn(A, from, checkUnit, sortInPlace);
 }
 
 static bool se2_is_sparse(SEXP mat)
 {
-  const char* Matrix_valid_Csparse[] = { MATRIX_VALID_Csparse, ""};
+  const char* Matrix_valid_Csparse[] = {"dgCMatrix", "ngCMatrix", ""};
   return R_check_class_etc(mat, Matrix_valid_Csparse) >= 0;
 }
 
@@ -62,6 +61,8 @@ static void se2_matrix_to_igraph(SEXP mat, igraph_t* graph,
 }
 
 /* Convert a sparse matrix to an igraph graph. Returns n_nodes.
+   Sparse matrix is defined as a cholmod_sparse matrix (see cholmod_core.h in
+   Matrix package), a sparse matrix in a non-compressed form is not accepted.
 
 Currently assumes:
     itype == int,
@@ -69,8 +70,8 @@ Currently assumes:
     dtype == double,
     packed == TRUE
 
-SE2 only works on real graph so xtype should have to be real. The others
-assumptions will need to be removed. */
+SE2 only works on real graph so xtype should have to be real. May need to
+revist itype and dtype assumptions. */
 static void se2_spmatrix_to_igraph(SEXP mat, igraph_t* graph,
                                    igraph_vector_t* weights,
                                    igraph_bool_t is_directed)
@@ -79,10 +80,11 @@ static void se2_spmatrix_to_igraph(SEXP mat, igraph_t* graph,
 
   igraph_vector_int_t edges;
   int n_nodes = mat_i->nrow;
-  int n_edges = mat_i->nzmax;
+  int n_edges = ((int*)mat_i->p)[mat_i->ncol];
   int* cols = (int*)mat_i->p;
   int* rows = (int*)mat_i->i;
   double* values = (double*)mat_i->x;
+  bool has_x = mat_i->xtype != CHOLMOD_PATTERN;
 
   igraph_vector_int_init(&edges, n_edges * 2);
   igraph_vector_init(weights, n_edges);
@@ -90,7 +92,7 @@ static void se2_spmatrix_to_igraph(SEXP mat, igraph_t* graph,
   int count = 0;
   for (int j = 0; j < mat_i->ncol; j++) {
     for (int i = cols[j]; i < cols[j + 1]; i++) {
-      VECTOR(*weights)[count / 2] = values[i];
+      VECTOR(*weights)[count / 2] = has_x ? values[i] : 1;
       VECTOR(edges)[count++] = rows[i];
       VECTOR(edges)[count++] = j;
     }
