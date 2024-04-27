@@ -1,9 +1,9 @@
 seed <- 1234
 graph <- igraph::graph.famous("zachary")
-expected_membership <- matrix(c(
-  8, 8, 8, 8, 0, 0, 0, 8, 5, 4, 0, 6, 8, 8, 3, 3, 0, 8, 3, 8, 3, 8, 3, 7, 2,
-  2, 1, 7, 2, 1, 5, 2, 3, 3
-), 1, 34)
+expected_membership <- c(
+  9, 9, 9, 9, 1, 1, 1, 9, 6, 5, 1, 7, 9, 9, 4, 4, 1, 9, 4, 9, 4, 9, 4, 8, 3,
+  3, 2, 8, 3, 2, 6, 3, 4, 4
+)
 
 test_that("matrix works", {
   graph_i <- as.matrix(as.matrix(graph))

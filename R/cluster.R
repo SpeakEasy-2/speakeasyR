@@ -46,9 +46,15 @@ cluster <- function(graph, discard_transient = 3, independent_runs = 10,
     seed <- sample.int(9999, 1)
   }
 
-  .Call(
+  memb <- .Call(
     C_speakeasy2, graph, discard_transient, independent_runs,
     max_threads, seed, target_clusters, target_partitions, subcluster,
     min_clust, verbose, is_directed
   )
+
+  if (subcluster == 1) {
+    memb <- as.vector(memb)
+  }
+
+  memb
 }

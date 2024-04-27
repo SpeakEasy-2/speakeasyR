@@ -46,5 +46,9 @@ order_nodes <- function(graph, membership, is_directed = "detect") {
     is_directed <- !Matrix::isSymmetric(graph)
   }
 
+  if (is.vector(membership)) {
+    membership <- matrix(membership, nrow = 1)
+  }
+
   .Call(C_order_nodes, graph, membership, is_directed)
 }
