@@ -29,7 +29,7 @@
 #'   ## Dimension reduction
 #'   counts_norm <- t(prcomp(t(counts_norm), scale. = FALSE)$x)[1:50, ]
 #'
-#'   adj <- speakeasyr::knn_graph(counts_norm, k)
+#'   adj <- speakeasyr::knn_graph(counts_norm, 10)
 #' }
 knn_graph <- function(mat, k, weighted = FALSE) {
   if (!is.matrix(mat)) {

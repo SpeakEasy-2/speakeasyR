@@ -37,8 +37,10 @@ License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1
+Imports: Matrix
 Suggests:
     igraph,
+    scRNAseq,
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)
