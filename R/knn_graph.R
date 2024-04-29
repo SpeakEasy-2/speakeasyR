@@ -1,9 +1,15 @@
 #' K-nearest neighbors graph
 #'
-#' @param mat a matrix to be compared column-by-column.
-#' @param k how many nearest neighbors to collect.
-#' @param weighted whether to return a weighted graph instead of a binary
-#'   graph.
+#' @description
+#' Create a directed sparse graph with edges to each nodes `k` nearest
+#'   neighbors. Nearness is calculated as the inverse of the euclidean distance
+#'   between two columns.
+#'
+#' @param mat A matrix to be compared column-by-column.
+#' @param k How many nearest neighbors to collect.
+#' @param weighted By default, a binary edge is made between a node and each of
+#'   it's `k` closest nodes. Set `weighted` to `TRUE` to weigh each edge by the
+#'   similarity (inverse of euclidean distance).
 #'
 #' @return A directed sparse adjacency matrix with `k * ncol(mat)` nonzero
 #'   edges. Each column has k edges connected to the k closest columns (not
@@ -12,13 +18,13 @@
 #'
 #' @examples
 #' if (require("scRNAseq")) {
-#'   rnaseq <- scRNAseq::FletcherOlfactoryData()
-#'   cell_types <- rnaseq$cluster_id
+#'   expression <- scRNAseq::FletcherOlfactoryData()
+#'   cell_types <- expression$cluster_id
 #'
-#'   ## Filter genes with low expression. Remove any genes with less than 10 cells
-#'   ## with at least 1 reads.
-#'   counts <- assay(rnaseq, "counts")
-#'   indices <- apply(counts, 1, function(gene) sum(gene > 0) > 10)
+#'   ## Filter genes with low expression. Remove any genes with less than 10
+#'   ## cells with with any reads.
+#'   counts <- assay(expression, "counts")
+#'   indices <- rowSums(counts > 0) > 10
 #'   counts <- counts[indices, ]
 #'
 #'   ## Normalize by shifted logarithm
@@ -29,7 +35,7 @@
 #'   ## Dimension reduction
 #'   counts_norm <- t(prcomp(t(counts_norm), scale. = FALSE)$x)[1:50, ]
 #'
-#'   adj <- speakeasyr::knn_graph(counts_norm, 10)
+#'   adj <- knn_graph(counts_norm, 10)
 #' }
 knn_graph <- function(mat, k, weighted = FALSE) {
   if (!is.matrix(mat)) {

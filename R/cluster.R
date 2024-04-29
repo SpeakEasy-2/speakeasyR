@@ -1,8 +1,11 @@
-#' SpeakEasy2 community detection
+#' SpeakEasy 2 community detection
+#'
+#' @description
+#' Group nodes into communities.
 #'
 #' @param graph A graph or adjacency matrix in a form that can be converted to
-#'   'matrix' or 'Matrix::dgCMatrix' using an 'as.matrix' coercion method.
-#'   Accepted types include 'matrix', 'dgCMatrix', and 'igraph::graph's.
+#'   `matrix` or `Matrix::dgCMatrix` using an `as.matrix()` coercion method.
+#'   Accepted types include `matrix`, `dgCMatrix`, and `igraph::graph`s.
 #' @param discard_transient The number of partitions to discard before tracking.
 #' @param independent_runs How many runs SpeakEasy2 should perform.
 #' @param max_threads The maximum number of threads to use. By default uses the
