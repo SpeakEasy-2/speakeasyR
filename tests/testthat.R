@@ -9,4 +9,4 @@
 library(testthat)
 library(speakeasyr)
 
-test_check("cluster")
+test_check("speakeasyr")

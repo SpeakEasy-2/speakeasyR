@@ -1,4 +1,4 @@
-# speakeasyr unreleased
+# speakeasyr 0.1.0
 
 ## Add
 
