@@ -2,10 +2,11 @@
 ^LICENSE$
 \.astylerc$
 \.git$
+\.gitignore$
 \.editorconfig$
-\.pre-commit-config.yaml$
-\.travis.yml$
-\.zenodo.json$
+\.pre-commit-config\.yaml$
+\.travis\.yml$
+\.zenodo\.json$
 \.azure$
 \.devcontainer$
 \.github$
@@ -17,7 +18,8 @@
 ^tools/se2/vendor/igraph/doc$
 ^tools/se2/vendor/igraph/examples$
 ^tools/se2/vendor/igraph/tests$
-^tools/se2/vendor/igraph/CITATION.cff$
-^build$
+^tools/se2/vendor/igraph/CITATION\.cff$
+^tools/build$
 ^\.ccls-cache$
-^compile_commands.json$
+^compile_commands\.json$
+^cran-comments\.md$

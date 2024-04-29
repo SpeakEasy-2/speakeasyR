@@ -1,6 +1,7 @@
 *.Rcheck
 *.tar.gz
-build/
+tools/build/
+dist/
 man/
 .RData
 inst/doc

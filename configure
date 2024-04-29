@@ -6,7 +6,9 @@ ROOT=$(
 )
 
 PREFIX="${ROOT}/src/build"
-SE2="${ROOT}/tools/se2"
+TOOLS="${ROOT}/tools"
+BUILD="${TOOLS}/build"
+SE2="${TOOLS}/se2"
 IGRAPH="${SE2}/vendor/igraph"
 
 if [ -z "$R_HOME" ]; then
@@ -40,17 +42,18 @@ fi
 cp "${ROOT}/tools/IGRAPH_VERSION" "${IGRAPH}"
 cp "${ROOT}/tools/SE2_VERSION" "${SE2}"
 
-[ -d ../build ] || cmake \
-    -B build \
+[ -d "${BUILD}" ] || cmake \
+    -S "${TOOLS}" \
+    -B "${BUILD}" \
     -D CMAKE_PACKAGE_VERSION="$(cat "${SE2}/SE2_VERSION")" \
     -D CMAKE_C_COMPILER="$i_CMAKE_CC" \
     -D CMAKE_C_FLAGS="$i_CMAKE_CFLAGS" \
     -D R_INCLUDE_DIRS="$i_CMAKE_INCLUDE_DIRS" \
     -D DEVELOP="$DEVELOP" \
     -G "$GENERATOR" \
-    --install-prefix="$PREFIX" .
+    --install-prefix="$PREFIX"
 
-cmake --build build --target install
+cmake --build "${BUILD}" --target install
 "$AR" -cr "${PREFIX}/lib64/libse2.a" "${PREFIX}"/objects/SpeakEasy2/*.o
 "$RANLIB" "${PREFIX}/lib64/libse2.a"
 
