@@ -12,3 +12,15 @@ Graphs can be passed to the algorithm as adjacency matrices using the `Matrix` l
 ## Installation
 
 ## Building from source
+
+For development, clone this repository and use:
+
+```bash
+git submodule update --init --recursive
+```
+
+To set up the vendored dependencies.
+
+Building the source requires `cmake` and the `igraph` dependencies: `bison`, `flex`, and `libxml2`. For development `astyle` is recommended for formatting C code while `texlive`/`latex`, `qpdf`, and `checkbashims` are expected by `R` for building the documentation and checking shell scripts during the `R CMD build` process.
+
+It should now be possible to run `devtools::load_all()` in `R`. After the source is compiled, a `compile_commands.json` can be found in `tools/build` if needed.
