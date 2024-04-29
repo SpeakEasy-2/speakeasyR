@@ -24,10 +24,16 @@ unset R_HOME
 
 i_CMAKE_INCLUDE_DIRS="$("$Rscript" "${ROOT}/tools/find_linkingto_deps.R")"
 i_CMAKE_INCLUDE_DIRS="$i_CMAKE_INCLUDE_DIRS;$("$R" CMD config --cppflags | sed -n s/-I//p)"
-i_CMAKE_CC=$("$R" CMD config CC)
-i_CMAKE_CFLAGS=$("$R" CMD config CFLAGS)
-AR=$("$R" CMD config AR)
-RANLIB=$("$R" CMD config RANLIB)
+i_CMAKE_CC="$("$R" CMD config CC)"
+i_CMAKE_CFLAGS="$("$R" CMD config CFLAGS)"
+AR="$("$R" CMD config AR)"
+RANLIB="$("$R" CMD config RANLIB)"
+
+# On some OSes (such as fedora) R CMD config CC returns a compiler along
+# with flags. The flags confuse CMake and it is unable to find the compiler.
+# Since, in the tested cases, the flags were also found in R CMD config CFLAGS,
+# it appears safe to strip everything to the right of the compiler.
+i_CMAKE_CC="${i_CMAKE_CC% *}"
 
 if [ "$(which ninja)" ]; then
     GENERATOR="Ninja"
