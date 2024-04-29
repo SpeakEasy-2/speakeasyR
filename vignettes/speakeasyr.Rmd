@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 
 The SpeakEasy 2: Champagne (SE2) community detection algorithm groups together graph nodes into communities based on their connectivity. The detection algorithm works on weighted or unweighted graphs and directed or undirected graphs.
 
-This __speakeasyr__ package provides a convenient way to run the SE2 algorithm in R using the `cluster()` function. The `cluster()` function accepts graphs in the form of adjacency matrices (both base R matrices and __Matrix__ sparse matrices), igraph graphs, or anything that can be coerced into an adjacency matrix using an `as.matrix()` generic function.
+This __speakeasyr__ package provides a convenient way to run the SE2 algorithm in R using the `cluster()` function. The `cluster()` function accepts graphs in the form of adjacency matrices (both base R matrices and __Matrix__ sparse matrices), __igraph__ graphs, or anything that can be coerced into an adjacency matrix using an `as.matrix()` generic function.
 
 ## A simple example
 
@@ -48,7 +48,7 @@ To view the results, we can plot the graph:
 
 ```{r plot}
 plot(
-  g, vertex.color = memb, layout = igraph::layout_with_kk, vertex.labels = NA
+  g, vertex.color = memb, layout = igraph::layout_with_kk, vertex.label = NA
 )
 ```
 
@@ -78,13 +78,13 @@ color <- rainbow(length(unique(memb)))[memb[ordering]]
 heatmap(adj, scale = "none", Rowv = NA, Colv = NA, RowSideColors = color)
 ```
 
-Even with 40% of each communities edges rewired to other communities, the original membership is still closely recovered.
+Even with 40% of each community's edges rewired to other communities, the original membership is still closely recovered.
 
 ## Tweaking the algorithm
 
 Out of the box, SE2 should work well. But one of the main goals of SE2 is to ensure consistent results. Some more challenging graphs may need extra runs to get past the variance and converge on a stable community structure.
 
-SE2 works by running the same core clustering algorithm multiple times independently, starting with different initial guesses, and then looking for stable patterns across runs to come to conclusions about community structure. By default it performs 10 `independent_runs`, in many cases this is more than enough, but if multiple calls to `cluster()` return significantly different membership vectors, it's worth increases the number of runs by setting the `independent_runs` parameter to a larger value. The `target_partitions` and `discard_transient` parameters may also help produce a more robust result.
+SE2 works by running the same core clustering algorithm multiple times independently, starting with different initial guesses, and then looking for stable patterns across runs to come to conclusions about community structure. By default it performs 10 `independent_runs`, in many cases this is more than enough, but if multiple calls to `cluster()` return significantly different membership vectors, it's worth increasing the number of runs by setting the `independent_runs` parameter to a larger value. The `target_partitions` and `discard_transient` parameters may also help produce a more robust result.
 
 Each independent run tracks multiple possible partitions throughout the run. The run ends when it has found `target_partitions` number of partitions. In cases where there isn't a clear structure to converge on, increasing this parameter can provide more examples of where the nodes naturally group.
 
@@ -94,7 +94,7 @@ If the graph is particularly noisy, it may take a longer time to find useful com
 
 
 
-SE2 also has a few options that don't impact how it clusters the graph. These are `seed`, `verbose`, and `max_threads`. The `seed` parameter was mentioned above and sets the seed of the RNG used by SE2. While SE2 uses a random number generator (RNG) different than R's, the default value of the seed is generated using R's RNG. Because of this it's possible to ensure reproducible results over multiple SE2 calls by setting the R RNG seed instead of setting the `cluster()` parameter.
+SE2 also has a few options that don't impact how it clusters the graph. These are `seed`, `verbose`, and `max_threads`. The `seed` parameter was mentioned above and sets the seed of the RNG used by SE2. While SE2 uses a random number generator (RNG) different from R's, the default value of the seed is generated using R's RNG. Because of this it's possible to ensure reproducible results over multiple SE2 calls by setting the R RNG seed instead of setting the `cluster()` parameter.
 
 Setting `verbose` to `TRUE` will cause SE2 to print some information about clustering while it runs. This can be used to ensure SE2 identifies the graph as expected but is more useful to give information about the status of clustering during longer runs. Lastly, `max_threads` provides the maximum number of threads to run in parallel. SE2, can run each independent run in a separate thread, each of which can be run on separate processing cores. By default, SE2 will use as many threads as cores available but this can be reduced if desired.
 
@@ -179,7 +179,7 @@ memb <- speakeasyr::cluster(
 ordering <- speakeasyr::order_nodes(adj, memb)
 ```
 
-`memb` is now a matrix with one row per level of subclustering instead of a vector. Similarly, there are two sets of order indices in `ordering`, one in row 1 and the second in row 2. The `order_nodes()` function recursively orders nodes by community. So each community in the previous level is reordered rather than completely reordering all nodes based only on the second level of clustering. This gives some reminense of previous levels' ordering in the resulting heatmaps.
+`memb` is now a matrix with one row per level of subclustering instead of a vector. Similarly, there are two sets of order indices in `ordering`, one in row 1 and the second in row 2. The `order_nodes()` function recursively orders nodes by community. So each community in the previous level is reordered rather than completely reordering all nodes based only on the second level of clustering. This leaves some remnants of previous levels' ordering in the resulting heatmaps.
 
 ``` {r viewsubtypes}
 level <- 2
@@ -197,4 +197,4 @@ heatmap(
 )
 ```
 
-Here the original communities have been further broken down into groups of cells that are particularly similar within cell types. When comparing this heatmap to the previous heatmap, notice some of the communities at level 1 combine multiple of the publication's communities but at level 2, they are seperated out into distinct cell types.
+Here the original communities have been further broken down into groups of cells that are particularly similar within cell types. When comparing this heatmap to the previous heatmap, notice some of the communities at level 1 combine multiple of the publication's communities but at level 2, they are separated out into distinct cell types.
