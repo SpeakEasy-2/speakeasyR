@@ -1,3 +1,7 @@
+se2_is_spmatrix_i <- function(obj) {
+  class(obj)[[1]] %in% c("dgCMatrix", "ngCMatrix")
+}
+
 se2_is_matrix_i <- function(obj) {
   class(obj)[[1]] %in% c("dgCMatrix", "ngCMatrix", "matrix")
 }

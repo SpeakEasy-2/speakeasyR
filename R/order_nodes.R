@@ -50,8 +50,37 @@ order_nodes <- function(graph, membership, is_directed = "detect") {
   }
 
   if (is.vector(membership)) {
-    membership <- matrix(membership, nrow = 1)
+    n_levels <- 1
+    n_nodes <- length(membership)
+  } else {
+    n_levels <- nrow(membership)
+    n_nodes <- ncol(membership)
   }
 
-  .Call(C_order_nodes, graph, membership, is_directed)
+  if (n_levels > 1) {
+    ordering <- matrix(0, nrow = n_levels, ncol = n_nodes)
+  } else {
+    ordering <- integer(n_nodes)
+  }
+
+  if ((se2_is_spmatrix_i(graph)) && ("x" %in% slotNames(graph))) {
+    rows <- graph@i
+    cols <- graph@p
+    values <- graph@x
+  } else if (se2_is_spmatrix_i(graph)) {
+    rows <- graph@i
+    cols <- graph@p
+    values <- -1
+  } else {
+    rows <- -1
+    cols <- -1
+    values <- graph
+  }
+
+  .C(
+    C_order_nodes, as.integer(rows), as.integer(cols), as.double(values),
+    as.integer(n_nodes), as.integer(membership), as.integer(n_levels),
+    as.logical(is_directed),
+    ordering = ordering
+  )$ordering
 }

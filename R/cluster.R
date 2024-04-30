@@ -5,7 +5,8 @@
 #'
 #' @param graph A graph or adjacency matrix in a form that can be converted to
 #'   `matrix` or `Matrix::dgCMatrix` using an `as.matrix()` coercion method.
-#'   Accepted types include `matrix`, `dgCMatrix`, and `igraph::graph`s.
+#'   Accepted types include `matrix`, `dgCMatrix`, `ngCMatrix`, and
+#'   `igraph::graph`s.
 #' @param discard_transient The number of partitions to discard before tracking.
 #' @param independent_runs How many runs SpeakEasy2 should perform.
 #' @param max_threads The maximum number of threads to use. By default uses the
@@ -34,7 +35,7 @@
 #' @examples
 #' if (require("igraph")) {
 #'   graph <- igraph::graph.famous("zachary")
-#'   memb <- cluster(graph)
+#'   membership <- cluster(graph)
 #' }
 cluster <- function(graph, discard_transient = 3, independent_runs = 10,
                     max_threads = 0, seed = 0, target_clusters = 0,
@@ -49,15 +50,34 @@ cluster <- function(graph, discard_transient = 3, independent_runs = 10,
     seed <- sample.int(9999, 1)
   }
 
-  memb <- .Call(
-    C_speakeasy2, graph, discard_transient, independent_runs,
-    max_threads, seed, target_clusters, target_partitions, subcluster,
-    min_clust, verbose, is_directed
-  )
-
-  if (subcluster == 1) {
-    memb <- as.vector(memb)
+  n_nodes <- ncol(graph)
+  if (subcluster > 1) {
+    membership <- matrix(0, nrow = subcluster, ncol = n_nodes)
+  } else {
+    membership <- integer(n_nodes)
   }
 
-  memb
+  if ((se2_is_spmatrix_i(graph)) && ("x" %in% slotNames(graph))) {
+    rows <- graph@i
+    cols <- graph@p
+    values <- graph@x
+  } else if (se2_is_spmatrix_i(graph)) {
+    rows <- graph@i
+    cols <- graph@p
+    values <- -1
+  } else {
+    rows <- -1
+    cols <- -1
+    values <- graph
+  }
+
+  .C(
+    C_speakeasy2, as.integer(rows), as.integer(cols), as.double(values),
+    as.integer(n_nodes), as.integer(discard_transient),
+    as.integer(independent_runs), as.integer(max_threads), as.integer(seed),
+    as.integer(target_clusters), as.integer(target_partitions),
+    as.integer(subcluster), as.integer(min_clust), as.logical(verbose),
+    as.logical(is_directed),
+    membership = membership
+  )$membership
 }
