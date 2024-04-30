@@ -3,4 +3,4 @@
 export(cluster)
 export(knn_graph)
 export(order_nodes)
-useDynLib(speakeasyr, .registration = TRUE, .fixes = "C_")
+useDynLib(speakeasyR, .registration = TRUE, .fixes = "C_")

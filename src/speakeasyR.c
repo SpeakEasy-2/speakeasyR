@@ -277,7 +277,7 @@ static const R_CMethodDef cMethods[] = {
   {NULL, NULL, 0}
 };
 
-void attribute_visible R_init_speakeasyr(DllInfo* info)
+void attribute_visible R_init_speakeasyR(DllInfo* info)
 {
   R_registerRoutines(info, cMethods, NULL, NULL, NULL);
   R_useDynamicSymbols(info, FALSE);

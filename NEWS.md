@@ -1,4 +1,4 @@
-# speakeasyr 0.1.0
+# speakeasyR 0.1.0
 
 ## Add
 

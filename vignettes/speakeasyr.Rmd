@@ -1,5 +1,5 @@
 ---
-title: "speakeasyr"
+title: "speakeasyR"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{igraph}
@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 
 The SpeakEasy 2: Champagne (SE2) community detection algorithm groups together graph nodes into communities based on their connectivity. The detection algorithm works on weighted or unweighted graphs and directed or undirected graphs.
 
-This __speakeasyr__ package provides a convenient way to run the SE2 algorithm in R using the `cluster()` function. The `cluster()` function accepts graphs in the form of adjacency matrices (both base R matrices and __Matrix__ sparse matrices), __igraph__ graphs, or anything that can be coerced into an adjacency matrix using an `as.matrix()` generic function.
+This __speakeasyR__ package provides a convenient way to run the SE2 algorithm in R using the `cluster()` function. The `cluster()` function accepts graphs in the form of adjacency matrices (both base R matrices and __Matrix__ sparse matrices), __igraph__ graphs, or anything that can be coerced into an adjacency matrix using an `as.matrix()` generic function.
 
 ## A simple example
 
@@ -39,7 +39,7 @@ g <- igraph_from_mixing_param(n_nodes=50, n_types=5, mu=0.1)
 The graph can be clustered by calling `cluster`:
 
 ```{r simple-cluster}
-memb <- speakeasyr::cluster(g, seed = 222)
+memb <- speakeasyR::cluster(g, seed = 222)
 ```
 
 The membership vector returned contains the community ids for each vector, such that `memb[vid]` is the community id of vertex `vid`. The seed argument is given to ensure reproducible results.
@@ -55,7 +55,7 @@ plot(
 This works okay since the graph we're working has few nodes, but, unless the layout function comes to the same conclusions about community structure, it's not a great presentation of the resulting membership vector. As graphs get larger, these node and edge visuals also start to get crowded. An alternative view is to plot the edges as a heatmap. To view the detected communities, the nodes need to be reordered to group members of the same community together. For this the `order_nodes()` function is used.
 
 ```{r ordering}
-ordering <- speakeasyr::order_nodes(g, memb)
+ordering <- speakeasyR::order_nodes(g, memb)
 adj <- as(g[], "matrix")[ordering, ordering]
 color <- rainbow(length(unique(memb)))[memb[ordering]]
 heatmap(adj, scale = "none", Rowv = NA, Colv = NA, RowSideColors = color)
@@ -71,8 +71,8 @@ Using the same wrapper function as before, we can generate and cluster a tougher
 
 ```{r tougher}
 g <- igraph_from_mixing_param(n_nodes = 1000, n_types = 10, mu = 0.4)
-memb <- speakeasyr::cluster(g, seed = 222)
-ordering <- speakeasyr::order_nodes(g, memb)
+memb <- speakeasyR::cluster(g, seed = 222)
+ordering <- speakeasyR::order_nodes(g, memb)
 adj <- as(g[], "matrix")[ordering, ordering]
 color <- rainbow(length(unique(memb)))[memb[ordering]]
 heatmap(adj, scale = "none", Rowv = NA, Colv = NA, RowSideColors = color)
@@ -91,8 +91,6 @@ Each independent run tracks multiple possible partitions throughout the run. The
 If the graph is particularly noisy, it may take a longer time to find useful communities. The `discard_transient` allows you to adjust how many partitions to discard before the run starts tracking partitions. By discarding a higher number of initial partitions, you give SE2 more time to generate a sound foundation, giving less influence to earlier, weaker communities structures in determining the final membership vector.
 
 ## Other options
-
-
 
 SE2 also has a few options that don't impact how it clusters the graph. These are `seed`, `verbose`, and `max_threads`. The `seed` parameter was mentioned above and sets the seed of the RNG used by SE2. While SE2 uses a random number generator (RNG) different from R's, the default value of the seed is generated using R's RNG. Because of this it's possible to ensure reproducible results over multiple SE2 calls by setting the R RNG seed instead of setting the `cluster()` parameter.
 
@@ -133,17 +131,17 @@ Lastly, to further reduce noise, we use PCA to create 50 composite features made
 counts_norm <- t(prcomp(t(counts_norm), scale. = FALSE)$x)[1:50, ]
 ```
 
-Now that we have preprocessed the data, it's possible to convert it to a similarity based graph. We will use the 50 PCA components to determine how similar the gene expression between each of the cells are and use this to create a k-nearest neighbors (kNN) graph. That is a directed graph where each cell has `k` unweighted edges leaving it going to the `k` most similar cells. Luckily, the __speakeasyr__ package provides a function to create this graph:
+Now that we have preprocessed the data, it's possible to convert it to a similarity based graph. We will use the 50 PCA components to determine how similar the gene expression between each of the cells are and use this to create a k-nearest neighbors (kNN) graph. That is a directed graph where each cell has `k` unweighted edges leaving it going to the `k` most similar cells. Luckily, the __speakeasyR__ package provides a function to create this graph:
 
 ```{r knn-graph}
-adj <- speakeasyr::knn_graph(counts_norm, 10)
+adj <- speakeasyR::knn_graph(counts_norm, 10)
 ```
 
 This graph can be passed to SE2 and visualized using a heatmap as before:
 
 ```{r celltypes}
-memb <- speakeasyr::cluster(adj, verbose = TRUE, seed = 222)
-ordering <- speakeasyr::order_nodes(adj, memb)
+memb <- speakeasyR::cluster(adj, verbose = TRUE, seed = 222)
+ordering <- speakeasyR::order_nodes(adj, memb)
 adj <- as.matrix(as(adj, "dMatrix"))
 ```
 
@@ -173,10 +171,10 @@ SE2 provides subclustering where the individual communities of the initial clust
 We can use this subclustering feature to cluster the cell types in the previous example into subtypes.
 
 ```{r subclust}
-memb <- speakeasyr::cluster(
+memb <- speakeasyR::cluster(
   adj, subcluster = 2, verbose = TRUE, seed = 222
 )
-ordering <- speakeasyr::order_nodes(adj, memb)
+ordering <- speakeasyR::order_nodes(adj, memb)
 ```
 
 `memb` is now a matrix with one row per level of subclustering instead of a vector. Similarly, there are two sets of order indices in `ordering`, one in row 1 and the second in row 2. The `order_nodes()` function recursively orders nodes by community. So each community in the previous level is reordered rather than completely reordering all nodes based only on the second level of clustering. This leaves some remnants of previous levels' ordering in the resulting heatmaps.

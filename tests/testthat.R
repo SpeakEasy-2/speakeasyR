@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(speakeasyr)
+library(speakeasyR)
 
-test_check("speakeasyr")
+test_check("speakeasyR")
