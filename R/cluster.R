@@ -41,43 +41,29 @@ cluster <- function(graph, discard_transient = 3, independent_runs = 10,
                     max_threads = 0, seed = 0, target_clusters = 0,
                     target_partitions = 5, subcluster = 1, min_clust = 5,
                     verbose = FALSE, is_directed = "detect") {
-  graph <- se2_as_matrix_i(graph)
+  adj <- se2_as_matrix_i(graph)
+
   if (is_directed == "detect") {
-    is_directed <- !Matrix::isSymmetric(graph)
+    is_directed <- adj$is_directed
   }
 
   if (seed == 0) {
     seed <- sample.int(9999, 1)
   }
 
-  n_nodes <- ncol(graph)
   if (subcluster > 1) {
-    membership <- matrix(0, nrow = subcluster, ncol = n_nodes)
+    membership <- matrix(0, nrow = subcluster, ncol = adj$n_nodes)
   } else {
-    membership <- integer(n_nodes)
-  }
-
-  if ((se2_is_spmatrix_i(graph)) && ("x" %in% slotNames(graph))) {
-    rows <- graph@i
-    cols <- graph@p
-    values <- graph@x
-  } else if (se2_is_spmatrix_i(graph)) {
-    rows <- graph@i
-    cols <- graph@p
-    values <- -1
-  } else {
-    rows <- -1
-    cols <- -1
-    values <- graph
+    membership <- integer(adj$n_nodes)
   }
 
   .C(
-    C_speakeasy2, as.integer(rows), as.integer(cols), as.double(values),
-    as.integer(n_nodes), as.integer(discard_transient),
-    as.integer(independent_runs), as.integer(max_threads), as.integer(seed),
-    as.integer(target_clusters), as.integer(target_partitions),
-    as.integer(subcluster), as.integer(min_clust), as.logical(verbose),
-    as.logical(is_directed),
+    C_speakeasy2, as.integer(adj$se2_i), as.integer(adj$se2_p),
+    as.double(adj$values), as.integer(adj$n_nodes),
+    as.integer(discard_transient), as.integer(independent_runs),
+    as.integer(max_threads), as.integer(seed), as.integer(target_clusters),
+    as.integer(target_partitions), as.integer(subcluster),
+    as.integer(min_clust), as.logical(verbose), as.logical(is_directed),
     membership = membership
   )$membership
 }

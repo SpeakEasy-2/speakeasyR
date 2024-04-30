@@ -24,5 +24,23 @@ se2_as_matrix_i <- function(adj_like) {
     stop("Graph adjacency matrix must be square.")
   }
 
-  adj_like
+  new_adj <- list()
+  if ((se2_is_spmatrix_i(adj_like)) && ("x" %in% slotNames(adj_like))) {
+    new_adj$values <- adj_like@x
+    new_adj$se2_i <- adj_like@i
+    new_adj$se2_p <- adj_like@p
+  } else if (se2_is_spmatrix_i(adj_like)) {
+    new_adj$values <- -1
+    new_adj$se2_i <- adj_like@i
+    new_adj$se2_p <- adj_like@p
+  } else {
+    new_adj$values <- adj_like
+    new_adj$se2_i <- -1
+    new_adj$se2_p <- -1
+  }
+
+  new_adj$is_directed <- !Matrix::isSymmetric(adj_like)
+  new_adj$n_nodes <- ncol(adj_like)
+
+  new_adj
 }
