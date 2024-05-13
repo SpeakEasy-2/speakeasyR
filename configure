@@ -60,11 +60,16 @@ cp "${ROOT}/tools/SE2_VERSION" "${SE2}"
     --install-prefix="$PREFIX"
 
 cmake --build "${BUILD}" --target install
-"$AR" -cr "${PREFIX}/lib64/libse2.a" "${PREFIX}"/objects/SpeakEasy2/*.o
-"$RANLIB" "${PREFIX}/lib64/libse2.a"
+
+# On some OSes libraries end up in "lib64" and on others in "lib". This is a
+# simple way to keep the rest of the installation consistent.
+[ -d "${PREFIX}/lib64" ] && mv "${PREFIX}/lib64" "${PREFIX}/lib"
+
+"$AR" -cr "${PREFIX}/lib/libse2.a" "${PREFIX}"/objects/SpeakEasy2/*.o
+"$RANLIB" "${PREFIX}/lib/libse2.a"
 
 cat <<_EOF_ >"${ROOT}/src/Makevars"
 PKG_CFLAGS = \$(C_VISIBILITY)
 PKG_CPPFLAGS = -I${PREFIX}/include/igraph -I${PREFIX}/include
-PKG_LIBS = ${PREFIX}/lib64/libse2.a ${PREFIX}/lib64/libigraph.a
+PKG_LIBS = ${PREFIX}/lib/libse2.a ${PREFIX}/lib/libigraph.a
 _EOF_
