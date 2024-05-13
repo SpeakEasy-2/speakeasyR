@@ -11,11 +11,14 @@ Graphs can be passed to the algorithm as adjacency matrices using the `Matrix` l
 
 ## Installation
 
-Using `devtools`, `speakeasyR` can be installed with the `devtools::install_github(speakeasy-2/speakeasyR)` command.
+Using `devtools`, `speakeasyR` can be installed with the `devtools::install_github("speakeasy-2/speakeasyR")` command.
 
-### Ubuntu
+### Linux
 
-### Fedora
+Installation with `devtools::install_github` has been tested in clean VMs running Ubuntu and Fedora.
+
+> [!TIP]
+> If an error occurs while installing, it may be that a dependency is missing. This can lead to a red hearing error that `igraph.h` can't be found but this is a consequence of an early failure. Check the output to see if it explicitly mentions a missing dependency. On Ubuntu cmake, bison, and flex were not installed by default.
 
 ## Building from source
 
