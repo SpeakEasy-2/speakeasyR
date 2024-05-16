@@ -1,5 +1,3 @@
-#!/usr/bin/env sh
-
 ROOT=$(
     cd "$(dirname "$0")"
     pwd
@@ -16,29 +14,22 @@ if [ -z "$R_HOME" ]; then
     exit 1
 fi
 
+R="${R_HOME}/bin/R"
+
+# Should use $R CMD config --cppflags to get include dirs but it provides to
+# paths that are getting spliced together with ":" when passing to CMake and
+# I'm not sure where this is happening. Additionally, "${R_HOME}/include/x64"
+# does not exist in my install despite $R_ARCH == "/x64".
+i_CMAKE_INCLUDE_DIRS="${R_HOME}/include"
+
 # Otherwise, R will echo a warning about ignoring R_HOME that gets included in
 # the variable assignment.
-R="${R_HOME}/bin/R"
-Rscript="${R_HOME}/bin/Rscript"
 unset R_HOME
 
-i_CMAKE_INCLUDE_DIRS="$("$R" CMD config --cppflags | sed -n 's/-I//g')"
 i_CMAKE_CC="$("$R" CMD config CC)"
 i_CMAKE_CFLAGS="$("$R" CMD config CFLAGS)"
 AR="$("$R" CMD config AR)"
 RANLIB="$("$R" CMD config RANLIB)"
-
-# On some OSes (such as fedora) R CMD config CC returns a compiler along
-# with flags. The flags confuse CMake and it is unable to find the compiler.
-# Since, in the tested cases, the flags were also found in R CMD config CFLAGS,
-# it appears safe to strip everything to the right of the compiler.
-i_CMAKE_CC="${i_CMAKE_CC% *}"
-
-if [ "$(which ninja)" ]; then
-    GENERATOR="Ninja"
-else
-    GENERATOR="Unix Makefiles"
-fi
 
 if [ -z "$DEVELOP" ]; then
     DEVELOP=0
@@ -55,20 +46,16 @@ cp "${ROOT}/tools/SE2_VERSION" "${SE2}"
     -D CMAKE_C_FLAGS="$i_CMAKE_CFLAGS" \
     -D R_INCLUDE_DIRS="$i_CMAKE_INCLUDE_DIRS" \
     -D DEVELOP="$DEVELOP" \
-    -G "$GENERATOR" \
+    -G "MSYS Makefiles" \
     --install-prefix="$PREFIX"
 
-cmake --build "${BUILD}" --target install
+cmake --build "$BUILD" --target install
 
-# On some OSes libraries end up in "lib64" and on others in "lib". This is a
-# simple way to keep the rest of the installation consistent.
-[ -d "${PREFIX}/lib64" ] && mv "${PREFIX}/lib64" "${PREFIX}/lib"
-
-"$AR" -cr "${PREFIX}/lib/libse2.a" "${PREFIX}"/objects/SpeakEasy2/*.o
+"$AR" -cr "${PREFIX}/lib/libse2.a" "${PREFIX}"/objects/SpeakEasy2/*.obj
 "$RANLIB" "${PREFIX}/lib/libse2.a"
 
-cat <<_EOF_ >"${ROOT}/src/Makevars"
-PKG_CFLAGS = \$(C_VISIBILITY)
+cat <<_EOF_ >"${ROOT}/src/Makevars.win"
+PKG_CFLAGS = \$(C_VISIBILITY) \${SHLIB_OPENMP_CFLAGS}
 PKG_CPPFLAGS = -I${PREFIX}/include/igraph -I${PREFIX}/include
-PKG_LIBS = ${PREFIX}/lib/libse2.a ${PREFIX}/lib/libigraph.a
+PKG_LIBS = ${PREFIX}/lib/libse2.a ${PREFIX}/lib/libigraph.a \$(SHLIB_OPENMP_CFLAGS)
 _EOF_

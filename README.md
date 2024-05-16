@@ -20,6 +20,15 @@ Installation with `devtools::install_github` has been tested in clean VMs runnin
 > [!TIP]
 > If an error occurs while installing, it may be that a dependency is missing. This can lead to a red hearing error that `igraph.h` can't be found but this is a consequence of an early failure. Check the output to see if it explicitly mentions a missing dependency. On Ubuntu cmake, bison, and flex were not installed by default.
 
+### Windows
+
+To set up the development environment on Windows, install the appropriate version of [Rtools](https://cran.r-project.org/bin/windows/Rtools/) for your R install. Using Rtools' MSYS2, install the required build tools. This has been tested with ucrt64 environment but likely works in other environments.
+
+```bash
+pacman -S mingw-ucrt-x86_64-toolchain mingw-ucrt-x86_64-cmake \
+	mingw-ucrt-x86_64-libxml2 git bison flex
+```
+
 ## Building from source
 
 For development, clone this repository and use:

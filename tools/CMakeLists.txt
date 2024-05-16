@@ -12,7 +12,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(BUILD_SHARED_LIBS OFF)
 
-include_directories(${R_INCLUDE_DIRS})
+include_directories("${R_INCLUDE_DIRS}")
 
 add_compile_definitions(USING_R)
 add_subdirectory(se2)
@@ -33,12 +33,3 @@ install(TARGETS SpeakEasy2
   RUNTIME_DEPENDENCY_SET SE2_deps)
 
 install(TARGETS SpeakEasy2 FILE_SET HEADERS)
-
-if ("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
-  install(RUNTIME_DEPENDENCY_SET SE2_deps
-    DIRECTORIES
-    "C:\\msys64\\mingw64\\bin" "C:\\msys64\\ucrt64\\bin"
-    "D:\\msys64\\mingw64\\bin" "D:\\msys64\\ucrt64\\bin"
-    PRE_EXCLUDE_REGEXES "api-ms-*" "libmx" "libmex" "ext-ms-*"
-    DESTINATION lib)
-endif()
