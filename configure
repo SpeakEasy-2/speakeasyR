@@ -22,8 +22,7 @@ R="${R_HOME}/bin/R"
 Rscript="${R_HOME}/bin/Rscript"
 unset R_HOME
 
-i_CMAKE_INCLUDE_DIRS="$("$Rscript" "${ROOT}/tools/find_linkingto_deps.R")"
-i_CMAKE_INCLUDE_DIRS="$i_CMAKE_INCLUDE_DIRS;$("$R" CMD config --cppflags | sed -n s/-I//p)"
+i_CMAKE_INCLUDE_DIRS="$("$R" CMD config --cppflags | sed -n -e 's/-I//g' -e 's/\s/:/gp')"
 i_CMAKE_CC="$("$R" CMD config CC)"
 i_CMAKE_CFLAGS="$("$R" CMD config CFLAGS)"
 AR="$("$R" CMD config AR)"
