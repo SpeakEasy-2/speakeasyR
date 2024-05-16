@@ -44,15 +44,7 @@ memb <- speakeasyR::cluster(g, seed = 222)
 
 The membership vector returned contains the community ids for each vector, such that `memb[vid]` is the community id of vertex `vid`. The seed argument is given to ensure reproducible results.
 
-To view the results, we can plot the graph:
-
-```{r plot}
-plot(
-  g, vertex.color = memb, layout = igraph::layout_with_kk, vertex.label = NA
-)
-```
-
-This works okay since the graph we're working has few nodes, but, unless the layout function comes to the same conclusions about community structure, it's not a great presentation of the resulting membership vector. As graphs get larger, these node and edge visuals also start to get crowded. An alternative view is to plot the edges as a heatmap. To view the detected communities, the nodes need to be reordered to group members of the same community together. For this the `order_nodes()` function is used.
+The graph can be visualized using a heatmap to display the edges. To view the detected communities, the nodes need to be reordered to group members of the same community together. For this the `order_nodes()` function is used.
 
 ```{r ordering}
 ordering <- speakeasyR::order_nodes(g, memb)
