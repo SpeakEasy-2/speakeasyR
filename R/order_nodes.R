@@ -58,7 +58,7 @@ order_nodes <- function(graph, membership, is_directed = "detect") {
   }
 
   if (n_levels > 1) {
-    ordering <- matrix(0, nrow = n_levels, ncol = n_nodes)
+    ordering <- matrix(as.integer(0), nrow = n_levels, ncol = n_nodes)
   } else {
     ordering <- integer(n_nodes)
   }

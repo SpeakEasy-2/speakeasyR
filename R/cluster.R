@@ -52,7 +52,7 @@ cluster <- function(graph, discard_transient = 3, independent_runs = 10,
   }
 
   if (subcluster > 1) {
-    membership <- matrix(0, nrow = subcluster, ncol = adj$n_nodes)
+    membership <- matrix(as.integer(0), nrow = subcluster, ncol = adj$n_nodes)
   } else {
     membership <- integer(adj$n_nodes)
   }
