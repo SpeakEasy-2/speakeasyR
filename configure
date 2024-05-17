@@ -22,7 +22,7 @@ R="${R_HOME}/bin/R"
 Rscript="${R_HOME}/bin/Rscript"
 unset R_HOME
 
-i_CMAKE_INCLUDE_DIRS="$("$R" CMD config --cppflags | sed -n 's/-I//g')"
+i_CMAKE_INCLUDE_DIRS="$("$R" CMD config --cppflags | sed -n 's/-I//gp')"
 i_CMAKE_CC="$("$R" CMD config CC)"
 i_CMAKE_CFLAGS="$("$R" CMD config CFLAGS)"
 AR="$("$R" CMD config AR)"
