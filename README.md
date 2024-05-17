@@ -25,8 +25,8 @@ Installation with `devtools::install_github` has been tested in clean VMs runnin
 To set up the development environment on Windows, install the appropriate version of [Rtools](https://cran.r-project.org/bin/windows/Rtools/) for your R install. Using Rtools' MSYS2, install the required build tools. This has been tested with ucrt64 environment but likely works in other environments.
 
 ```bash
-pacman -S mingw-ucrt-x86_64-toolchain mingw-ucrt-x86_64-cmake \
-	mingw-ucrt-x86_64-libxml2 git bison flex
+pacman -S mingw-w64-ucrt-x86_64-toolchain mingw-w64-ucrt-x86_64-cmake \
+	mingw-ucrt-w64-x86_64-libxml2 git bison flex
 ```
 
 ## Building from source
