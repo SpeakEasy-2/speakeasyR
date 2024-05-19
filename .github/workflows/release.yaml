@@ -35,8 +35,7 @@ jobs:
       - name: Copy final packages to release
         run: |
           mkdir release
-          mv artifacts/speakeasyr-toolbox-${{ github.sha }}/* release
-          mv artifacts/speakeasyr-python-*-${{ github.sha }}/* release
+          mv artifacts/speakeasyR-${{ github.sha }}/* release
 
       - name: Upload assets to release
         uses: softprops/action-gh-release@v1

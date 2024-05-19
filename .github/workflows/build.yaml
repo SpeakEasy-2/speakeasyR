@@ -12,9 +12,12 @@ jobs:
   build-linux:
     name: Build Linux toolbox
     runs-on: ubuntu-20.04
-    env:
-      CC: gcc-10
-      CXX: g++-10
+    strategy:
+      matrix:
+        config:
+          - {r: 'release'}
+          - {r: 'devel', http-user-agent: 'release'}
+          - {r: 'oldrel-1'}
 
     steps:
       - uses: actions/checkout@v4
@@ -22,14 +25,21 @@ jobs:
           submodules: true
           fetch-depth: 0
 
+      - name: Clone igraph
+        run: |
+          cd tools/se2
+          git submodule init
+          git submodule update --recursive
+
       - name: Install dependencies
         run: |
           sudo apt update && sudo apt upgrade
-          sudo apt install cmake ninja-build gcc-10 g++-10 libxml2-dev libbison-dev libfl-dev
+          sudo apt install cmake ninja-build gcc g++ libxml2-dev libbison-dev libfl-dev
 
       - uses: r-lib/actions/setup-r@v2
         with:
-          r-version: release
+          r-version: ${{ matrix.config.r }}
+          http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 
       - uses: r-lib/actions/setup-r-dependencies@v2
@@ -39,14 +49,13 @@ jobs:
 
       - name: Build from source
         run: |
-          cmake -B build . -G Ninja \
-            -DCMAKE_PACKAGE_VERSION="${{ github.ref_name }}"
-          cmake --build build --target package
+          R CMD build .
+          mv speakeasyR-*.tar.gz speakeasyR-${{ github.ref }}-${{ runner.os }}-${{ matrix.config.r }}.tar.gz
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: speakeasyr-${{ runner.os }}-${{ github.sha }}
+          name: speakeasyR-${{ runner.os }}-${{ matrix.config.r }}-${{ github.sha }}
           path: build/
 
   build-windows:
@@ -69,13 +78,19 @@ jobs:
           msystem: ucrt64
           install: >-
             git
-            base-devel
+            bison
+            flex
             mingw-w64-ucrt-x86_64-cmake
-            mingw-w64-ucrt-x86_64-ninja
             mingw-w64-ucrt-x86_64-toolchain
             mingw-w64-ucrt-x86_64-libxml2
           update: true
           location: D:\
+
+      - name: Clone igraph
+        run: |
+          cd tools/se2
+          git submodule init
+          git submodule update --recursive
 
       - uses: r-lib/actions/setup-r@v2
         with:
@@ -89,16 +104,13 @@ jobs:
 
       - name: Build from source
         run: |
-          cmake -B build . \
-            -G Ninja \
-            -DIGRAPH_OPENMP_SUPPORT=ON \
-            -DCMAKE_PACKAGE_VERSION="${{ github.ref_name }}"
-          cmake --build build --target package
+          R CMD build .
+          mv speakeasyR-*.tar.gz speakeasyR-${{ github.ref }}-${{ runner.os }}-release.tar.gz
 
-      - name: Upload package
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: speakeasyr-${{ runner.os }}-${{ github.sha }}
+          name: speakeasyR-${{ runner.os }}-release-${{ github.sha }}
           path: build/
 
   build-macos:
@@ -120,6 +132,12 @@ jobs:
           submodules: true
           fetch-depth: 0
 
+      - name: Clone igraph
+        run: |
+          cd tools/se2
+          git submodule init
+          git submodule update --recursive
+
       - name: Install dependencies
         run: brew install ninja autoconf automake libtool libomp
 
@@ -135,12 +153,11 @@ jobs:
 
       - name: Build from source
         run: |
-          cmake -B build . -G Ninja \
-            -DCMAKE_PACKAGE_VERSION="${{ github.ref_name }}"
-          cmake --build build --target package
+          R CMD build .
+          mv speakeasyR-*.tar.gz speakeasyR-${{ github.ref }}-${{ runner.os }}-release.tar.gz
 
-      - name: Upload package
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: speakeasyr-${{ runner.os }}-${{ github.sha }}
+          name: speakeasyR-${{ runner.os }}-release-${{ github.sha }}
           path: build/
