@@ -96,7 +96,7 @@ We will use the `scRNAseq` package to obtain a clean data set:
 
 ```{r obtaining-data}
 expression <- scRNAseq::FletcherOlfactoryData()
-counts <- assay(expression, "counts")
+counts <- SummarizedExperiment::assay(expression, "counts")
 cell_types <- expression$cluster_id
 ```
 

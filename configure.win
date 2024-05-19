@@ -26,6 +26,8 @@ i_CMAKE_INCLUDE_DIRS="${R_HOME}/include"
 # the variable assignment.
 unset R_HOME
 
+CC="$("$R" CMD config CC)"
+CXX="$("$R" CMD config CXX)"
 i_CMAKE_CC="$("$R" CMD config CC)"
 i_CMAKE_CFLAGS="$("$R" CMD config CFLAGS)"
 AR="$("$R" CMD config AR)"
@@ -38,7 +40,7 @@ fi
 cp "${ROOT}/tools/IGRAPH_VERSION" "${IGRAPH}"
 cp "${ROOT}/tools/SE2_VERSION" "${SE2}"
 
-[ -d "${BUILD}" ] || cmake \
+[ -d "${BUILD}" ] || CC="$CC" CXX="$CXX" cmake \
     -S "${TOOLS}" \
     -B "${BUILD}" \
     -D CMAKE_PACKAGE_VERSION="$(cat "${SE2}/SE2_VERSION")" \

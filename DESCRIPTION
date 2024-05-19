@@ -47,5 +47,16 @@ Suggests:
     testthat (>= 3.0.0)
 URL: https://github.com/SpeakEasy-2/speakeasyR
 BugReports: https://github.com/SpeakEasy-2/speakeasyR/issues
+SystemRequirements:
+    cmake (>=3.23),
+    bison,
+    flex,
+    libxml2 (optional),
+    gmp (optional),
+    glpk (>= 4.57, optional)
+    arpack (optional),
+    plfit (optional),
+    blas (optional),
+    lapack (optional)
 VignetteBuilder: knitr
 Config/testthat/edition: 3

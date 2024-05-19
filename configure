@@ -19,20 +19,14 @@ fi
 # Otherwise, R will echo a warning about ignoring R_HOME that gets included in
 # the variable assignment.
 R="${R_HOME}/bin/R"
-Rscript="${R_HOME}/bin/Rscript"
 unset R_HOME
 
+CC="$("$R" CMD config CC)"
+CXX="$("$R" CMD config CXX)"
 i_CMAKE_INCLUDE_DIRS="$("$R" CMD config --cppflags | sed -n 's/-I//gp')"
-i_CMAKE_CC="$("$R" CMD config CC)"
 i_CMAKE_CFLAGS="$("$R" CMD config CFLAGS)"
 AR="$("$R" CMD config AR)"
 RANLIB="$("$R" CMD config RANLIB)"
-
-# On some OSes (such as fedora) R CMD config CC returns a compiler along
-# with flags. The flags confuse CMake and it is unable to find the compiler.
-# Since, in the tested cases, the flags were also found in R CMD config CFLAGS,
-# it appears safe to strip everything to the right of the compiler.
-i_CMAKE_CC="${i_CMAKE_CC% *}"
 
 if [ "$(which ninja)" ]; then
     GENERATOR="Ninja"
@@ -47,11 +41,10 @@ fi
 cp "${ROOT}/tools/IGRAPH_VERSION" "${IGRAPH}"
 cp "${ROOT}/tools/SE2_VERSION" "${SE2}"
 
-[ -d "${BUILD}" ] || cmake \
+[ -d "${BUILD}" ] || CC="$CC" CXX="$CXX" cmake \
     -S "${TOOLS}" \
     -B "${BUILD}" \
     -D CMAKE_PACKAGE_VERSION="$(cat "${SE2}/SE2_VERSION")" \
-    -D CMAKE_C_COMPILER="$i_CMAKE_CC" \
     -D CMAKE_C_FLAGS="$i_CMAKE_CFLAGS" \
     -D R_INCLUDE_DIRS="$i_CMAKE_INCLUDE_DIRS" \
     -D DEVELOP="$DEVELOP" \

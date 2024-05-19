@@ -1,5 +1,5 @@
 # speakeasyR Community Detection
-  [![R-CMD-check](https://github.com/SpeakEasy-2/r-speakeasy2/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/SpeakEasy-2/r-speakeasy2/actions/workflows/R-CMD-check.yaml)
+  [![R-CMD-check](https://github.com/SpeakEasy-2/speakeasyR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/SpeakEasy-2/speakeasyR/actions/workflows/R-CMD-check.yaml)
 
 This packages provides R functions for running the SpeakEasy 2 community detection algorithm using the [SpeakEasy2 C library](https://github.com/speakeasy-2/libspeakeasy2). See the [Genome Biology article](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-023-03062-0).
 

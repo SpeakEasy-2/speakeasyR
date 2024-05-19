@@ -1,14 +1,21 @@
 # Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
-on:
-  - workflow_call
-
 name: R-CMD-check
+
+on:
+  push:
+    branches:
+      - devel
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+permissions: read-all
 
 jobs:
   R-CMD-check:
     runs-on: ${{ matrix.config.os }}
     name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+
     strategy:
       fail-fast: false
       matrix:
@@ -24,10 +31,10 @@ jobs:
       R_KEEP_PKG_SOURCE: yes
 
     steps:
-      - name: Collect packages
-        uses: actions/download-artifact@v4
+      - uses: actions/checkout@v4
         with:
-          path: artifacts
+          submodules: true
+          fetch-depth: 0
 
       - uses: r-lib/actions/setup-pandoc@v2
 
@@ -39,12 +46,43 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::rcmdcheck
+          cache: always
+          extra-packages: any::rcmdcheck any::igraph any::scRNAseq
           needs: check
+
+      - name: Install macOS system dependencies
+        if: runner.os == 'macOS'
+        run: |
+          brew install ninja autoconf automake libtool
+          brew install arpack lapack openblas glpk gmp
+
+      - name: Install Windows system dependencies
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          pacman -S git bison flex --noconfirm
+          pacman -S mingw-w64-x86_64-cmake --noconfirm
+          pacman -S mingw-w64-x86_64-toolchain --noconfirm
+          pacman -S mingw-w64-x86_64-libxml2 --noconfirm
+          pacman -S mingw-w64-x86_64-glpk --noconfirm
+          pacman -S mingw-w64-x86_64-arpack --noconfirm
+
+      - name: Install Linux system dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt update && sudo apt upgrade
+          sudo apt install cmake ninja-build gcc g++ libbison-dev libfl-dev
+          sudo apt install libxml2-dev libblas-dev libplfit-dev
+          sudo apt install libglpk-dev libgmp-dev libgomp1 liblapack-dev
+
+      - name: Clone igraph
+        shell: bash
+        run: |
+          cd tools/se2
+          git submodule init
+          git submodule update --recursive
 
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
-          args: 'c("path=artifacts/speakeasyR-${{ github.ref }}-${{ matrix.config.r }}-${{ matrix.config.os }}.tar.gz")'
           build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
-          errors-on: '"error"'

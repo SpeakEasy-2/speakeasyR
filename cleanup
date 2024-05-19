@@ -14,3 +14,5 @@ IGRAPH="${SE2}/vendor/igraph"
 
 [ -f "${ROOT}/src/Makevars" ] && rm "${ROOT}/src/Makevars"
 [ -d "${PREFIX}" ] && rm -rf "${PREFIX}"
+
+[ -d "${ROOT}/tools/build" ] && rm -rf "${ROOT}/tools/build"
