@@ -25,7 +25,8 @@ se2_as_matrix_i <- function(adj_like) {
   }
 
   new_adj <- list()
-  if ((se2_is_spmatrix_i(adj_like)) && ("x" %in% slotNames(adj_like))) {
+  if ((se2_is_spmatrix_i(adj_like)) &&
+    ("x" %in% methods::slotNames(adj_like))) {
     new_adj$values <- adj_like@x
     new_adj$se2_i <- adj_like@i
     new_adj$se2_p <- adj_like@p
