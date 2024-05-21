@@ -24,7 +24,7 @@
 #'
 #'   ## Filter genes with low expression. Remove any genes with less than 10
 #'   ## cells with with any reads.
-#'   counts <- assay(expression, "counts")
+#'   counts <- SummarizedExperiment::assay(expression, "counts")
 #'   indices <- rowSums(counts > 0) > 10
 #'   counts <- counts[indices, ]
 #'

@@ -47,7 +47,7 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           cache: always
-          extra-packages: any::rcmdcheck any::igraph any::scRNAseq
+          extra-packages: any::rcmdcheck any::igraph any::scRNAseq any::SummarizedExperiment
           needs: check
 
       - name: Install macOS system dependencies
@@ -86,3 +86,4 @@ jobs:
         with:
           upload-snapshots: true
           build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
+          error-on: '"error"'
