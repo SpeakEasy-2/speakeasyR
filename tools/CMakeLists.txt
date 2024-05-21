@@ -1,5 +1,4 @@
-cmake_minimum_required(VERSION 3.23)
-# 3.23 Needed for file sets to collect SpeakEasy2 headers.
+cmake_minimum_required(VERSION 3.18)
 
 project(
   speakeasyR
@@ -24,12 +23,9 @@ if (${DEVELOP})
   target_link_libraries(RSE2 SpeakEasy2)
 endif ()
 
-target_sources(SpeakEasy2 PUBLIC FILE_SET HEADERS
-  BASE_DIRS ${PROJECT_SOURCE_DIR}/se2/include
-  FILES ${PROJECT_SOURCE_DIR}/se2/include/speak_easy_2.h)
-
 install(TARGETS SpeakEasy2
   DESTINATION .
   RUNTIME_DEPENDENCY_SET SE2_deps)
 
-install(TARGETS SpeakEasy2 FILE_SET HEADERS)
+install(FILES ${PROJECT_SOURCE_DIR}/se2/include/speak_easy_2.h
+  DESTINATION include)
