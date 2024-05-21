@@ -1,6 +1,7 @@
-#' Group nodes by community
+#' order_nodes
 #'
 #' @description
+#' Group nodes by community
 #' Reorders the graph to group nodes in the same community together.
 #' Useful for viewing community structure of a graph using a `heatmap()`.
 #'

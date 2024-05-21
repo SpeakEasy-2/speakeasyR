@@ -1,6 +1,7 @@
-#' K-nearest neighbors graph
+#' knn_graph
 #'
 #' @description
+#' K-nearest neighbors graph
 #' Create a directed sparse graph with edges to each nodes `k` nearest
 #'   neighbors. Nearness is calculated as the inverse of the euclidean distance
 #'   between two columns.

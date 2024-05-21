@@ -1,6 +1,7 @@
-#' SpeakEasy 2 community detection
+#' cluster
 #'
 #' @description
+#' SpeakEasy 2 community detection
 #' Group nodes into communities.
 #'
 #' @param graph A graph or adjacency matrix in a form that can be converted to
