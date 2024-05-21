@@ -38,10 +38,12 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1
 Imports:
-    Matrix
+    Matrix,
+    methods
 Suggests:
     igraph,
     scRNAseq,
+    SummarizedExperiment,
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)
