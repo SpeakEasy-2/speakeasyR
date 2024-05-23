@@ -2,7 +2,7 @@
 title: "speakeasyR"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{igraph}
+  %\VignetteIndexEntry{speakeasyR}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
