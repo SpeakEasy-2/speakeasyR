@@ -14,6 +14,10 @@ knitr::opts_chunk$set(
 )
 ```
 
+```{r load-Matrix}
+library(Matrix)
+```
+
 The SpeakEasy 2: Champagne (SE2) community detection algorithm groups together graph nodes into communities based on their connectivity. The detection algorithm works on weighted or unweighted graphs and directed or undirected graphs.
 
 This __speakeasyR__ package provides a convenient way to run the SE2 algorithm in R using the `cluster()` function. The `cluster()` function accepts graphs in the form of adjacency matrices (both base R matrices and __Matrix__ sparse matrices), __igraph__ graphs, or anything that can be coerced into an adjacency matrix using an `as.matrix()` generic function.
