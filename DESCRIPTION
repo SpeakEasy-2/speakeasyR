@@ -29,7 +29,7 @@ Description: A graph community detection algorithm that aims to be performant
     is written in C, providing speed and keeping the memory requirments low.
     This implementation can take advantage of multiple computing cores without
     increasing memory usage. SE2 can detect community structure across scales,
-    making it a good choice for biological data, which is often has hierchical
+    making it a good choice for biological data, which often has hierchical
     structure. Graphs can be passed to the algorithm as adjacency matrices
     using the 'Matrix' library, 'igraph' graphs, or any data that can coreced
     into a matrix.
