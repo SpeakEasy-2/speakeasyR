@@ -1,7 +1,6 @@
-#' knn_graph
+#' K-nearest neighbors graph
 #'
 #' @description
-#' K-nearest neighbors graph
 #' Create a directed sparse graph with edges to each nodes `k` nearest
 #'   neighbors. Nearness is calculated as the inverse of the euclidean distance
 #'   between two columns.
@@ -18,26 +17,26 @@
 #' @export
 #'
 #' @examples
-#' if (require("scRNAseq")) {
-#'   expression <- scRNAseq::FletcherOlfactoryData()
-#'   cell_types <- expression$cluster_id
+#' library(Matrix)
 #'
-#'   ## Filter genes with low expression. Remove any genes with less than 10
-#'   ## cells with with any reads.
-#'   counts <- SummarizedExperiment::assay(expression, "counts")
-#'   indices <- rowSums(counts > 0) > 10
-#'   counts <- counts[indices, ]
+#' expression <- scRNAseq::FletcherOlfactoryData()
+#' cell_types <- expression$cluster_id
 #'
-#'   ## Normalize by shifted logarithm
-#'   target <- median(colSums(counts))
-#'   size_factors <- colSums(counts) / target
-#'   counts_norm <- log(t(t(counts) / size_factors + 1))
+#' ## Filter genes with low expression. Remove any genes with less than 10
+#' ## cells with with any reads.
+#' counts <- SummarizedExperiment::assay(expression, "counts")
+#' indices <- rowSums(counts > 0) > 10
+#' counts <- counts[indices, ]
 #'
-#'   ## Dimension reduction
-#'   counts_norm <- t(prcomp(t(counts_norm), scale. = FALSE)$x)[1:50, ]
+#' ## Normalize by shifted logarithm
+#' target <- median(colSums(counts))
+#' size_factors <- colSums(counts) / target
+#' counts_norm <- log(t(t(counts) / size_factors + 1))
 #'
-#'   adj <- knn_graph(counts_norm, 10)
-#' }
+#' ## Dimension reduction
+#' counts_norm <- t(prcomp(t(counts_norm), scale. = FALSE)$x)[1:50, ]
+#'
+#' adj <- knn_graph(counts_norm, 10)
 knn_graph <- function(mat, k, weighted = FALSE) {
   if (!is.matrix(mat)) {
     stop("Matrix must be of type matrix.")

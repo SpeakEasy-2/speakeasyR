@@ -1,7 +1,6 @@
-#' cluster
+#' SpeakEasy 2 community detection
 #'
 #' @description
-#' SpeakEasy 2 community detection
 #' Group nodes into communities.
 #'
 #' @param graph A graph or adjacency matrix in a form that can be converted to
@@ -34,10 +33,8 @@
 #' @export
 #'
 #' @examples
-#' if (require("igraph")) {
-#'   graph <- igraph::graph.famous("zachary")
-#'   membership <- cluster(graph)
-#' }
+#' graph <- igraph::graph.famous("zachary")
+#' membership <- cluster(graph)
 cluster <- function(graph, discard_transient = 3, independent_runs = 10,
                     max_threads = 0, seed = 0, target_clusters = 0,
                     target_partitions = 5, subcluster = 1, min_clust = 5,

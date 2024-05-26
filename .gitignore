@@ -2,6 +2,5 @@
 *.tar.gz
 tools/build/
 dist/
-man/
 .RData
 inst/doc
