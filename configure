@@ -21,10 +21,10 @@ fi
 R="${R_HOME}/bin/R"
 unset R_HOME
 
-CC="$("$R" CMD config CC17)"
-CXX="$("$R" CMD config CXX17)"
+CC="$("$R" CMD config CC)"
+CXX="$("$R" CMD config CXX)"
 i_CMAKE_INCLUDE_DIRS="$("$R" CMD config --cppflags | sed -n 's/-I//gp')"
-i_CMAKE_CFLAGS="$("$R" CMD config C17FLAGS)"
+i_CMAKE_CFLAGS="$("$R" CMD config CFLAGS)"
 AR="$("$R" CMD config AR)"
 RANLIB="$("$R" CMD config RANLIB)"
 
