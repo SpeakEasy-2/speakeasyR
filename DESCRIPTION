@@ -50,6 +50,7 @@ Suggests:
 URL: https://github.com/SpeakEasy-2/speakeasyR
 BugReports: https://github.com/SpeakEasy-2/speakeasyR/issues
 SystemRequirements:
+    USE_C17,
     cmake (>=3.23),
     bison,
     flex,

@@ -15,6 +15,7 @@ include_directories("${R_INCLUDE_DIRS}")
 
 add_compile_definitions(USING_R)
 add_subdirectory(se2)
+set_property(TARGET igraph PROPERTY C_STANDARD 17)
 
 if (${DEVELOP})
   # To create compile_commands.json. Not otherwise needed as R will handle

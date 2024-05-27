@@ -21,10 +21,10 @@ fi
 R="${R_HOME}/bin/R"
 unset R_HOME
 
-CC="$("$R" CMD config CC)"
-CXX="$("$R" CMD config CXX)"
+CC="$("$R" CMD config CC17)"
+CXX="$("$R" CMD config CXX17)"
 i_CMAKE_INCLUDE_DIRS="$("$R" CMD config --cppflags | sed -n 's/-I//gp')"
-i_CMAKE_CFLAGS="$("$R" CMD config CFLAGS)"
+i_CMAKE_CFLAGS="$("$R" CMD config C17FLAGS)"
 AR="$("$R" CMD config AR)"
 RANLIB="$("$R" CMD config RANLIB)"
 
@@ -46,6 +46,8 @@ cp "${ROOT}/tools/SE2_VERSION" "${SE2}"
     -B "${BUILD}" \
     -D CMAKE_PACKAGE_VERSION="$(cat "${SE2}/SE2_VERSION")" \
     -D CMAKE_C_FLAGS="$i_CMAKE_CFLAGS" \
+    -D CMAKE_C_STANDARD=17 \
+    -D CMAKE_CXX_STANDARD=17 \
     -D R_INCLUDE_DIRS="$i_CMAKE_INCLUDE_DIRS" \
     -D DEVELOP="$DEVELOP" \
     -G "$GENERATOR" \
