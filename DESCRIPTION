@@ -25,14 +25,16 @@ Authors@R: c(
     )
 Description: A graph community detection algorithm that aims to be performant
     on large graphs and robust, returning consistent results across runs.
-    Provides the 'SpeakEasy 2' (SE2) algorithm for use in R. The core algorithm
-    is written in C, providing speed and keeping the memory requirments low.
-    This implementation can take advantage of multiple computing cores without
-    increasing memory usage. SE2 can detect community structure across scales,
-    making it a good choice for biological data, which often has hierchical
-    structure. Graphs can be passed to the algorithm as adjacency matrices
-    using the 'Matrix' library, 'igraph' graphs, or any data that can coreced
-    into a matrix.
+    SpeakEasy 2 (SE2), the underlying algorthim, is described in Chris Gaiteri,
+    David R. Connell & Faraz A. Sultan et al. (2023)
+    <doi:10.1186/s13059-023-03062-0>. The core algorithm is written in C,
+    providing speed and keeping the memory requirments low. This implementation
+    can take advantage of multiple computing cores without increasing memory
+    usage. SE2 can detect community structure across scales, making it a good
+    choice for biological data, which often has hierchical structure. Graphs
+    can be passed to the algorithm as adjacency matrices using base 'R'
+    matrices, the 'Matrix' library, 'igraph' graphs, or any data that can
+    coreced into a matrix.
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
