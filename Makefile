@@ -1,6 +1,8 @@
 export ROOT_DIR := $(PWD)
 export SRC_DIR := $(ROOT_DIR)/src
 
+R_FILES := $(wildcard $(ROOT_DIR)/R/*.R)
+HEADERS := $(wildcard $(ROOT_DIR)/src/include/*.h)
 VERSION := $(shell \
 	grep -o "Version: [[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+" < DESCRIPTION | \
 	sed 's/Version: //')
@@ -11,8 +13,8 @@ all: build
 .PHONY: build
 build: speakeasyR_$(VERSION).tar.gz
 
-speakeasyR_$(VERSION).tar.gz: $(SRC_DIR)/speakeasyR.c
-	R CMD build --no-build-vignettes $(ROOT_DIR)
+speakeasyR_$(VERSION).tar.gz: $(SRC_DIR)/speakeasyR.c $(R_FILES) $(HEADERS) configure
+	R CMD build $(ROOT_DIR)
 
 .PHONY: check
 check: build
