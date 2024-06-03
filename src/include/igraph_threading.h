@@ -40,7 +40,7 @@ __BEGIN_DECLS
  * that igraph links to.
  */
 
-#define IGRAPH_THREAD_SAFE 0
+#define IGRAPH_THREAD_SAFE 1
 
 __END_DECLS
 

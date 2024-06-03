@@ -3,6 +3,7 @@ export SRC_DIR := $(ROOT_DIR)/src
 
 R_FILES := $(wildcard $(ROOT_DIR)/R/*.R)
 HEADERS := $(wildcard $(ROOT_DIR)/src/include/*.h)
+BUILD_FLAGS :=
 VERSION := $(shell \
 	grep -o "Version: [[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+" < DESCRIPTION | \
 	sed 's/Version: //')
@@ -14,13 +15,14 @@ all: build
 build: speakeasyR_$(VERSION).tar.gz
 
 speakeasyR_$(VERSION).tar.gz: $(SRC_DIR)/speakeasyR.c $(R_FILES) $(HEADERS) configure
-	R CMD build $(ROOT_DIR)
+	R CMD build $(BUILD_FLAGS) $(ROOT_DIR)
 
 .PHONY: check
 check: build
 	R CMD check --as-cran speakeasyR_$(VERSION).tar.gz
 
 .PHONY: check-quick
+check-quick: BUILD_FLAGS += --no-build-vignettes
 check-quick: build
 	R CMD check --no-build-vignettes \
 		--no-examples \
@@ -28,11 +30,15 @@ check-quick: build
 
 .PHONY: clean
 clean:
-	find src -name '*.o' -exec rm {} \;
+	@find src -name '*.o' -exec rm {} \;
 
 .PHONY: clean-dist
 clean-dist: clean
-	[ -f speakeasyR_$(VERSION).tar.gz ] && rm speakeasyR_$(VERSION).tar.gz
-	[ -d speakeasyR.Rcheck ] && rm -rf speakeasyR.Rcheck
-	[ -f $(SRC_DIR)/speakeasyR.so ] && rm $(SRC_DIR)/speakeasyR.so
-	[ -f $(SRC_DIR)/speakeasyR.dll ] && rm $(SRC_DIR)/speakeasyR.dll
+	rm -f speakeasyR_$(VERSION).tar.gz
+	rm -rf speakeasyR.Rcheck
+	rm -f $(SRC_DIR)/speakeasyR.so
+	rm -f $(SRC_DIR)/speakeasyR.dll
+	rm -rf vignettes/speakeasyr_files
+	rm -f vignettes/.build.timestamp
+	rm -f vignettes/speakeasyr.R
+	rm -f $(SRC_DIR)/include/arith.h
