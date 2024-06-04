@@ -52,16 +52,8 @@ Suggests:
 URL: https://github.com/SpeakEasy-2/speakeasyR
 BugReports: https://github.com/SpeakEasy-2/speakeasyR/issues
 SystemRequirements:
-    USE_C17,
-    cmake (>=3.23),
-    bison,
-    flex,
-    libxml2 (optional),
-    gmp (optional),
-    glpk (>= 4.57, optional)
-    arpack (optional),
-    plfit (optional),
-    blas (optional),
-    lapack (optional)
+    arpack,
+    blas,
+    lapack
 VignetteBuilder: knitr
 Config/testthat/edition: 3

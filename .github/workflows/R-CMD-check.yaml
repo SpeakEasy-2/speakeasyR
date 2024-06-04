@@ -53,27 +53,22 @@ jobs:
       - name: Install macOS system dependencies
         if: runner.os == 'macOS'
         run: |
-          brew install ninja autoconf automake libtool
-          brew install arpack lapack openblas glpk gmp
+          brew install libtool arpack lapack openblas
 
       - name: Install Windows system dependencies
         if: runner.os == 'Windows'
         shell: bash
         run: |
-          pacman -S git bison flex --noconfirm
-          pacman -S mingw-w64-x86_64-cmake --noconfirm
           pacman -S mingw-w64-x86_64-toolchain --noconfirm
-          pacman -S mingw-w64-x86_64-libxml2 --noconfirm
-          pacman -S mingw-w64-x86_64-glpk --noconfirm
+          pacman -S mingw-w64-x86_64-blas --noconfirm
+          pacman -S mingw-w64-x86_64-lapack --noconfirm
           pacman -S mingw-w64-x86_64-arpack --noconfirm
 
       - name: Install Linux system dependencies
         if: runner.os == 'Linux'
         run: |
           sudo apt update && sudo apt upgrade
-          sudo apt install cmake ninja-build gcc g++ libbison-dev libfl-dev
-          sudo apt install libxml2-dev libblas-dev libplfit-dev
-          sudo apt install libglpk-dev libgmp-dev liblapack-dev
+          sudo apt install gcc g++ libblas-dev liblapack-dev libarpack-dev
 
       - name: Clone igraph
         shell: bash
