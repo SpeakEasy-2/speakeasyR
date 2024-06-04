@@ -78,7 +78,7 @@ jobs:
       - name: Clone igraph
         shell: bash
         run: |
-          cd tools/se2
+          cd src/se2
           git submodule init
           git submodule update --recursive
 
