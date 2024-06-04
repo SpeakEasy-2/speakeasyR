@@ -53,22 +53,19 @@ jobs:
       - name: Install macOS system dependencies
         if: runner.os == 'macOS'
         run: |
-          brew install libtool arpack lapack openblas
+          brew install libtool
 
       - name: Install Windows system dependencies
         if: runner.os == 'Windows'
         shell: bash
         run: |
           pacman -S mingw-w64-x86_64-toolchain --noconfirm
-          pacman -S mingw-w64-x86_64-blas --noconfirm
-          pacman -S mingw-w64-x86_64-lapack --noconfirm
-          pacman -S mingw-w64-x86_64-arpack --noconfirm
 
       - name: Install Linux system dependencies
         if: runner.os == 'Linux'
         run: |
           sudo apt update && sudo apt upgrade
-          sudo apt install gcc g++ libblas-dev liblapack-dev libarpack-dev
+          sudo apt install gcc g++
 
       - name: Clone igraph
         shell: bash

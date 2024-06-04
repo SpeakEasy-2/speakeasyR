@@ -4,6 +4,4 @@ ROOT=$(
 )
 
 [ -f "${ROOT}/src/Makevars.win" ] && rm "${ROOT}/src/Makevars.win"
-
-cd "${ROOT}" || exit
-make clean
+find "${ROOT}/src" -name '*.o' -exec rm {} \;
