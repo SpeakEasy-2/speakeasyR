@@ -39,8 +39,8 @@ viewed.
 See vignette for a multilevel example.
 }
 \examples{
-n_nodes <- 1000
-n_types <- 10
+n_nodes <- 100
+n_types <- 3
 mu <- 0.3 # Mixing parameter (likelihood an edge is between communities).
 pref <- matrix(mu, n_types, n_types)
 diag(pref) <- 1 - mu
@@ -49,5 +49,7 @@ g <- igraph::preference.game(n_nodes, types = n_types, pref.matrix = pref)
 adj <- as(g[], "matrix")
 memb <- speakeasyR::cluster(adj, seed = 222)
 ordering <- speakeasyR::order_nodes(adj, memb)
+\dontrun{
 heatmap(adj[ordering, ordering], scale = "none", Rowv = NA, Colv = NA)
+}
 }

@@ -30,8 +30,8 @@
 #' @export
 #'
 #' @examples
-#' n_nodes <- 1000
-#' n_types <- 10
+#' n_nodes <- 100
+#' n_types <- 3
 #' mu <- 0.3 # Mixing parameter (likelihood an edge is between communities).
 #' pref <- matrix(mu, n_types, n_types)
 #' diag(pref) <- 1 - mu
@@ -40,7 +40,9 @@
 #' adj <- as(g[], "matrix")
 #' memb <- speakeasyR::cluster(adj, seed = 222)
 #' ordering <- speakeasyR::order_nodes(adj, memb)
+#' \dontrun{
 #' heatmap(adj[ordering, ordering], scale = "none", Rowv = NA, Colv = NA)
+#' }
 order_nodes <- function(graph, membership, is_directed = "detect") {
   adj <- se2_as_matrix_i(graph)
   if (is_directed == "detect") {
