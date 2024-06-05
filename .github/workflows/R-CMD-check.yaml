@@ -60,12 +60,13 @@ jobs:
         shell: bash
         run: |
           pacman -S mingw-w64-x86_64-toolchain --noconfirm
+          pacman -S mingw-w64-x86_64-make --noconfirm
 
       - name: Install Linux system dependencies
         if: runner.os == 'Linux'
         run: |
           sudo apt update && sudo apt upgrade
-          sudo apt install gcc g++
+          sudo apt install gcc
 
       - name: Clone igraph
         shell: bash
