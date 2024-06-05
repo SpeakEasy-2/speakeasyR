@@ -41,7 +41,7 @@ FILE* tf;
 if (a->aunit >= MXUNIT || a->aunit < 0) err(a->aerr, 101, "endfile");
 b = &f__units[a->aunit];
 if (b->ufd == NULL) {
-  integer strmax = 9;
+  integer strmax = 31;
   char nbuf[strmax + 1];
   snprintf(nbuf, strmax, "fort.%ld", (long)a->aunit);
   if ((tf = FOPEN(nbuf, f__w_mode[0])))

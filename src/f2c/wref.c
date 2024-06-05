@@ -234,7 +234,7 @@ wrt_F(ufloat* p, int w, int d, ftnlen len)
 #endif
   }
 
-  if ((n = f__scale))
+  if ((n = f__scale)) {
     if (n > 0) {
       do {
         x *= 10.;
@@ -244,6 +244,7 @@ wrt_F(ufloat* p, int w, int d, ftnlen len)
         x *= 0.1;
       } while (++n < 0);
     }
+  }
 
 #ifdef USE_STRLEN
   snprintf(b = buf, strmax, "%#.*f", d, x);
