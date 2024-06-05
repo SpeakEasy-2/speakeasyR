@@ -244,7 +244,7 @@ same:
 #ifdef NON_ANSI_STDIO
 replace:
 #endif
-    if (tf = FOPEN(buf, f__w_mode[0]))
+    if ((tf = FOPEN(buf, f__w_mode[0])))
       fclose(tf);
   }
 
@@ -254,9 +254,9 @@ replace:
   if ((s = a->oacc) && b->url)
     ufmt = 0;
   if (!(tf = FOPEN(buf, f__w_mode[ufmt | 2]))) {
-    if (tf = FOPEN(buf, f__r_mode[ufmt]))
+    if ((tf = FOPEN(buf, f__r_mode[ufmt])))
       b->urw = 1;
-    else if (tf = FOPEN(buf, f__w_mode[ufmt])) {
+    else if ((tf = FOPEN(buf, f__w_mode[ufmt]))) {
       b->uwrt = 1;
       b->urw = 2;
     } else

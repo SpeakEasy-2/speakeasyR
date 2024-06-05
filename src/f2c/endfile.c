@@ -44,7 +44,7 @@ if (b->ufd == NULL) {
   integer strmax = 9;
   char nbuf[strmax + 1];
   snprintf(nbuf, strmax, "fort.%ld", (long)a->aunit);
-  if (tf = FOPEN(nbuf, f__w_mode[0]))
+  if ((tf = FOPEN(nbuf, f__w_mode[0])))
     fclose(tf);
   return (0);
 }
