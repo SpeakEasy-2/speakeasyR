@@ -3,4 +3,3 @@
 *.dll
 Makevars
 Makevars.win
-include/arith.h

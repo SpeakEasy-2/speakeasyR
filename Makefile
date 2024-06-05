@@ -41,4 +41,3 @@ clean-dist: clean
 	rm -rf vignettes/speakeasyr_files
 	rm -f vignettes/.build.timestamp
 	rm -f vignettes/speakeasyr.R
-	rm -f $(SRC_DIR)/include/arith.h
