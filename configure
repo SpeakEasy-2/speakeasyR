@@ -10,13 +10,6 @@ SE2="${SRC}/se2"
 IGRAPH="${SE2}/vendor/igraph"
 REL_IGRAPH=".${IGRAPH#"$SRC"}"
 
-# Build arith.h
-(
-    cd "${F2C}" || exit
-    CC="$i_CC" "$MAKE" -f makefile.u arith.h
-    mv arith.h "${SRC}/include"
-)
-
 # Only collects C files. If C++ needed, extend patterns.
 collect_objs() {
     cd "$SRC" || exit
