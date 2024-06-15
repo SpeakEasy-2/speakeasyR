@@ -47,7 +47,7 @@ diag(pref) <- 1 - mu
 g <- igraph::preference.game(n_nodes, types = n_types, pref.matrix = pref)
 # Use a dense matrix representation to easily apply index.
 adj <- as(g[], "matrix")
-memb <- speakeasyR::cluster(adj, seed = 222)
+memb <- speakeasyR::cluster(adj, seed = 222, max_threads = 2)
 ordering <- speakeasyR::order_nodes(adj, memb)
 \dontrun{
 heatmap(adj[ordering, ordering], scale = "none", Rowv = NA, Colv = NA)

@@ -66,5 +66,5 @@ Group nodes into communities.
 }
 \examples{
 graph <- igraph::graph.famous("zachary")
-membership <- cluster(graph)
+membership <- cluster(graph, max_threads = 2)
 }
