@@ -27,7 +27,7 @@ Description: A graph community detection algorithm that aims to be performant
     on large graphs and robust, returning consistent results across runs.
     SpeakEasy 2 (SE2), the underlying algorithm, is described in Chris Gaiteri,
     David R. Connell & Faraz A. Sultan et al. (2023)
-    <doi:10.1186/s13059-023-03062-0>. The core algorithm is written in C,
+    <doi:10.1186/s13059-023-03062-0>. The core algorithm is written in 'C',
     providing speed and keeping the memory requirements low. This implementation
     can take advantage of multiple computing cores without increasing memory
     usage. SE2 can detect community structure across scales, making it a good
