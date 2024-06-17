@@ -22,7 +22,7 @@
 #' knn_graph(mat, 3)
 #'
 #' ## Don't run because loading data is slow.
-#' \dontrun{
+#' \donttest{
 #' # Single Cell RNA data
 #' library(Matrix)
 #'

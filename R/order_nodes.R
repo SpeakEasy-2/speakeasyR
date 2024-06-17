@@ -40,7 +40,7 @@
 #' adj <- as(g[], "matrix")
 #' memb <- speakeasyR::cluster(adj, seed = 222, max_threads = 2)
 #' ordering <- speakeasyR::order_nodes(adj, memb)
-#' \dontrun{
+#' \donttest{
 #' heatmap(adj[ordering, ordering], scale = "none", Rowv = NA, Colv = NA)
 #' }
 order_nodes <- function(graph, membership, is_directed = "detect") {

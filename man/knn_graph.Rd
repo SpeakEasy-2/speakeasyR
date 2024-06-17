@@ -31,7 +31,7 @@ mat <- matrix(runif(100) > 0.75, nrow = 5)
 knn_graph(mat, 3)
 
 ## Don't run because loading data is slow.
-\dontrun{
+\donttest{
 # Single Cell RNA data
 library(Matrix)
 
