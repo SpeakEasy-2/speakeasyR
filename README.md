@@ -11,7 +11,17 @@ Graphs can be passed to the algorithm as adjacency matrices using the `Matrix` l
 
 ## Installation
 
-Using `devtools`, `speakeasyR` can be installed with the `devtools::install_github("speakeasy-2/speakeasyR")` command.
+For most users, this package should be installed from CRAN using:
+
+``` r
+install.packages("speakeasyR")
+```
+
+It can also be installed using `devtools`:
+
+``` r
+devtools::install_github("speakeasy-2/speakeasyR")
+```
 
 ### Linux
 

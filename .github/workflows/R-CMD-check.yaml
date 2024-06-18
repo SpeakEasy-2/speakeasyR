@@ -53,32 +53,25 @@ jobs:
       - name: Install macOS system dependencies
         if: runner.os == 'macOS'
         run: |
-          brew install ninja autoconf automake libtool
-          brew install arpack lapack openblas glpk gmp
+          brew install libtool
 
       - name: Install Windows system dependencies
         if: runner.os == 'Windows'
         shell: bash
         run: |
-          pacman -S git bison flex --noconfirm
-          pacman -S mingw-w64-x86_64-cmake --noconfirm
           pacman -S mingw-w64-x86_64-toolchain --noconfirm
-          pacman -S mingw-w64-x86_64-libxml2 --noconfirm
-          pacman -S mingw-w64-x86_64-glpk --noconfirm
-          pacman -S mingw-w64-x86_64-arpack --noconfirm
+          pacman -S mingw-w64-x86_64-make --noconfirm
 
       - name: Install Linux system dependencies
         if: runner.os == 'Linux'
         run: |
           sudo apt update && sudo apt upgrade
-          sudo apt install cmake ninja-build gcc g++ libbison-dev libfl-dev
-          sudo apt install libxml2-dev libblas-dev libplfit-dev
-          sudo apt install libglpk-dev libgmp-dev liblapack-dev
+          sudo apt install gcc
 
       - name: Clone igraph
         shell: bash
         run: |
-          cd tools/se2
+          cd src/se2
           git submodule init
           git submodule update --recursive
 
@@ -86,4 +79,3 @@ jobs:
         with:
           upload-snapshots: true
           build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
-          error-on: '"error"'

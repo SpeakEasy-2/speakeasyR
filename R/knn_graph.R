@@ -17,6 +17,13 @@
 #' @export
 #'
 #' @examples
+#' # Simple random graph
+#' mat <- matrix(runif(100) > 0.75, nrow = 5)
+#' knn_graph(mat, 3)
+#'
+#' ## Don't run because loading data is slow.
+#' \donttest{
+#' # Single Cell RNA data
 #' library(Matrix)
 #'
 #' expression <- scRNAseq::FletcherOlfactoryData()
@@ -37,6 +44,7 @@
 #' counts_norm <- t(prcomp(t(counts_norm), scale. = FALSE)$x)[1:50, ]
 #'
 #' adj <- knn_graph(counts_norm, 10)
+#' }
 knn_graph <- function(mat, k, weighted = FALSE) {
   if (!is.matrix(mat)) {
     stop("Matrix must be of type matrix.")

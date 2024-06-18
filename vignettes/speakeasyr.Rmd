@@ -43,7 +43,7 @@ g <- igraph_from_mixing_param(n_nodes=50, n_types=5, mu=0.1)
 The graph can be clustered by calling `cluster`:
 
 ```{r simple-cluster}
-memb <- speakeasyR::cluster(g, seed = 222)
+memb <- speakeasyR::cluster(g, seed = 222, max_threads = 2)
 ```
 
 The membership vector returned contains the community ids for each vector, such that `memb[vid]` is the community id of vertex `vid`. The seed argument is given to ensure reproducible results.
@@ -67,7 +67,7 @@ Using the same wrapper function as before, we can generate and cluster a tougher
 
 ```{r tougher}
 g <- igraph_from_mixing_param(n_nodes = 1000, n_types = 10, mu = 0.4)
-memb <- speakeasyR::cluster(g, seed = 222)
+memb <- speakeasyR::cluster(g, seed = 222, max_threads = 2)
 ordering <- speakeasyR::order_nodes(g, memb)
 adj <- as(g[], "matrix")[ordering, ordering]
 color <- rainbow(length(unique(memb)))[memb[ordering]]
@@ -136,14 +136,14 @@ adj <- speakeasyR::knn_graph(counts_norm, 10)
 This graph can be passed to SE2 and visualized using a heatmap as before:
 
 ```{r celltypes}
-memb <- speakeasyR::cluster(adj, verbose = TRUE, seed = 222)
+memb <- speakeasyR::cluster(adj, verbose = TRUE, seed = 222, max_threads = 2)
 ordering <- speakeasyR::order_nodes(adj, memb)
-adj <- as.matrix(as(adj, "dMatrix"))
 ```
 
 The kNN graph is initially in a sparse matrix form, this is converted to a base `matrix` type to make it easier to reorder the nodes.
 
 ```{r display-cells}
+  adj <- as.matrix(as(adj, "dMatrix"))
   row_colors <- rainbow(length(unique(cell_types)))[cell_types[ordering]]
   col_colors <- rainbow(length(unique(memb)))[memb[ordering]]
   heatmap(
@@ -168,7 +168,7 @@ We can use this subclustering feature to cluster the cell types in the previous 
 
 ```{r subclust}
 memb <- speakeasyR::cluster(
-  adj, subcluster = 2, verbose = TRUE, seed = 222
+  adj, subcluster = 2, verbose = TRUE, seed = 222, max_threads = 2
 )
 ordering <- speakeasyR::order_nodes(adj, memb)
 ```

@@ -28,8 +28,11 @@ Accepted types include \code{matrix}, \code{dgCMatrix}, \code{ngCMatrix}, and
 
 \item{independent_runs}{How many runs SpeakEasy2 should perform.}
 
-\item{max_threads}{The maximum number of threads to use. By default uses the
-number of cores available.}
+\item{max_threads}{The maximum number of threads to use. By default this is
+the same as the number of independent runs. If max_threads is greater than
+or equal to the number of processing cores, all cores may run. If
+max_threads is less than the number of cores, at most max_threads cores
+will run.}
 
 \item{seed}{Random seed to use for reproducible results. SpeakEasy2 uses a
 different random number generator than R, but if the seed is not
@@ -63,5 +66,5 @@ Group nodes into communities.
 }
 \examples{
 graph <- igraph::graph.famous("zachary")
-membership <- cluster(graph)
+membership <- cluster(graph, max_threads = 2)
 }

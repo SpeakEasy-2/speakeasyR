@@ -9,8 +9,11 @@
 #'   `igraph::graph`s.
 #' @param discard_transient The number of partitions to discard before tracking.
 #' @param independent_runs How many runs SpeakEasy2 should perform.
-#' @param max_threads The maximum number of threads to use. By default uses the
-#'   number of cores available.
+#' @param max_threads The maximum number of threads to use. By default this is
+#'   the same as the number of independent runs. If max_threads is greater than
+#'   or equal to the number of processing cores, all cores may run. If
+#'   max_threads is less than the number of cores, at most max_threads cores
+#'   will run.
 #' @param seed Random seed to use for reproducible results. SpeakEasy2 uses a
 #'   different random number generator than R, but if the seed is not
 #'   explicitly set, R's random number generator is used create one. Because of
@@ -34,7 +37,7 @@
 #'
 #' @examples
 #' graph <- igraph::graph.famous("zachary")
-#' membership <- cluster(graph)
+#' membership <- cluster(graph, max_threads = 2)
 cluster <- function(graph, discard_transient = 3, independent_runs = 10,
                     max_threads = 0, seed = 0, target_clusters = 0,
                     target_partitions = 5, subcluster = 1, min_clust = 5,

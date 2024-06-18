@@ -1,16 +1,7 @@
 ROOT=$(
-    cd $(dirname "$0")
+    cd "$(dirname "$0")" || exit
     pwd
 )
 
-PREFIX="${ROOT}/src/build"
-SE2="${ROOT}/tools/se2"
-IGRAPH="${SE2}/vendor/igraph"
-
-[ -f "${SE2}/SE2_VERSION" ] && rm "${SE2}/SE2_VERSION"
-[ -f "${IGRAPH}/IGRAPH_VERSION" ] && rm "${IGRAPH}/IGRAPH_VERSION"
-
 [ -f "${ROOT}/src/Makevars.win" ] && rm "${ROOT}/src/Makevars.win"
-[ -d "${PREFIX}" ] && rm -rf "${PREFIX}"
-
-[ -d "${ROOT}/tools/build" ] && rm -rf "${ROOT}/tools/build"
+find "${ROOT}/src" -name '*.o' -exec rm {} \;

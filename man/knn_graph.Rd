@@ -26,6 +26,13 @@ neighbors. Nearness is calculated as the inverse of the euclidean distance
 between two columns.
 }
 \examples{
+# Simple random graph
+mat <- matrix(runif(100) > 0.75, nrow = 5)
+knn_graph(mat, 3)
+
+## Don't run because loading data is slow.
+\donttest{
+# Single Cell RNA data
 library(Matrix)
 
 expression <- scRNAseq::FletcherOlfactoryData()
@@ -46,4 +53,5 @@ counts_norm <- log(t(t(counts) / size_factors + 1))
 counts_norm <- t(prcomp(t(counts_norm), scale. = FALSE)$x)[1:50, ]
 
 adj <- knn_graph(counts_norm, 10)
+}
 }
