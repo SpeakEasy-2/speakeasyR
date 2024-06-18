@@ -30,7 +30,7 @@ check-quick: build
 
 .PHONY: clean
 clean:
-	@find src -name '*.o' -exec rm {} \;
+	@find src -name '*.o' -not -path "*/tests/*" -exec rm {} \;
 
 .PHONY: clean-dist
 clean-dist: clean
