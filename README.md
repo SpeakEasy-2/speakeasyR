@@ -27,16 +27,13 @@ devtools::install_github("speakeasy-2/speakeasyR")
 
 Installation with `devtools::install_github` has been tested in clean VMs running Ubuntu and Fedora.
 
-> [!TIP]
-> If an error occurs while installing, it may be that a dependency is missing. This can lead to a red hearing error that `igraph.h` can't be found but this is a consequence of an early failure. Check the output to see if it explicitly mentions a missing dependency. On Ubuntu cmake, bison, and flex were not installed by default.
-
 ### Windows
 
 To set up the development environment on Windows, install the appropriate version of [Rtools](https://cran.r-project.org/bin/windows/Rtools/) for your R install. Using Rtools' MSYS2, install the required build tools. This has been tested with ucrt64 environment but likely works in other environments.
 
 ```bash
-pacman -S mingw-w64-ucrt-x86_64-toolchain mingw-w64-ucrt-x86_64-cmake \
-	mingw-ucrt-w64-x86_64-libxml2 git bison flex
+pacman -S mingw-w64-ucrt-x86_64-toolchain \
+	mingw-ucrt-w64-x86_64-libxml2 git
 ```
 
 ## Building from source
@@ -49,6 +46,6 @@ git submodule update --init --recursive
 
 To set up the vendored dependencies.
 
-Building the source requires `cmake` and the `igraph` dependencies: `bison`, `flex`, and `libxml2`. For development `astyle` is recommended for formatting C code while `texlive`/`latex`, `qpdf`, and `checkbashims` are expected by `R` for building the documentation and checking shell scripts during the `R CMD build` process.
+For development `astyle` is recommended for formatting C code while `texlive`/`latex`, `qpdf`, and `checkbashims` are expected by `R` for building the documentation and checking shell scripts during the `R CMD build` process.
 
 It should now be possible to run `devtools::load_all()` in `R`. After the source is compiled, a `compile_commands.json` can be found in `tools/build` if needed.
