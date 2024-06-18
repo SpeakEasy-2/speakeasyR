@@ -21,6 +21,11 @@ speakeasyR_$(VERSION).tar.gz: $(SRC_DIR)/speakeasyR.c $(R_FILES) $(HEADERS) conf
 check: build
 	R CMD check --as-cran speakeasyR_$(VERSION).tar.gz
 
+.PHONY: check-deps
+check-deps: build
+	_R_CHECK_DEPENDS_ONLY_=true \
+          R CMD check --as-cran speakeasyR_$(VERSION).tar.gz
+
 .PHONY: check-quick
 check-quick: BUILD_FLAGS += --no-build-vignettes
 check-quick: build

@@ -39,17 +39,20 @@ viewed.
 See vignette for a multilevel example.
 }
 \examples{
-n_nodes <- 100
-n_types <- 3
-mu <- 0.3 # Mixing parameter (likelihood an edge is between communities).
-pref <- matrix(mu, n_types, n_types)
-diag(pref) <- 1 - mu
-g <- igraph::preference.game(n_nodes, types = n_types, pref.matrix = pref)
-# Use a dense matrix representation to easily apply index.
-adj <- as(g[], "matrix")
-memb <- speakeasyR::cluster(adj, seed = 222, max_threads = 2)
-ordering <- speakeasyR::order_nodes(adj, memb)
-\donttest{
-heatmap(adj[ordering, ordering], scale = "none", Rowv = NA, Colv = NA)
+if (require("igraph")) {
+  n_nodes <- 100
+  n_types <- 3
+  # Mixing parameter (likelihood an edge is between communities).
+  mu <- 0.3
+  pref <- matrix(mu, n_types, n_types)
+  diag(pref) <- 1 - mu
+  g <- igraph::preference.game(n_nodes, types = n_types, pref.matrix = pref)
+  # Use a dense matrix representation to easily apply index.
+  adj <- as(g[], "matrix")
+  memb <- speakeasyR::cluster(adj, seed = 222, max_threads = 2)
+  ordering <- speakeasyR::order_nodes(adj, memb)
+  \donttest{
+  heatmap(adj[ordering, ordering], scale = "none", Rowv = NA, Colv = NA)
+  }
 }
 }

@@ -36,8 +36,10 @@
 #' @export
 #'
 #' @examples
-#' graph <- igraph::graph.famous("zachary")
-#' membership <- cluster(graph, max_threads = 2)
+#' if (require("igraph")) {
+#'   graph <- igraph::graph.famous("zachary")
+#'   membership <- cluster(graph, max_threads = 2)
+#' }
 cluster <- function(graph, discard_transient = 3, independent_runs = 10,
                     max_threads = 0, seed = 0, target_clusters = 0,
                     target_partitions = 5, subcluster = 1, min_clust = 5,

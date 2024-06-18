@@ -32,26 +32,29 @@ knn_graph(mat, 3)
 
 ## Don't run because loading data is slow.
 \donttest{
-# Single Cell RNA data
-library(Matrix)
+if (requireNamespace("scRNAseq") &&
+  requireNamespace("SummarizedExperiment")) {
+  # Single Cell RNA data
+  library(Matrix)
 
-expression <- scRNAseq::FletcherOlfactoryData()
-cell_types <- expression$cluster_id
+  expression <- scRNAseq::FletcherOlfactoryData()
+  cell_types <- expression$cluster_id
 
-## Filter genes with low expression. Remove any genes with less than 10
-## cells with with any reads.
-counts <- SummarizedExperiment::assay(expression, "counts")
-indices <- rowSums(counts > 0) > 10
-counts <- counts[indices, ]
+  ## Filter genes with low expression. Remove any genes with less than 10
+  ## cells with with any reads.
+  counts <- SummarizedExperiment::assay(expression, "counts")
+  indices <- rowSums(counts > 0) > 10
+  counts <- counts[indices, ]
 
-## Normalize by shifted logarithm
-target <- median(colSums(counts))
-size_factors <- colSums(counts) / target
-counts_norm <- log(t(t(counts) / size_factors + 1))
+  ## Normalize by shifted logarithm
+  target <- median(colSums(counts))
+  size_factors <- colSums(counts) / target
+  counts_norm <- log(t(t(counts) / size_factors + 1))
 
-## Dimension reduction
-counts_norm <- t(prcomp(t(counts_norm), scale. = FALSE)$x)[1:50, ]
+  ## Dimension reduction
+  counts_norm <- t(prcomp(t(counts_norm), scale. = FALSE)$x)[1:50, ]
 
-adj <- knn_graph(counts_norm, 10)
+  adj <- knn_graph(counts_norm, 10)
+}
 }
 }

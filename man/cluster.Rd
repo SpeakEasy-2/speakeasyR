@@ -65,6 +65,8 @@ the highest resolution.
 Group nodes into communities.
 }
 \examples{
-graph <- igraph::graph.famous("zachary")
-membership <- cluster(graph, max_threads = 2)
+if (require("igraph")) {
+  graph <- igraph::graph.famous("zachary")
+  membership <- cluster(graph, max_threads = 2)
+}
 }
