@@ -48,4 +48,4 @@ To set up the vendored dependencies.
 
 For development `astyle` is recommended for formatting C code while `texlive`/`latex`, `qpdf`, and `checkbashims` are expected by `R` for building the documentation and checking shell scripts during the `R CMD build` process.
 
-It should now be possible to run `devtools::load_all()` in `R`. After the source is compiled, a `compile_commands.json` can be found in `tools/build` if needed.
+It should now be possible to run `devtools::load_all()` in `R`.
