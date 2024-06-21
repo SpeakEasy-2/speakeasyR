@@ -1,3 +1,13 @@
+# speakeasyR 0.1.2
+
+## Add
+
+- Contributors of vendored software to DESCRIPTION.
+
+## Fixed
+
+- Prevent unused igraph vendored packages from being shipped in the source tarball.
+
 # speakeasyR 0.1.1
 
 ## Fixed

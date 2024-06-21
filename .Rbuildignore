@@ -21,6 +21,10 @@
 ^src/se2/vendor/igraph/examples$
 ^src/se2/vendor/igraph/tests$
 ^src/se2/vendor/igraph/CITATION\.cff$
+^src/se2/vendor/igraph/vendor/f2c
+^src/se2/vendor/igraph/vendor/glpk
+^src/se2/vendor/igraph/vendor/mini-gmp
+^src/se2/vendor/igraph/vendor/plfit
 ^\.ccls-cache$
 ^cran-comments\.md$
 ^CRAN-SUBMISSION$
