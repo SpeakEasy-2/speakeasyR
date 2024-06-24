@@ -4,3 +4,4 @@ tools/build/
 dist/
 .RData
 inst/doc
+CRAN-SUBMISSION
