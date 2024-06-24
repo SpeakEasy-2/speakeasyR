@@ -4,4 +4,4 @@ ROOT=$(
 )
 
 [ -f "${ROOT}/src/Makevars.win" ] && rm "${ROOT}/src/Makevars.win"
-find "${ROOT}/src" -name '*.o' -exec rm {} \;
+find "${ROOT}/src" -name '*.o' -not -path "*/tests/*" -exec rm {} \;
