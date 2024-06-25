@@ -4,6 +4,10 @@
 
 - Contributors of vendored software to DESCRIPTION.
 
+## Changed
+
+- Use autoconf to generate configure file in order to detect system packages and support for pthreads.
+
 ## Fixed
 
 - Prevent unused igraph vendored packages from being shipped in the source tarball.

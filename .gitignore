@@ -1,7 +1,10 @@
 *.Rcheck
 *.tar.gz
-tools/build/
 dist/
 .RData
 inst/doc
 CRAN-SUBMISSION
+config.*
+autom4te.cache/
+configure~
+!tools/config.*

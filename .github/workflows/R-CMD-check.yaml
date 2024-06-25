@@ -68,12 +68,23 @@ jobs:
           sudo apt update && sudo apt upgrade
           sudo apt install gcc
 
+      - name: Install ARPACK
+        if: ${{ runner.os == 'Linux' && matrix.config.arpack == 'external' }}
+        run: sudo apt install libarpack-dev
+
       - name: Clone igraph
         shell: bash
         run: |
           cd src/se2
           git submodule init
           git submodule update --recursive
+
+      # Seems like the line-endings get changed to CRLF when checking out from
+      # git repo? R CMD check keeps complaining that configure.ac doesn't have
+      # LF line endings on Windows build.
+      - name: Fix line-endings
+        if: runner.os == 'Windows'
+        run: dos2unix configure.ac
 
       - uses: r-lib/actions/check-r-package@v2
         with:

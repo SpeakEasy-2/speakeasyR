@@ -2,13 +2,15 @@
 #include <Rinternals.h>
 #include <R_ext/Visibility.h>
 
-#include "igraph_datatype.h"
-#include "igraph_vector.h"
-#include "igraph_matrix.h"
-#include "igraph_constructors.h"
-#include "igraph_interface.h"
+#include <config.h>
 
-#include "speak_easy_2.h"
+#include <igraph_datatype.h>
+#include <igraph_vector.h>
+#include <igraph_matrix.h>
+#include <igraph_constructors.h>
+#include <igraph_interface.h>
+
+#include <speak_easy_2.h>
 
 #define R_MATRIX(mat, i, j, vcount) (mat)[(i) + ((j) * (vcount))]
 

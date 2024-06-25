@@ -1,0 +1,57 @@
+/* src/include/config.h.in.  Generated from configure.ac by autoheader.  */
+
+#ifndef IGRAPH_PRIVATE_CONFIG_H
+#define IGRAPH_PRIVATE_CONFIG_H
+
+#include "igraph_config.h"
+
+#define HAVE_STRCASECMP 1
+#define HAVE_STRNCASECMP 1
+
+#define HAVE_BUILTIN_OVERFLOW 1
+
+#if defined(__GNUC__) && defined(__SIZEOF_INT128__)
+#  define HAVE___UINT128_T 1
+#endif
+
+/* Have PTHREAD_PRIO_INHERIT. */
+#undef HAVE_PTHREAD_PRIO_INHERIT
+
+/* Thread local storage. */
+#undef IGRAPH_F77_SAVE
+
+/* Thread local storage. */
+#undef IGRAPH_THREAD_LOCAL
+
+/* Use internal ARPACK library. */
+#undef INTERNAL_ARPACK
+
+/* Use internal BLAS library. */
+#undef INTERNAL_BLAS
+
+/* Use internal LAPACK library. */
+#undef INTERNAL_LAPACK
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* Define to necessary symbol if this constant uses a non-standard name on
+   your system. */
+#undef PTHREAD_CREATE_JOINABLE
+
+#endif

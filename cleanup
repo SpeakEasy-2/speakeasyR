@@ -6,4 +6,6 @@ ROOT=$(
 )
 
 [ -f "${ROOT}/src/Makevars" ] && rm "${ROOT}/src/Makevars"
+rm "${ROOT}/src/include/config.h"
+rm "${ROOT}"/config.*
 find "${ROOT}/src" -name '*.o' -not -path "*/tests/*" -exec rm {} \;

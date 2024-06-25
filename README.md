@@ -49,3 +49,8 @@ To set up the vendored dependencies.
 For development `astyle` is recommended for formatting C code while `texlive`/`latex`, `qpdf`, and `checkbashims` are expected by `R` for building the documentation and checking shell scripts during the `R CMD build` process.
 
 It should now be possible to run `devtools::load_all()` in `R`.
+
+## Development
+
+GNU autotools is used to generate the configuration script and files needed to run the configuration script. `R`'s build commands do not run `autoconf` instead, if changes are made to the `configuration.ac` file, `autoconf` (and possibly `autoreconf -i`) needs to be run and manually and the resulting files should be committed along with the source `configuration.ac` file.
+The `Makefile` can determine when the `autoconf` programs need to be run by either directly calling the configure target (i.e. `make configure`) or running a build target (i.e. `make build` or `make check` or similar).

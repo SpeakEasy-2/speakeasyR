@@ -3,3 +3,7 @@
 *.dll
 Makevars
 Makevars.win
+config.h.in~
+include/config.h
+!include/config.h.in
+!include/config.h.win

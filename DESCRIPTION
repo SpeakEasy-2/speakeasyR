@@ -1,6 +1,6 @@
 Package: speakeasyR
 Title: Fast and Robust Multi-Scale Graph Clustering
-Version: 0.1.1
+Version: 0.1.2
 Authors@R: c(
       person(
         "David", "Connell",
@@ -69,7 +69,13 @@ Authors@R: c(
       person("A", "Greenbaum", role = "ctb",
         comment = "Author of LAPACK."),
       person("A", "McKenney", role = "ctb",
-        comment = "Author of LAPACK.")
+        comment = "Author of LAPACK."),
+      person("Steven", "Johnson", role = "ctb",
+        comment = "Author of ax_pthread."),
+      person("Daniel", "G.", role = "ctb",
+        comment = "Author of ax_pthread."),
+      person("Marc", "Stevens", role = "ctb",
+        comment = "Author of ax_pthread.")
     )
 Description: A graph community detection algorithm that aims to be performant
     on large graphs and robust, returning consistent results across runs.

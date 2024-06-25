@@ -14,8 +14,15 @@ all: build
 .PHONY: build
 build: speakeasyR_$(VERSION).tar.gz
 
-speakeasyR_$(VERSION).tar.gz: $(SRC_DIR)/speakeasyR.c $(R_FILES) $(HEADERS) configure
+speakeasyR_$(VERSION).tar.gz: $(SRC_DIR)/speakeasyR.c $(R_FILES) $(HEADERS)
+speakeasyR_$(VERSION).tar.gz: configure $(SRC_DIR)/Makevars.in
 	R CMD build $(BUILD_FLAGS) $(ROOT_DIR)
+
+configure: configure.ac tools/config.guess tools/config.sub src/include/config.h.in
+	autoconf
+
+src/include/config.h.in tools/config.sub tools/config.guess:
+	autoreconf -i
 
 .PHONY: check
 check: build
@@ -36,13 +43,21 @@ check-quick: build
 .PHONY: clean
 clean:
 	@find src -name '*.o' -not -path "*/tests/*" -exec rm {} \;
+	rm -f configure~
+	rm -f src/include/config.h.in~
+	rm -f config.*
 
 .PHONY: clean-dist
 clean-dist: clean
-	rm -f speakeasyR_$(VERSION).tar.gz
+	rm -f speakeasyR_*.tar.gz
 	rm -rf speakeasyR.Rcheck
 	rm -f $(SRC_DIR)/speakeasyR.so
 	rm -f $(SRC_DIR)/speakeasyR.dll
 	rm -rf vignettes/speakeasyr_files
 	rm -f vignettes/.build.timestamp
 	rm -f vignettes/speakeasyr.R
+	rm -f src/include/config.h
+	rm -f src/Makevars
+	rm -f configure
+	rm -f tools/config.*
+	rm -f src/include/config.h.in
