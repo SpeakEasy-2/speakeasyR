@@ -12,6 +12,7 @@
 ## Fixed
 
 - Prevent unused igraph vendored packages from being shipped in the source tarball.
+- Update SE2 C library to fix address sanitizer errors.
 
 # speakeasyR 0.1.1
 
