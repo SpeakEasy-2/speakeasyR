@@ -3,6 +3,7 @@
 ## Add
 
 - Contributors of vendored software to DESCRIPTION.
+- Support for external ARPACK
 
 ## Changed
 

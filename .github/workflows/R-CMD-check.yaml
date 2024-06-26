@@ -22,9 +22,10 @@ jobs:
         config:
           - {os: macos-latest, r: 'release'}
           - {os: windows-latest, r: 'release'}
-          - {os: ubuntu-latest, r: 'devel', http-user-agent: 'release'}
-          - {os: ubuntu-latest, r: 'release'}
-          - {os: ubuntu-latest, r: 'oldrel-1'}
+          - {os: ubuntu-latest, r: 'devel', http-user-agent: 'release', arpack: 'internal'}
+          - {os: ubuntu-latest, r: 'release', arpack: 'internal'}
+          - {os: ubuntu-latest, r: 'release', arpack: 'external'}
+          - {os: ubuntu-latest, r: 'oldrel-1', arpack: 'internal'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -70,7 +71,7 @@ jobs:
 
       - name: Install ARPACK
         if: ${{ runner.os == 'Linux' && matrix.config.arpack == 'external' }}
-        run: sudo apt install libarpack-dev
+        run: sudo apt install libarpack2-dev
 
       - name: Clone igraph
         shell: bash
