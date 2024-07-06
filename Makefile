@@ -24,13 +24,13 @@ speakeasyR_$(VERSION).tar.gz: configure $(SRC_DIR)/Makevars.in
 speakeasyR_$(VERSION).tar.gz: $(SRC_DIR)/include/igraph_version.h
 	R CMD build $(BUILD_FLAGS) $(ROOT_DIR)
 
-configure: configure.ac tools/config.guess tools/config.sub src/include/config.h.in
+configure: configure.ac tools/config.guess tools/config.sub $(SRC_DIR)/include/config.h.in
 	autoconf
 
-src/include/config.h.in tools/config.sub tools/config.guess:
+$(SRC_DIR)/include/config.h.in tools/config.sub tools/config.guess:
 	autoreconf -i
 
-src/include/igraph_version.h: src/se2/vendor/igraph/include/igraph_version.h.in
+$(SRC_DIR)/include/igraph_version.h: $(SRC_DIR)/se2/vendor/igraph/include/igraph_version.h.in
 	echo $${MAJOR}
 	sed -e "s/\@PACKAGE_VERSION\@/$(VERSION)/g" \
 	  -e "s/\@PACKAGE_VERSION_MAJOR\@/$(MAJOR_VERSION)/g" \
