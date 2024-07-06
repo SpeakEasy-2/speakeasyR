@@ -8,6 +8,7 @@
 ## Changed
 
 - Use autoconf to generate configure file in order to detect system packages and support for pthreads.
+- Remove support for compiling internal linear algebra packages and no longer ship source code for those packages.
 
 ## Fixed
 

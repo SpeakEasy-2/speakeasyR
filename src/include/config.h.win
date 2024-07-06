@@ -12,9 +12,9 @@
 #  define HAVE___UINT128_T 1
 #endif
 
-#define INTERNAL_BLAS 1
-#define INTERNAL_LAPACK 1
-#define INTERNAL_ARPACK 1
+/* #undef INTERNAL_BLAS */
+/* #undef INTERNAL_LAPACK */
+/* #undef INTERNAL_ARPACK */
 
 #define IGRAPH_F77_SAVE static __thread
 #define IGRAPH_THREAD_LOCAL __thread

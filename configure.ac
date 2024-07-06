@@ -95,27 +95,17 @@ SE2_LIBS="$PTHREAD_LIBS ${SE2_LIBS}"
 
 SE2_CPPFLAGS="${SE2_CPPFLAGS}  -I\"${SRC}/include\" -I\"${SE2}/include\" -I\"${IGRAPH}/include\" -I\"${IGRAPH}/src\" -I\"${IGRAPH}/vendor\""
 
-LINALG_OBJS=$(collect_objs "${IGRAPH}/vendor/lapack")
-F2C_OBJS=$(collect_objs "${SRC}/f2c")
-
 AH_TEMPLATE([INTERNAL_BLAS], [Use internal BLAS library.])
 AH_TEMPLATE([INTERNAL_LAPACK], [Use internal LAPACK library.])
 AH_TEMPLATE([INTERNAL_ARPACK], [Use internal ARPACK library.])
 if [ test -n "${HAVE_BLAS}" ] && [ test -n "${HAVE_LAPACK}" ]; then
+    SE2_LIBS="${SE2_LIBS} \$(LAPACK_LIBS) \$(BLAS_LIBS) \$(FLIBS)"
     AC_CHECK_LIB([arpack],[main],[
-      SE2_LIBS="${SE2_LIBS} \$(LAPACK_LIBS) \$(BLAS_LIBS) \$(FLIBS) -larpack"],[
-      AC_MSG_NOTICE([Did not find ARPACK, using vendored linear algebra packages.])
-      SE2_OBJECTS="${SE2_OBJECTS} ${LINALG_OBJS} ${F2C_OBJS}"
-      AC_DEFINE([INTERNAL_BLAS])
-      AC_DEFINE([INTERNAL_LAPACK])
-      AC_DEFINE([INTERNAL_ARPACK])],
+      SE2_LIBS="${SE2_LIBS} -larpack"],[
+      AC_MSG_ERROR([ARPACK not found. Install ARPACK])],
       [])ac_cv_lib_arpack=ac_cv_lib_arpack_main
 else
-    AC_MSG_NOTICE([Did not find linear algebra packages, using vendored versions.])
-    SE2_OJBECTS="${SE2_OBJECTS} ${LINALG_OBJS} ${F2C_OBJS}"
-    AC_DEFINE([INTERNAL_BLAS])
-    AC_DEFINE([INTERNAL_LAPACK])
-    AC_DEFINE([INTERNAL_ARPACK])
+    AC_MSG_ERROR([Linear algebra packages not found. Make sure BLAS, LAPACK, and ARPACK are installed.])
 fi
 
 dnl Respect user specified options.

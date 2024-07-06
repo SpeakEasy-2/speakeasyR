@@ -2500,8 +2500,7 @@ IGRAPH_OBJS="${REL_IGRAPH}/src/core/interruption.o \
     ${REL_IGRAPH}/src/math/utils.o \
     ${REL_IGRAPH}/src/properties/degrees.o \
     ${REL_IGRAPH}/src/constructors/basic_constructors.o \
-    ${REL_IGRAPH}/src/community/community_misc.o \
-    ${REL_IGRAPH}/src/linalg/arpack.o"
+    ${REL_IGRAPH}/src/community/community_misc.o"
 
 SE2_OBJECTS="${SE2_OBJECTS} $(collect_objs "${SE2}/src") ${IGRAPH_OBJS} $(collect_objs ${IGRAPH}/src/random) $(collect_objs ${IGRAPH}/vendor/cs) $(collect_objs ${IGRAPH}/vendor/pcg)"
 
@@ -4760,13 +4759,11 @@ SE2_LIBS="$PTHREAD_LIBS ${SE2_LIBS}"
 
 SE2_CPPFLAGS="${SE2_CPPFLAGS}  -I\"${SRC}/include\" -I\"${SE2}/include\" -I\"${IGRAPH}/include\" -I\"${IGRAPH}/src\" -I\"${IGRAPH}/vendor\""
 
-LINALG_OBJS=$(collect_objs "${IGRAPH}/vendor/lapack")
-F2C_OBJS=$(collect_objs "${SRC}/f2c")
-
 
 
 
 if  test -n "${HAVE_BLAS}"  &&  test -n "${HAVE_LAPACK}" ; then
+    SE2_LIBS="${SE2_LIBS} \$(LAPACK_LIBS) \$(BLAS_LIBS) \$(FLIBS)"
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for main in -larpack" >&5
 printf %s "checking for main in -larpack... " >&6; }
 if test ${ac_cv_lib_arpack_main+y}
@@ -4804,31 +4801,15 @@ printf "%s\n" "$ac_cv_lib_arpack_main" >&6; }
 if test "x$ac_cv_lib_arpack_main" = xyes
 then :
 
-      SE2_LIBS="${SE2_LIBS} \$(LAPACK_LIBS) \$(BLAS_LIBS) \$(FLIBS) -larpack"
+      SE2_LIBS="${SE2_LIBS} -larpack"
 else case e in #(
   e)
-      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Did not find ARPACK, using vendored linear algebra packages." >&5
-printf "%s\n" "$as_me: Did not find ARPACK, using vendored linear algebra packages." >&6;}
-      SE2_OBJECTS="${SE2_OBJECTS} ${LINALG_OBJS} ${F2C_OBJS}"
-      printf "%s\n" "#define INTERNAL_BLAS 1" >>confdefs.h
-
-      printf "%s\n" "#define INTERNAL_LAPACK 1" >>confdefs.h
-
-      printf "%s\n" "#define INTERNAL_ARPACK 1" >>confdefs.h
- ;;
+      as_fn_error $? "ARPACK not found. Install ARPACK" "$LINENO" 5 ;;
 esac
 fi
 ac_cv_lib_arpack=ac_cv_lib_arpack_main
 else
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Did not find linear algebra packages, using vendored versions." >&5
-printf "%s\n" "$as_me: Did not find linear algebra packages, using vendored versions." >&6;}
-    SE2_OJBECTS="${SE2_OBJECTS} ${LINALG_OBJS} ${F2C_OBJS}"
-    printf "%s\n" "#define INTERNAL_BLAS 1" >>confdefs.h
-
-    printf "%s\n" "#define INTERNAL_LAPACK 1" >>confdefs.h
-
-    printf "%s\n" "#define INTERNAL_ARPACK 1" >>confdefs.h
-
+    as_fn_error $? "Linear algebra packages not found. Make sure BLAS, LAPACK, and ARPACK are installed." "$LINENO" 5
 fi
 
 SE2_CPPFLAGS="${SE2_CPPFLAGS} ${CPPFLAGS}"
