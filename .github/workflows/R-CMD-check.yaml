@@ -20,10 +20,12 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: macos-latest, r: 'release'}
-          - {os: windows-latest, r: 'release'}
+          - {os: macos-latest, r: 'release', arpack: internal}
+          - {os: macos-latest, r: 'release', arpack: external}
+          - {os: windows-latest, r: 'release', arpack: internal}
           - {os: ubuntu-latest, r: 'devel', http-user-agent: 'release'}
-          - {os: ubuntu-latest, r: 'release'}
+          - {os: ubuntu-latest, r: 'release', arpack: internal}
+          - {os: ubuntu-latest, r: 'release', arpack: external}
           - {os: ubuntu-latest, r: 'oldrel-1'}
 
     env:
@@ -53,7 +55,12 @@ jobs:
       - name: Install macOS system dependencies
         if: runner.os == 'macOS'
         run: |
-          brew install libtool autoconf automake arpack
+          brew install libtool autoconf automake
+
+      - name: Install arpack on macOS
+        if: ${{ runner.os == 'macOS' && matrix.config.arpack == 'external' }}
+        run: |
+          brew install arpack
 
       - name: Install Windows system dependencies
         if: runner.os == 'Windows'
@@ -67,7 +74,11 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt update && sudo apt upgrade
-          sudo apt install gcc libarpack2-dev
+          sudo apt install gcc
+
+      - name: Install arpack for linux
+        if: ${{ runner.os == 'Linux' && matrix.config.arpack == 'external' }}
+          sudo apt install libarpack2-dev
 
       - name: Clone igraph
         shell: bash

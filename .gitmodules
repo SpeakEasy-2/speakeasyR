@@ -1,3 +1,6 @@
 [submodule "vendor/speakeasy2"]
 	path = src/se2
 	url = https://github.com/SpeakEasy-2/libspeakeasy2
+[submodule "src/arpack"]
+	path = src/arpack
+	url = https://github.com/opencollab/arpack-ng

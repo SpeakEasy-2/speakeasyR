@@ -23,13 +23,13 @@
 /* Thread local storage. */
 #undef IGRAPH_THREAD_LOCAL
 
-/* Use internal ARPACK library. */
+/* Use internal arpack library. */
 #undef INTERNAL_ARPACK
 
-/* Use internal BLAS library. */
+/* Use internal blas library. */
 #undef INTERNAL_BLAS
 
-/* Use internal LAPACK library. */
+/* Use internal lapack library. */
 #undef INTERNAL_LAPACK
 
 /* Define to the address where bug reports for this package should be sent. */

@@ -609,6 +609,7 @@ PACKAGE_URL=''
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
 SE2_OBJECTS
+SE2_FFLAGS
 SE2_CFLAGS
 SE2_LIBS
 SE2_CPPFLAGS
@@ -2454,8 +2455,8 @@ if test -z "${R_HOME}"; then
 fi
 RBIN="${R_HOME}/bin/R"
 : ${CC=$("${RBIN}" CMD config CC)}
-: ${HAVE_BLAS=$("${RBIN}" CMD config BLAS_LIBS)}
-: ${HAVE_LAPACK=$("${RBIN}" CMD config LAPACK_LIBS)}
+: ${R_BLAS=$("${RBIN}" CMD config BLAS_LIBS)}
+: ${R_LAPACK=$("${RBIN}" CMD config LAPACK_LIBS)}
 
 ROOT=$(
     cd "$(dirname "$0")" || exit
@@ -2464,6 +2465,7 @@ ROOT=$(
 SRC="${ROOT}/src"
 SE2="${SRC}/se2"
 IGRAPH="${SE2}/vendor/igraph"
+ARPACK="${SRC}/arpack"
 REL_IGRAPH=".${IGRAPH#"$SRC"}"
 
 # Only collects C files. If C++ needed, extend patterns.
@@ -4760,11 +4762,25 @@ SE2_LIBS="$PTHREAD_LIBS ${SE2_LIBS}"
 
 SE2_CPPFLAGS="${SE2_CPPFLAGS}  -I\"${SRC}/include\" -I\"${SE2}/include\" -I\"${IGRAPH}/include\" -I\"${IGRAPH}/src\" -I\"${IGRAPH}/vendor\""
 
+# Explicitly track only needed files.
+ARPACK_OBJECTS="${ARPACK}/SRC/dgetv0.o ${ARPACK}/SRC/dnaitr.o \
+${ARPACK}/SRC/dnapps.o ${ARPACK}/SRC/dnaup2.o ${ARPACK}/SRC/dnaupd.o \
+${ARPACK}/SRC/dnconv.o ${ARPACK}/SRC/dneigh.o ${ARPACK}/SRC/dneupd.o \
+${ARPACK}/SRC/dngets.o ${ARPACK}/SRC/dsaitr.o ${ARPACK}/SRC/dsapps.o \
+${ARPACK}/SRC/dsaup2.o ${ARPACK}/SRC/dsaupd.o ${ARPACK}/SRC/dsconv.o \
+${ARPACK}/SRC/dseigt.o ${ARPACK}/SRC/dsesrt.o ${ARPACK}/SRC/dseupd.o \
+${ARPACK}/SRC/dsgets.o ${ARPACK}/SRC/dsortc.o ${ARPACK}/SRC/dsortr.o \
+${ARPACK}/SRC/dstatn.o ${ARPACK}/SRC/dstats.o ${ARPACK}/SRC/dstqrb.o \
+${ARPACK}/UTIL/second.o ${ARPACK}/UTIL/dvout.o ${ARPACK}/UTIL/dmout.o \
+${ARPACK}/UTIL/ivout.o"
+
+# Always false now.
 
 
 
-if  test -n "${HAVE_BLAS}"  &&  test -n "${HAVE_LAPACK}" ; then
+if  test -n "${R_BLAS}"  &&  test -n "${R_LAPACK}" ; then
     SE2_LIBS="${SE2_LIBS} \$(LAPACK_LIBS) \$(BLAS_LIBS) \$(FLIBS)"
+
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for main in -larpack" >&5
 printf %s "checking for main in -larpack... " >&6; }
 if test ${ac_cv_lib_arpack_main+y}
@@ -4805,17 +4821,21 @@ then :
       SE2_LIBS="${SE2_LIBS} -larpack"
 else case e in #(
   e)
-      as_fn_error $? "ARPACK not found. Install ARPACK" "$LINENO" 5 ;;
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: arpack not found; compiling shipped arpack" >&5
+printf "%s\n" "$as_me: arpack not found; compiling shipped arpack" >&6;}
+      SE2_OBJECTS="${SE2_OBJECTS} ${ARPACK_OBJECTS}" ;;
 esac
 fi
 ac_cv_lib_arpack=ac_cv_lib_arpack_main
 else
-    as_fn_error $? "Linear algebra packages not found. Make sure BLAS, LAPACK, and ARPACK are installed." "$LINENO" 5
+    as_fn_error $? "Linear algebra packages not found. Make sure blas, lapack, and arpack are installed." "$LINENO" 5
 fi
 
 SE2_CPPFLAGS="${SE2_CPPFLAGS} ${CPPFLAGS}"
 SE2_LIBS="${SE2_LIBS} ${LDFLAGS}"
 SE2_CFLAGS="${SE2_CFLAGS} ${CFLAGS}"
+SE2_FFLAGS="${SE2_FFLAGS} ${FFLAGS} ${FCFLAGS}"
+
 
 
 

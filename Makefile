@@ -31,7 +31,6 @@ $(SRC_DIR)/include/config.h.in tools/config.sub tools/config.guess:
 	autoreconf -i
 
 $(SRC_DIR)/include/igraph_version.h: $(SRC_DIR)/se2/vendor/igraph/include/igraph_version.h.in
-	echo $${MAJOR}
 	sed -e "s/\@PACKAGE_VERSION\@/$(VERSION)/g" \
 	  -e "s/\@PACKAGE_VERSION_MAJOR\@/$(MAJOR_VERSION)/g" \
 	  -e "s/\@PACKAGE_VERSION_MINOR\@/$(MINOR_VERSION)/g" \

@@ -30,8 +30,8 @@ if test -z "${R_HOME}"; then
 fi
 RBIN="${R_HOME}/bin/R"
 : ${CC=$("${RBIN}" CMD config CC)}
-: ${HAVE_BLAS=$("${RBIN}" CMD config BLAS_LIBS)}
-: ${HAVE_LAPACK=$("${RBIN}" CMD config LAPACK_LIBS)}
+: ${R_BLAS=$("${RBIN}" CMD config BLAS_LIBS)}
+: ${R_LAPACK=$("${RBIN}" CMD config LAPACK_LIBS)}
 
 ROOT=$(
     cd "$(dirname "$0")" || exit
@@ -40,6 +40,7 @@ ROOT=$(
 SRC="${ROOT}/src"
 SE2="${SRC}/se2"
 IGRAPH="${SE2}/vendor/igraph"
+ARPACK="${SRC}/arpack"
 REL_IGRAPH=".${IGRAPH#"$SRC"}"
 
 # Only collects C files. If C++ needed, extend patterns.
@@ -95,27 +96,44 @@ SE2_LIBS="$PTHREAD_LIBS ${SE2_LIBS}"
 
 SE2_CPPFLAGS="${SE2_CPPFLAGS}  -I\"${SRC}/include\" -I\"${SE2}/include\" -I\"${IGRAPH}/include\" -I\"${IGRAPH}/src\" -I\"${IGRAPH}/vendor\""
 
-AH_TEMPLATE([INTERNAL_BLAS], [Use internal BLAS library.])
-AH_TEMPLATE([INTERNAL_LAPACK], [Use internal LAPACK library.])
-AH_TEMPLATE([INTERNAL_ARPACK], [Use internal ARPACK library.])
-if [ test -n "${HAVE_BLAS}" ] && [ test -n "${HAVE_LAPACK}" ]; then
+# Explicitly track only needed files.
+ARPACK_OBJECTS="${ARPACK}/SRC/dgetv0.o ${ARPACK}/SRC/dnaitr.o \
+${ARPACK}/SRC/dnapps.o ${ARPACK}/SRC/dnaup2.o ${ARPACK}/SRC/dnaupd.o \
+${ARPACK}/SRC/dnconv.o ${ARPACK}/SRC/dneigh.o ${ARPACK}/SRC/dneupd.o \
+${ARPACK}/SRC/dngets.o ${ARPACK}/SRC/dsaitr.o ${ARPACK}/SRC/dsapps.o \
+${ARPACK}/SRC/dsaup2.o ${ARPACK}/SRC/dsaupd.o ${ARPACK}/SRC/dsconv.o \
+${ARPACK}/SRC/dseigt.o ${ARPACK}/SRC/dsesrt.o ${ARPACK}/SRC/dseupd.o \
+${ARPACK}/SRC/dsgets.o ${ARPACK}/SRC/dsortc.o ${ARPACK}/SRC/dsortr.o \
+${ARPACK}/SRC/dstatn.o ${ARPACK}/SRC/dstats.o ${ARPACK}/SRC/dstqrb.o \
+${ARPACK}/UTIL/second.o ${ARPACK}/UTIL/dvout.o ${ARPACK}/UTIL/dmout.o \
+${ARPACK}/UTIL/ivout.o"
+
+# Always false now.
+AH_TEMPLATE([INTERNAL_BLAS], [Use internal blas library.])
+AH_TEMPLATE([INTERNAL_LAPACK], [Use internal lapack library.])
+AH_TEMPLATE([INTERNAL_ARPACK], [Use internal arpack library.])
+if [ test -n "${R_BLAS}" ] && [ test -n "${R_LAPACK}" ]; then
     SE2_LIBS="${SE2_LIBS} \$(LAPACK_LIBS) \$(BLAS_LIBS) \$(FLIBS)"
+
     AC_CHECK_LIB([arpack],[main],[
       SE2_LIBS="${SE2_LIBS} -larpack"],[
-      AC_MSG_ERROR([ARPACK not found. Install ARPACK])],
+      AC_MSG_NOTICE([arpack not found; compiling shipped arpack])
+      SE2_OBJECTS="${SE2_OBJECTS} ${ARPACK_OBJECTS}"],
       [])ac_cv_lib_arpack=ac_cv_lib_arpack_main
 else
-    AC_MSG_ERROR([Linear algebra packages not found. Make sure BLAS, LAPACK, and ARPACK are installed.])
+    AC_MSG_ERROR([Linear algebra packages not found. Make sure blas, lapack, and arpack are installed.])
 fi
 
 dnl Respect user specified options.
 SE2_CPPFLAGS="${SE2_CPPFLAGS} ${CPPFLAGS}"
 SE2_LIBS="${SE2_LIBS} ${LDFLAGS}"
 SE2_CFLAGS="${SE2_CFLAGS} ${CFLAGS}"
+SE2_FFLAGS="${SE2_FFLAGS} ${FFLAGS} ${FCFLAGS}"
 
 AC_SUBST(SE2_CPPFLAGS)
 AC_SUBST(SE2_LIBS)
 AC_SUBST(SE2_CFLAGS)
+AC_SUBST(SE2_FFLAGS)
 AC_SUBST(SE2_OBJECTS)
 
 AC_OUTPUT

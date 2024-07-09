@@ -4,6 +4,7 @@ licenses.
 
 * igraph: GPLv2
 * SpeakEasy2: GPLv3+
+* arpack-ng: BSD
 * PCG: See src/se2/vendor/igraph/vendor/pcg/LICENSE.txt
 * CXSparse: LGPLv2.1
 
