@@ -13,7 +13,7 @@ REL_IGRAPH=".${IGRAPH#"$SRC"}"
 collect_objs() {
     cd "$SRC" || exit
     obj_path="${1#"$SRC"}"
-    find ".$obj_path" -name '*.c' | sed -n 's/\.c/.o/p' | tr '\n' ' '
+    find ".$obj_path" -name '*.c' -or -name '*.f' | sed -n 's/.$/o/p' | tr '\n' ' '
 }
 
 # Attempt to piece-wise collect igraph source files to reduce hard to handle
@@ -49,16 +49,7 @@ IGRAPH_RAND_OBJS=$(collect_objs "${IGRAPH}/src/random")
 CS_OBJS=$(collect_objs "${IGRAPH}/vendor/cs")
 PCG_OBJS=$(collect_objs "${IGRAPH}/vendor/pcg")
 
-ARPACK_OBJECTS="${ARPACK}/SRC/dgetv0.o ${ARPACK}/SRC/dnaitr.o \
-${ARPACK}/SRC/dnapps.o ${ARPACK}/SRC/dnaup2.o ${ARPACK}/SRC/dnaupd.o \
-${ARPACK}/SRC/dnconv.o ${ARPACK}/SRC/dneigh.o ${ARPACK}/SRC/dneupd.o \
-${ARPACK}/SRC/dngets.o ${ARPACK}/SRC/dsaitr.o ${ARPACK}/SRC/dsapps.o \
-${ARPACK}/SRC/dsaup2.o ${ARPACK}/SRC/dsaupd.o ${ARPACK}/SRC/dsconv.o \
-${ARPACK}/SRC/dseigt.o ${ARPACK}/SRC/dsesrt.o ${ARPACK}/SRC/dseupd.o \
-${ARPACK}/SRC/dsgets.o ${ARPACK}/SRC/dsortc.o ${ARPACK}/SRC/dsortr.o \
-${ARPACK}/SRC/dstatn.o ${ARPACK}/SRC/dstats.o ${ARPACK}/SRC/dstqrb.o \
-${ARPACK}/UTIL/second.o ${ARPACK}/UTIL/dvout.o ${ARPACK}/UTIL/dmout.o \
-${ARPACK}/UTIL/ivout.o"
+ARPACK_OBJECTS=$(collect_objs "$ARPACK")
 
 cp "${ROOT}"/src/include/config.h.win "${ROOT}"/src/include/config.h
 
