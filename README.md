@@ -32,8 +32,7 @@ Installation with `devtools::install_github` has been tested in clean VMs runnin
 To set up the development environment on Windows, install the appropriate version of [Rtools](https://cran.r-project.org/bin/windows/Rtools/) for your R install. Using Rtools' MSYS2, install the required build tools. This has been tested with ucrt64 environment but likely works in other environments.
 
 ```bash
-pacman -S mingw-w64-ucrt-x86_64-toolchain \
-	mingw-ucrt-w64-x86_64-libxml2 git
+pacman -S mingw-w64-ucrt-x86_64-toolchain git
 ```
 
 ## Building from source
@@ -54,3 +53,7 @@ It should now be possible to run `devtools::load_all()` in `R`.
 
 GNU autotools is used to generate the configuration script and files needed to run the configuration script. `R`'s build commands do not run `autoconf` instead, if changes are made to the `configuration.ac` file, `autoconf` (and possibly `autoreconf -i`) needs to be run and manually and the resulting files should be committed along with the source `configuration.ac` file.
 The `Makefile` can determine when the `autoconf` programs need to be run by either directly calling the configure target (i.e. `make configure`) or running a build target (i.e. `make build` or `make check` or similar).
+
+The `makefile` in the top level directory is intended for development. It will automate recreating committed generated files when needed. These generated files must be committed with changes to the source files that created them as they are not created by the `R CMD build` command. It should always be possible to run `R CMD build` to build the project in a clean state without needing to run `make` to generate other files. The `makefile` also sets some flags to provide stricter checks than what are run during the normal build process.
+
+As `clang` and `gcc` can behave differently changes should be tested against both. To explicitly set the compiler used run `make ${target} CC=${CC}` where target is likely `build` or `check` and CC is either `clang` or `gcc`.
