@@ -1,8 +1,13 @@
 export ROOT_DIR := $(PWD)
 export SRC_DIR := $(ROOT_DIR)/src
 
+CFLAGS := -Wall -pedantic
+FFLAGS := -Wall -pedantic
+
 R_FILES := $(wildcard $(ROOT_DIR)/R/*.R)
+C_FILES := $(wildcard $(ROOT_DIR)/src/*.c)
 HEADERS := $(wildcard $(ROOT_DIR)/src/include/*.h)
+ARPACK := $(wildcard $(ROOT_DIR)/src/arpack/*)
 BUILD_FLAGS :=
 VERSION := $(shell \
 	grep -o "Version: [[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+" < DESCRIPTION | \
@@ -19,10 +24,11 @@ all: build
 .PHONY: build
 build: speakeasyR_$(VERSION).tar.gz
 
-speakeasyR_$(VERSION).tar.gz: $(SRC_DIR)/speakeasyR.c $(R_FILES) $(HEADERS)
-speakeasyR_$(VERSION).tar.gz: configure $(SRC_DIR)/Makevars.in
-speakeasyR_$(VERSION).tar.gz: $(SRC_DIR)/include/igraph_version.h
-	R CMD build $(BUILD_FLAGS) $(ROOT_DIR)
+speakeasyR_$(VERSION).tar.gz: $(SRC_DIR)/speakeasyR.c $(R_FILES) $(C_FILES)
+speakeasyR_$(VERSION).tar.gz: $(HEADERS) configure $(SRC_DIR)/Makevars.in
+speakeasyR_$(VERSION).tar.gz: $(SRC_DIR)/include/igraph_version.h $(ARPACK)
+	CC="$(CC)" CFLAGS="$(CFLAGS)" FFLAGS="$(FFLAGS)" \
+	  R CMD build $(BUILD_FLAGS) $(ROOT_DIR)
 
 configure: configure.ac tools/config.guess tools/config.sub $(SRC_DIR)/include/config.h.in
 	autoconf
@@ -38,7 +44,8 @@ $(SRC_DIR)/include/igraph_version.h: $(SRC_DIR)/se2/vendor/igraph/include/igraph
 
 .PHONY: check
 check: build
-	R CMD check --as-cran speakeasyR_$(VERSION).tar.gz
+	CC="$(CC)" CFLAGS="$(CFLAGS)" FFLAGS="$(FFLAGS)" \
+	  R CMD check --as-cran speakeasyR_$(VERSION).tar.gz
 
 .PHONY: check-deps
 check-deps: build
