@@ -106,11 +106,10 @@ AH_TEMPLATE([INTERNAL_ARPACK], [Use internal arpack library.])
 if [ test -n "${R_BLAS}" ] && [ test -n "${R_LAPACK}" ]; then
     SE2_LIBS="${SE2_LIBS} \$(LAPACK_LIBS) \$(BLAS_LIBS) \$(FLIBS)"
 
-    AC_CHECK_LIB([arpack],[main],[
+    PKG_CHECK_MODULES([arpack], [arpack],[
       SE2_LIBS="${SE2_LIBS} -larpack"],[
       AC_MSG_NOTICE([arpack not found; compiling shipped arpack])
-      SE2_OBJECTS="${SE2_OBJECTS} ${ARPACK_OBJECTS}"],
-      [])ac_cv_lib_arpack=ac_cv_lib_arpack_main
+      SE2_OBJECTS="${SE2_OBJECTS} ${ARPACK_OBJECTS}"])
 else
     AC_MSG_ERROR([Linear algebra packages not found. Make sure blas, lapack, and arpack are installed.])
 fi

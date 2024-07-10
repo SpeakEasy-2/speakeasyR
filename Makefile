@@ -30,10 +30,10 @@ speakeasyR_$(VERSION).tar.gz: $(SRC_DIR)/include/igraph_version.h $(ARPACK)
 	CC="$(CC)" CFLAGS="$(CFLAGS)" FFLAGS="$(FFLAGS)" \
 	  R CMD build $(BUILD_FLAGS) $(ROOT_DIR)
 
-configure: configure.ac tools/config.guess tools/config.sub $(SRC_DIR)/include/config.h.in
+configure: configure.ac tools/config.guess tools/config.sub $(SRC_DIR)/include/config.h.in aclocal.m4
 	autoconf
 
-$(SRC_DIR)/include/config.h.in tools/config.sub tools/config.guess:
+$(SRC_DIR)/include/config.h.in tools/config.sub tools/config.guess aclocal.m4:
 	autoreconf -i
 
 $(SRC_DIR)/include/igraph_version.h: $(SRC_DIR)/se2/vendor/igraph/include/igraph_version.h.in
@@ -65,6 +65,8 @@ clean:
 	rm -f configure~
 	rm -f src/include/config.h.in~
 	rm -f config.*
+	rm -f aclocal.m4
+	rm -rf autom4te.cache
 
 .PHONY: clean-dist
 clean-dist: clean
