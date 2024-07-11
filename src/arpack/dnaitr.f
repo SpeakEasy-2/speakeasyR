@@ -131,10 +131,6 @@ c     TR95-13, Department of Computational and Applied Mathematics.
 c
 c\Routines called:
 c     dgetv0  ARPACK routine to generate the initial vector.
-c     ivout   ARPACK utility routine that prints integers.
-c     arscnd  ARPACK utility routine for timing.
-c     dmout   ARPACK utility routine that prints matrices
-c     dvout   ARPACK utility routine that prints vectors.
 c     dlabad  LAPACK routine that computes machine constants.
 c     dlamch  LAPACK routine that determines machine constants.
 c     dlascl  LAPACK routine for careful scaling of a matrix.
@@ -210,13 +206,6 @@ c
      &   (ido, bmat, n, k, np, nb, resid, rnorm, v, ldv, h, ldh,
      &    ipntr, workd, info)
 c
-c     %----------------------------------------------------%
-c     | Include files for debugging and timing information |
-c     %----------------------------------------------------%
-c
-      include   'debug.h'
-      include   'stat.h'
-c
 c     %------------------%
 c     | Scalar Arguments |
 c     %------------------%
@@ -247,28 +236,19 @@ c     | Local Scalars |
 c     %---------------%
 c
       logical    first, orth1, orth2, rstart, step3, step4
-      integer    ierr, i, infol, ipj, irj, ivj, iter, itry, j, msglvl,
-     &           jj
+      integer    ierr, i, infol, ipj, irj, ivj, iter, itry, j, jj
       Double precision
      &           betaj, ovfl, temp1, rnorm1, smlnum, tst1, ulp, unfl,
      &           wnorm
       save       first, orth1, orth2, rstart, step3, step4,
-     &           ierr, ipj, irj, ivj, iter, itry, j, msglvl, ovfl,
+     &           ierr, ipj, irj, ivj, iter, itry, j, ovfl,
      &           betaj, rnorm1, smlnum, ulp, unfl, wnorm
-c
-c     %-----------------------%
-c     | Local Array Arguments |
-c     %-----------------------%
-c
-      Double precision
-     &           xtemp(2)
 c
 c     %----------------------%
 c     | External Subroutines |
 c     %----------------------%
 c
-      external   daxpy, dcopy, dscal, dgemv, dgetv0, dlabad,
-     &           dvout, dmout, ivout, arscnd
+      external   daxpy, dcopy, dscal, dgemv, dgetv0, dlabad
 c
 c     %--------------------%
 c     | External Functions |
@@ -313,14 +293,6 @@ c
       end if
 c
       if (ido .eq. 0) then
-c
-c        %-------------------------------%
-c        | Initialize timing statistics  |
-c        | & message level for debugging |
-c        %-------------------------------%
-c
-         call arscnd (t0)
-         msglvl = mnaitr
 c
 c        %------------------------------%
 c        | Initial call to this routine |
@@ -370,13 +342,6 @@ c     %--------------------------------------------------------------%
 
  1000 continue
 c
-         if (msglvl .gt. 1) then
-            call ivout (logfil, 1, [j], ndigit,
-     &                  '_naitr: generating Arnoldi vector number')
-            call dvout (logfil, 1, [rnorm], ndigit,
-     &                  '_naitr: B-norm of the current residual is')
-         end if
-c
 c        %---------------------------------------------------%
 c        | STEP 1: Check if the B norm of j-th residual      |
 c        | vector is zero. Equivalent to determining whether |
@@ -391,11 +356,6 @@ c           | Invariant subspace found, generate a new starting |
 c           | vector which is orthogonal to the current Arnoldi |
 c           | basis and continue the iteration.                 |
 c           %---------------------------------------------------%
-c
-            if (msglvl .gt. 0) then
-               call ivout (logfil, 1, [j], ndigit,
-     &                     '_naitr: ****** RESTART AT STEP ******')
-            end if
 c
 c           %---------------------------------------------%
 c           | ITRY is the loop variable that controls the |
@@ -430,8 +390,6 @@ c              | which spans OP and exit.                       |
 c              %------------------------------------------------%
 c
                info = j - 1
-               call arscnd (t1)
-               tnaitr = tnaitr + (t1 - t0)
                ido = 99
                go to 9000
             end if
@@ -470,7 +428,6 @@ c        %------------------------------------------------------%
 c
          step3 = .true.
          nopx  = nopx + 1
-         call arscnd (t2)
          call dcopy (n, v(1,j), 1, workd(ivj), 1)
          ipntr(1) = ivj
          ipntr(2) = irj
@@ -490,9 +447,6 @@ c        | WORKD(IRJ:IRJ+N-1) := OP*v_{j}   |
 c        | if step3 = .true.                |
 c        %----------------------------------%
 c
-         call arscnd (t3)
-         tmvopx = tmvopx + (t3 - t2)
-
          step3 = .false.
 c
 c        %------------------------------------------%
@@ -506,7 +460,6 @@ c        | STEP 4:  Finish extending the Arnoldi |
 c        |          factorization to length j.   |
 c        %---------------------------------------%
 c
-         call arscnd (t2)
          if (bmat .eq. 'G') then
             nbx = nbx + 1
             step4 = .true.
@@ -529,11 +482,6 @@ c        | Back from reverse communication; |
 c        | WORKD(IPJ:IPJ+N-1) := B*OP*v_{j} |
 c        | if step4 = .true.                |
 c        %----------------------------------%
-c
-         if (bmat .eq. 'G') then
-            call arscnd (t3)
-            tmvbx = tmvbx + (t3 - t2)
-         end if
 c
          step4 = .false.
 c
@@ -576,11 +524,8 @@ c
 c
          if (j .gt. 1) h(j,j-1) = betaj
 c
-         call arscnd (t4)
-c
          orth1 = .true.
 c
-         call arscnd (t2)
          if (bmat .eq. 'G') then
             nbx = nbx + 1
             call dcopy (n, resid, 1, workd(irj), 1)
@@ -602,11 +547,6 @@ c        %---------------------------------------------------%
 c        | Back from reverse communication if ORTH1 = .true. |
 c        | WORKD(IPJ:IPJ+N-1) := B*r_{j}.                    |
 c        %---------------------------------------------------%
-c
-         if (bmat .eq. 'G') then
-            call arscnd (t3)
-            tmvbx = tmvbx + (t3 - t2)
-         end if
 c
          orth1 = .false.
 c
@@ -652,15 +592,6 @@ c        %---------------------------------------------------%
 c
    80    continue
 c
-         if (msglvl .gt. 2) then
-            xtemp(1) = wnorm
-            xtemp(2) = rnorm
-            call dvout (logfil, 2, xtemp, ndigit,
-     &           '_naitr: re-orthonalization; wnorm and rnorm are')
-            call dvout (logfil, j, h(1,j), ndigit,
-     &                  '_naitr: j-th column of H')
-         end if
-c
 c        %----------------------------------------------------%
 c        | Compute V_{j}^T * B * r_{j}.                       |
 c        | WORKD(IRJ:IRJ+J-1) = v(:,1:J)'*WORKD(IPJ:IPJ+N-1). |
@@ -681,7 +612,6 @@ c
          call daxpy (j, one, workd(irj), 1, h(1,j), 1)
 c
          orth2 = .true.
-         call arscnd (t2)
          if (bmat .eq. 'G') then
             nbx = nbx + 1
             call dcopy (n, resid, 1, workd(irj), 1)
@@ -704,11 +634,6 @@ c        %---------------------------------------------------%
 c        | Back from reverse communication if ORTH2 = .true. |
 c        %---------------------------------------------------%
 c
-         if (bmat .eq. 'G') then
-            call arscnd (t3)
-            tmvbx = tmvbx + (t3 - t2)
-         end if
-c
 c        %-----------------------------------------------------%
 c        | Compute the B-norm of the corrected residual r_{j}. |
 c        %-----------------------------------------------------%
@@ -718,17 +643,6 @@ c
              rnorm1 = sqrt(abs(rnorm1))
          else if (bmat .eq. 'I') then
              rnorm1 = dnrm2(n, resid, 1)
-         end if
-c
-         if (msglvl .gt. 0 .and. iter .gt. 0) then
-            call ivout (logfil, 1, [j], ndigit,
-     &           '_naitr: Iterative refinement for Arnoldi residual')
-            if (msglvl .gt. 2) then
-                xtemp(1) = rnorm
-                xtemp(2) = rnorm1
-                call dvout (logfil, 2, xtemp, ndigit,
-     &           '_naitr: iterative refinement ; rnorm and rnorm1 are')
-            end if
          end if
 c
 c        %-----------------------------------------%
@@ -783,17 +697,12 @@ c
          rstart = .false.
          orth2  = .false.
 c
-         call arscnd (t5)
-         titref = titref + (t5 - t4)
-c
 c        %------------------------------------%
 c        | STEP 6: Update  j = j+1;  Continue |
 c        %------------------------------------%
 c
          j = j + 1
          if (j .gt. k+np) then
-            call arscnd (t1)
-            tnaitr = tnaitr + (t1 - t0)
             ido = 99
             do 110 i = max(1,k), k+np-1
 c
@@ -809,11 +718,6 @@ c
                if( abs( h( i+1,i ) ).le.max( ulp*tst1, smlnum ) )
      &              h(i+1,i) = zero
  110        continue
-c
-            if (msglvl .gt. 2) then
-               call dmout (logfil, k+np, k+np, h, ldh, ndigit,
-     &          '_naitr: Final upper Hessenberg matrix H of order K+NP')
-            end if
 c
             go to 9000
          end if

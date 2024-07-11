@@ -38,7 +38,6 @@ c\Local variables:
 c     xxxxxx  real
 c
 c\Routines called:
-c     arscnd  ARPACK utility routine for timing.
 c     dlamch  LAPACK routine that determines machine constants.
 c     dlapy2  LAPACK routine to compute sqrt(x**2+y**2) carefully.
 c
@@ -64,13 +63,6 @@ c
 c-----------------------------------------------------------------------
 c
       subroutine dnconv (n, ritzr, ritzi, bounds, tol, nconv)
-c
-c     %----------------------------------------------------%
-c     | Include files for debugging and timing information |
-c     %----------------------------------------------------%
-c
-      include   'debug.h'
-      include   'stat.h'
 c
 c     %------------------%
 c     | Scalar Arguments |
@@ -119,8 +111,6 @@ c     |                                                             |
 c     | for some appropriate choice of norm.                        |
 c     %-------------------------------------------------------------%
 c
-      call arscnd (t0)
-c
 c     %---------------------------------%
 c     | Get machine dependent constant. |
 c     %---------------------------------%
@@ -133,9 +123,6 @@ c
          temp = max( eps23, dlapy2( ritzr(i), ritzi(i) ) )
          if (bounds(i) .le. tol*temp)   nconv = nconv + 1
    20 continue
-c
-      call arscnd (t1)
-      tnconv = tnconv + (t1 - t0)
 c
       return
 c

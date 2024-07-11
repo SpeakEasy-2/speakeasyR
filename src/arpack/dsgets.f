@@ -64,9 +64,6 @@ c     xxxxxx  real
 c
 c\Routines called:
 c     dsortr  ARPACK utility sorting routine.
-c     ivout   ARPACK utility routine that prints integers.
-c     arscnd  ARPACK utility routine for timing.
-c     dvout   ARPACK utility routine that prints vectors.
 c     dcopy   Level 1 BLAS that copies one vector to another.
 c     dswap   Level 1 BLAS that swaps the contents of two vectors.
 c
@@ -91,13 +88,6 @@ c
 c-----------------------------------------------------------------------
 c
       subroutine dsgets ( ishift, which, kev, np, ritz, bounds, shifts )
-c
-c     %----------------------------------------------------%
-c     | Include files for debugging and timing information |
-c     %----------------------------------------------------%
-c
-      include   'debug.h'
-      include   'stat.h'
 c
 c     %------------------%
 c     | Scalar Arguments |
@@ -125,13 +115,13 @@ c     %---------------%
 c     | Local Scalars |
 c     %---------------%
 c
-      integer    kevd2, msglvl
+      integer    kevd2
 c
 c     %----------------------%
 c     | External Subroutines |
 c     %----------------------%
 c
-      external   dswap, dcopy, dsortr, arscnd
+      external   dswap, dcopy, dsortr
 c
 c     %---------------------%
 c     | Intrinsic Functions |
@@ -142,14 +132,6 @@ c
 c     %-----------------------%
 c     | Executable Statements |
 c     %-----------------------%
-c
-c     %-------------------------------%
-c     | Initialize timing statistics  |
-c     | & message level for debugging |
-c     %-------------------------------%
-c
-      call arscnd (t0)
-      msglvl = msgets
 c
       if (which .eq. 'BE') then
 c
@@ -196,18 +178,6 @@ c        %-------------------------------------------------------%
 c
          call dsortr ('SM', .true., np, bounds, ritz)
          call dcopy (np, ritz, 1, shifts, 1)
-      end if
-c
-      call arscnd (t1)
-      tsgets = tsgets + (t1 - t0)
-c
-      if (msglvl .gt. 0) then
-         call ivout (logfil, 1, [kev], ndigit, '_sgets: KEV is')
-         call ivout (logfil, 1, [np], ndigit, '_sgets: NP is')
-         call dvout (logfil, kev+np, ritz, ndigit,
-     &        '_sgets: Eigenvalues of current H matrix')
-         call dvout (logfil, kev+np, bounds, ndigit,
-     &        '_sgets: Associated Ritz estimates')
       end if
 c
       return

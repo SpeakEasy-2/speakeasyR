@@ -63,9 +63,6 @@ c
 c\Routines called:
 c     dlahqr  LAPACK routine to compute the real Schur form of an
 c             upper Hessenberg matrix and last row of the Schur vectors.
-c     arscnd  ARPACK utility routine for timing.
-c     dmout   ARPACK utility routine that prints matrices
-c     dvout   ARPACK utility routine that prints vectors.
 c     dlacpy  LAPACK matrix copy routine.
 c     dlapy2  LAPACK routine to compute sqrt(x**2+y**2) carefully.
 c     dtrevc  LAPACK routine to compute the eigenvectors of a matrix
@@ -100,13 +97,6 @@ c
       subroutine dneigh (rnorm, n, h, ldh, ritzr, ritzi, bounds,
      &                   q, ldq, workl, ierr)
 c
-c     %----------------------------------------------------%
-c     | Include files for debugging and timing information |
-c     %----------------------------------------------------%
-c
-      include   'debug.h'
-      include   'stat.h'
-c
 c     %------------------%
 c     | Scalar Arguments |
 c     %------------------%
@@ -136,7 +126,7 @@ c     | Local Scalars & Arrays |
 c     %------------------------%
 c
       logical    select(1)
-      integer    i, iconj, msglvl
+      integer    i, iconj
       Double precision
      &           temp, vl(1)
 c
@@ -144,7 +134,7 @@ c     %----------------------%
 c     | External Subroutines |
 c     %----------------------%
 c
-      external   dcopy, dlacpy, dlahqr, dtrevc, dvout, arscnd
+      external   dcopy, dlacpy, dlahqr, dtrevc
 c
 c     %--------------------%
 c     | External Functions |
@@ -165,19 +155,6 @@ c     | Executable Statements |
 c     %-----------------------%
 c
 c
-c     %-------------------------------%
-c     | Initialize timing statistics  |
-c     | & message level for debugging |
-c     %-------------------------------%
-c
-      call arscnd (t0)
-      msglvl = mneigh
-c
-      if (msglvl .gt. 2) then
-          call dmout (logfil, n, n, h, ldh, ndigit,
-     &         '_neigh: Entering upper Hessenberg matrix H ')
-      end if
-c
 c     %-----------------------------------------------------------%
 c     | 1. Compute the eigenvalues, the last components of the    |
 c     |    corresponding Schur vectors and the full Schur form T  |
@@ -195,10 +172,6 @@ c
      &            bounds, 1, ierr)
       if (ierr .ne. 0) go to 9000
 c
-      if (msglvl .gt. 1) then
-         call dvout (logfil, n, bounds, ndigit,
-     &              '_neigh: last row of the Schur matrix for H')
-      end if
 c
 c     %-----------------------------------------------------------%
 c     | 2. Compute the eigenvectors of the full Schur form T and  |
@@ -258,11 +231,6 @@ c
 c
       call dgemv ('T', n, n, one, q, ldq, bounds, 1, zero, workl, 1)
 c
-      if (msglvl .gt. 1) then
-         call dvout (logfil, n, workl, ndigit,
-     &              '_neigh: Last row of the eigenvector matrix for H')
-      end if
-c
 c     %----------------------------%
 c     | Compute the Ritz estimates |
 c     %----------------------------%
@@ -295,18 +263,6 @@ c
             end if
          end if
    20 continue
-c
-      if (msglvl .gt. 2) then
-         call dvout (logfil, n, ritzr, ndigit,
-     &              '_neigh: Real part of the eigenvalues of H')
-         call dvout (logfil, n, ritzi, ndigit,
-     &              '_neigh: Imaginary part of the eigenvalues of H')
-         call dvout (logfil, n, bounds, ndigit,
-     &              '_neigh: Ritz estimates for the eigenvalues of H')
-      end if
-c
-      call arscnd (t1)
-      tneigh = tneigh + (t1 - t0)
 c
  9000 continue
       return

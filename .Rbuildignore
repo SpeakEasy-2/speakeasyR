@@ -16,6 +16,8 @@
 \.ccls-cache$
 \.clang-format$
 \.mergify.yml$
+^aclocal\.m4$
+^autom4te\.cache$
 ^src/se2/examples$
 ^src/se2/CHANGELOG\.md$
 ^src/se2/flake\.

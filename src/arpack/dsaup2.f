@@ -147,9 +147,6 @@ c     dsconv  ARPACK convergence of Ritz values routine.
 c     dseigt  ARPACK compute Ritz values and error bounds routine.
 c     dsgets  ARPACK reorder Ritz values and error bounds routine.
 c     dsortr  ARPACK sorting routine.
-c     ivout   ARPACK utility routine that prints integers.
-c     arscnd  ARPACK utility routine for timing.
-c     dvout   ARPACK utility routine that prints vectors.
 c     dlamch  LAPACK routine that determines machine constants.
 c     dcopy   Level 1 BLAS that copies one vector to another.
 c     ddot    Level 1 BLAS that computes the scalar product of two vectors.
@@ -180,13 +177,6 @@ c
      &   ( ido, bmat, n, which, nev, np, tol, resid, mode, iupd,
      &     ishift, mxiter, v, ldv, h, ldh, ritz, bounds,
      &     q, ldq, workl, ipntr, workd, info )
-c
-c     %----------------------------------------------------%
-c     | Include files for debugging and timing information |
-c     %----------------------------------------------------%
-c
-      include   'debug.h'
-      include   'stat.h'
 c
 c     %------------------%
 c     | Scalar Arguments |
@@ -222,12 +212,12 @@ c     %---------------%
 c
       character  wprime*2
       logical    cnorm, getv0, initv, update, ushift
-      integer    ierr, iter, j, kplusp, msglvl, nconv, nevbef, nev0,
+      integer    ierr, iter, j, kplusp, nconv, nevbef, nev0,
      &           np0, nptemp, nevd2, nevm2, kp(3)
       Double precision
      &           rnorm, temp, eps23
       save       cnorm, getv0, initv, update, ushift,
-     &           iter, kplusp, msglvl, nconv, nev0, np0,
+     &           iter, kplusp, nconv, nev0, np0,
      &           rnorm, eps23
 c
 c     %----------------------%
@@ -235,7 +225,7 @@ c     | External Subroutines |
 c     %----------------------%
 c
       external   dcopy, dgetv0, dsaitr, dscal, dsconv, dseigt, dsgets,
-     &           dsapps, dsortr, dvout, ivout, arscnd, dswap
+     &           dsapps, dsortr, dswap
 c
 c     %--------------------%
 c     | External Functions |
@@ -256,14 +246,6 @@ c     | Executable Statements |
 c     %-----------------------%
 c
       if (ido .eq. 0) then
-c
-c        %-------------------------------%
-c        | Initialize timing statistics  |
-c        | & message level for debugging |
-c        %-------------------------------%
-c
-         call arscnd (t0)
-         msglvl = msaup2
 c
 c        %---------------------------------%
 c        | Set machine dependent constant. |
@@ -401,17 +383,6 @@ c
 c
          iter = iter + 1
 c
-         if (msglvl .gt. 0) then
-            call ivout (logfil, 1, [iter], ndigit,
-     &           '_saup2: **** Start of major iteration number ****')
-         end if
-         if (msglvl .gt. 1) then
-            call ivout (logfil, 1, [nev], ndigit,
-     &     '_saup2: The length of the current Lanczos factorization')
-            call ivout (logfil, 1, [np], ndigit,
-     &           '_saup2: Extend the Lanczos factorization by')
-         end if
-c
 c        %------------------------------------------------------------%
 c        | Compute NP additional steps of the Lanczos factorization. |
 c        %------------------------------------------------------------%
@@ -444,11 +415,6 @@ c
             go to 1200
          end if
          update = .false.
-c
-         if (msglvl .gt. 1) then
-            call dvout (logfil, 1, [rnorm], ndigit,
-     &           '_saup2: Current B-norm of residual for factorization')
-         end if
 c
 c        %--------------------------------------------------------%
 c        | Compute the eigenvalues and corresponding error bounds |
@@ -490,18 +456,6 @@ c        %-------------------%
 c
          call dcopy (nev, bounds(np+1), 1, workl(np+1), 1)
          call dsconv (nev, ritz(np+1), workl(np+1), tol, nconv)
-c
-         if (msglvl .gt. 2) then
-            kp(1) = nev
-            kp(2) = np
-            kp(3) = nconv
-            call ivout (logfil, 3, kp, ndigit,
-     &                  '_saup2: NEV, NP, NCONV are')
-            call dvout (logfil, kplusp, ritz, ndigit,
-     &           '_saup2: The eigenvalues of H')
-            call dvout (logfil, kplusp, bounds, ndigit,
-     &          '_saup2: Ritz estimates of the current NCV Ritz values')
-         end if
 c
 c        %---------------------------------------------------------%
 c        | Count the number of unwanted Ritz values that have zero |
@@ -644,13 +598,6 @@ c           %------------------------------------------%
 c
             h(1,1) = rnorm
 c
-            if (msglvl .gt. 1) then
-               call dvout (logfil, kplusp, ritz, ndigit,
-     &            '_saup2: Sorted Ritz values.')
-               call dvout (logfil, kplusp, bounds, ndigit,
-     &            '_saup2: Sorted ritz estimates.')
-            end if
-c
 c           %------------------------------------%
 c           | Max iterations have been exceeded. |
 c           %------------------------------------%
@@ -694,22 +641,6 @@ c
 c
          end if
 c
-         if (msglvl .gt. 0) then
-            call ivout (logfil, 1, [nconv], ndigit,
-     &           '_saup2: no. of "converged" Ritz values at this iter.')
-            if (msglvl .gt. 1) then
-               kp(1) = nev
-               kp(2) = np
-               call ivout (logfil, 2, kp, ndigit,
-     &              '_saup2: NEV and NP are')
-               call dvout (logfil, nev, ritz(np+1), ndigit,
-     &              '_saup2: "wanted" Ritz values.')
-               call dvout (logfil, nev, bounds(np+1), ndigit,
-     &              '_saup2: Ritz estimates of the "wanted" values ')
-            end if
-         end if
-
-c
          if (ishift .eq. 0) then
 c
 c           %-----------------------------------------------------%
@@ -742,17 +673,6 @@ c        %---------------------------------------------------------%
 c
          if (ishift .eq. 0) call dcopy (np, workl, 1, ritz, 1)
 c
-         if (msglvl .gt. 2) then
-            call ivout (logfil, 1, [np], ndigit,
-     &                  '_saup2: The number of shifts to apply ')
-            call dvout (logfil, np, workl, ndigit,
-     &                  '_saup2: shifts selected')
-            if (ishift .eq. 1) then
-               call dvout (logfil, np, bounds, ndigit,
-     &                  '_saup2: corresponding Ritz estimates')
-             end if
-         end if
-c
 c        %---------------------------------------------------------%
 c        | Apply the NP0 implicit shifts by QR bulge chasing.      |
 c        | Each shift is applied to the entire tridiagonal matrix. |
@@ -771,7 +691,6 @@ c        | the first step of the next call to dsaitr.  |
 c        %---------------------------------------------%
 c
          cnorm = .true.
-         call arscnd (t2)
          if (bmat .eq. 'G') then
             nbx = nbx + 1
             call dcopy (n, resid, 1, workd(n+1), 1)
@@ -796,7 +715,6 @@ c        | WORKD(1:N) := B*RESID            |
 c        %----------------------------------%
 c
          if (bmat .eq. 'G') then
-            call arscnd (t3)
             tmvbx = tmvbx + (t3 - t2)
          end if
 c
@@ -808,15 +726,6 @@ c
          end if
          cnorm = .false.
   130    continue
-c
-         if (msglvl .gt. 2) then
-            call dvout (logfil, 1, [rnorm], ndigit,
-     &      '_saup2: B-norm of residual for NEV factorization')
-            call dvout (logfil, nev, h(1,2), ndigit,
-     &           '_saup2: main diagonal of compressed H matrix')
-            call dvout (logfil, nev-1, h(2,1), ndigit,
-     &           '_saup2: subdiagonal of compressed H matrix')
-         end if
 c
       go to 1000
 c
@@ -837,9 +746,6 @@ c
 c     %------------%
 c     | Error exit |
 c     %------------%
-c
-      call arscnd (t1)
-      tsaup2 = t1 - t0
 c
  9000 continue
       return

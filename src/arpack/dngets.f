@@ -95,13 +95,6 @@ c
       subroutine dngets ( ishift, which, kev, np, ritzr, ritzi, bounds,
      &                    shiftr, shifti )
 c
-c     %----------------------------------------------------%
-c     | Include files for debugging and timing information |
-c     %----------------------------------------------------%
-c
-      include   'debug.h'
-      include   'stat.h'
-c
 c     %------------------%
 c     | Scalar Arguments |
 c     %------------------%
@@ -125,17 +118,11 @@ c
      &           one, zero
       parameter (one = 1.0, zero = 0.0)
 c
-c     %---------------%
-c     | Local Scalars |
-c     %---------------%
-c
-      integer    msglvl
-c
 c     %----------------------%
 c     | External Subroutines |
 c     %----------------------%
 c
-      external   dcopy, dsortc, arscnd
+      external   dcopy, dsortc
 c
 c     %----------------------%
 c     | Intrinsics Functions |
@@ -146,14 +133,6 @@ c
 c     %-----------------------%
 c     | Executable Statements |
 c     %-----------------------%
-c
-c     %-------------------------------%
-c     | Initialize timing statistics  |
-c     | & message level for debugging |
-c     %-------------------------------%
-c
-      call arscnd (t0)
-      msglvl = mngets
 c
 c     %----------------------------------------------------%
 c     | LM, SM, LR, SR, LI, SI case.                       |
@@ -206,20 +185,6 @@ c        | Be careful and use 'SR' since we want to sort BOUNDS! |
 c        %-------------------------------------------------------%
 c
          call dsortc ( 'SR', .true., np, bounds, ritzr, ritzi )
-      end if
-c
-      call arscnd (t1)
-      tngets = tngets + (t1 - t0)
-c
-      if (msglvl .gt. 0) then
-         call ivout (logfil, 1, [kev], ndigit, '_ngets: KEV is')
-         call ivout (logfil, 1, [np], ndigit, '_ngets: NP is')
-         call dvout (logfil, kev+np, ritzr, ndigit,
-     &        '_ngets: Eigenvalues of current H matrix -- real part')
-         call dvout (logfil, kev+np, ritzi, ndigit,
-     &        '_ngets: Eigenvalues of current H matrix -- imag part')
-         call dvout (logfil, kev+np, bounds, ndigit,
-     &      '_ngets: Ritz estimates of the current KEV+NP Ritz values')
       end if
 c
       return

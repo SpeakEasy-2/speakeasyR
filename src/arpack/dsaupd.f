@@ -377,11 +377,6 @@ c
 c\Routines called:
 c     dsaup2   ARPACK routine that implements the Implicitly Restarted
 c             Arnoldi Iteration.
-c     dstats   ARPACK routine that initialize timing and other statistics
-c             variables.
-c     ivout   ARPACK utility routine that prints integers.
-c     arscnd  ARPACK utility routine for timing.
-c     dvout    ARPACK utility routine that prints vectors.
 c     dlamch   LAPACK routine that determines machine constants.
 c
 c\Authors
@@ -408,13 +403,6 @@ c
       subroutine dsaupd
      &   ( ido, bmat, n, which, nev, tol, resid, ncv, v, ldv, iparam,
      &     ipntr, workd, workl, lworkl, info )
-c
-c     %----------------------------------------------------%
-c     | Include files for debugging and timing information |
-c     %----------------------------------------------------%
-c
-      include   'debug.h'
-      include   'stat.h'
 c
 c     %------------------%
 c     | Scalar Arguments |
@@ -446,17 +434,17 @@ c     | Local Scalars |
 c     %---------------%
 c
       integer    bounds, ierr, ih, iq, ishift, iupd, iw,
-     &           ldh, ldq, msglvl, mxiter, mode, nb,
+     &           ldh, ldq, mxiter, mode, nb,
      &           nev0, next, np, ritz, j
       save       bounds, ierr, ih, iq, ishift, iupd, iw,
-     &           ldh, ldq, msglvl, mxiter, mode, nb,
+     &           ldh, ldq, mxiter, mode, nb,
      &           nev0, next, np, ritz
 c
 c     %----------------------%
 c     | External Subroutines |
 c     %----------------------%
 c
-      external   dsaup2 ,  dvout , ivout, arscnd, dstats
+      external   dsaup2
 c
 c     %--------------------%
 c     | External Functions |
@@ -476,10 +464,6 @@ c        %-------------------------------%
 c        | Initialize timing statistics  |
 c        | & message level for debugging |
 c        %-------------------------------%
-c
-         call dstats
-         call arscnd (t0)
-         msglvl = msaupd
 c
          ierr   = 0
          ishift = iparam(1)
@@ -626,15 +610,6 @@ c     %------------------------------------%
 c
       if (info .lt. 0) go to 9000
       if (info .eq. 2) info = 3
-c
-      if (msglvl .gt. 0) then
-      end if
-c
-      call arscnd (t1)
-      tsaupd = t1 - t0
-c
-      if (msglvl .gt. 0) then
-      end if
 c
  9000 continue
 c

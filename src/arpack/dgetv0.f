@@ -93,8 +93,6 @@ c     Restarted Arnoldi Iteration", Rice University Technical Report
 c     TR95-13, Department of Computational and Applied Mathematics.
 c
 c\Routines called:
-c     arscnd  ARPACK utility routine for timing.
-c     dvout   ARPACK utility routine for vector output.
 c     dlarnv  LAPACK routine for generating a random vector.
 c     dgemv   Level 2 BLAS routine for matrix vector multiplication.
 c     dcopy   Level 1 BLAS that copies one vector to another.
@@ -119,13 +117,6 @@ c
       subroutine dgetv0
      &   ( ido, bmat, itry, initv, n, j, v, ldv, resid, rnorm,
      &     ipntr, workd, ierr )
-c
-c     %----------------------------------------------------%
-c     | Include files for debugging and timing information |
-c     %----------------------------------------------------%
-c
-      include   'debug.h'
-      include   'stat.h'
 c
 c     %------------------%
 c     | Scalar Arguments |
@@ -158,16 +149,16 @@ c     | Local Scalars & Arrays |
 c     %------------------------%
 c
       logical    first, inits, orth
-      integer    idist, iseed(4), iter, msglvl, jj
+      integer    idist, iseed(4), iter, jj
       Double precision
      &           rnorm0
-      save       first, iseed, inits, iter, msglvl, orth, rnorm0
+      save       first, iseed, inits, iter, orth, rnorm0
 c
 c     %----------------------%
 c     | External Subroutines |
 c     %----------------------%
 c
-      external   dlarnv, dvout, dcopy, dgemv, arscnd
+      external   dlarnv, dcopy, dgemv
 c
 c     %--------------------%
 c     | External Functions |
@@ -214,9 +205,6 @@ c        | Initialize timing statistics  |
 c        | & message level for debugging |
 c        %-------------------------------%
 c
-         call arscnd (t0)
-         msglvl = mgetv0
-c
          ierr   = 0
          iter   = 0
          first  = .FALSE.
@@ -241,7 +229,6 @@ c        | Force the starting vector into the range of OP to handle |
 c        | the generalized problem when B is possibly (singular).   |
 c        %----------------------------------------------------------%
 c
-         call arscnd (t2)
          if (itry .eq. 1) then
             nopx = nopx + 1
             ipntr(1) = 1
@@ -266,17 +253,11 @@ c     %-----------------------------------------------%
 c
       if (orth)  go to 40
 c
-      if (bmat .eq. 'G') then
-         call arscnd (t3)
-         tmvopx = tmvopx + (t3 - t2)
-      end if
-c
 c     %------------------------------------------------------%
 c     | Starting vector is now in the range of OP; r = OP*r; |
 c     | Compute B-norm of starting vector.                   |
 c     %------------------------------------------------------%
 c
-      call arscnd (t2)
       first = .TRUE.
       if (itry .eq. 1) call dcopy (n, workd(n + 1), 1, resid, 1)
       if (bmat .eq. 'G') then
@@ -290,11 +271,6 @@ c
       end if
 c
    20 continue
-c
-      if (bmat .eq. 'G') then
-         call arscnd (t3)
-         tmvbx = tmvbx + (t3 - t2)
-      end if
 c
       first = .FALSE.
       if (bmat .eq. 'G') then
@@ -335,7 +311,6 @@ c     %----------------------------------------------------------%
 c     | Compute the B-norm of the orthogonalized starting vector |
 c     %----------------------------------------------------------%
 c
-      call arscnd (t2)
       if (bmat .eq. 'G') then
          nbx = nbx + 1
          call dcopy (n, resid, 1, workd(n+1), 1)
@@ -350,11 +325,6 @@ c
    40 continue
 c
       if (bmat .eq. 'G') then
-         call arscnd (t3)
-         tmvbx = tmvbx + (t3 - t2)
-      end if
-c
-      if (bmat .eq. 'G') then
          rnorm = ddot (n, resid, 1, workd, 1)
          rnorm = sqrt(abs(rnorm))
       else if (bmat .eq. 'I') then
@@ -364,13 +334,6 @@ c
 c     %--------------------------------------%
 c     | Check for further orthogonalization. |
 c     %--------------------------------------%
-c
-      if (msglvl .gt. 2) then
-          call dvout (logfil, 1, [rnorm0], ndigit,
-     &                '_getv0: re-orthonalization ; rnorm0 is')
-          call dvout (logfil, 1, [rnorm], ndigit,
-     &                '_getv0: re-orthonalization ; rnorm is')
-      end if
 c
       if (rnorm .gt. 0.717*rnorm0) go to 50
 c
@@ -398,18 +361,7 @@ c
 c
    50 continue
 c
-      if (msglvl .gt. 0) then
-         call dvout (logfil, 1, [rnorm], ndigit,
-     &        '_getv0: B-norm of initial / restarted starting vector')
-      end if
-      if (msglvl .gt. 3) then
-         call dvout (logfil, n, resid, ndigit,
-     &        '_getv0: initial / restarted starting vector')
-      end if
       ido = 99
-c
-      call arscnd (t1)
-      tgetv0 = tgetv0 + (t1 - t0)
 c
  9000 continue
       return

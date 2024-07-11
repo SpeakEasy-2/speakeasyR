@@ -96,10 +96,6 @@ c     a k-Step Arnoldi Method", SIAM J. Matr. Anal. Apps., 13 (1992),
 c     pp 357-385.
 c
 c\Routines called:
-c     ivout   ARPACK utility routine that prints integers.
-c     arscnd  ARPACK utility routine for timing.
-c     dmout   ARPACK utility routine that prints matrices.
-c     dvout   ARPACK utility routine that prints vectors.
 c     dlabad  LAPACK routine that computes machine constants.
 c     dlacpy  LAPACK matrix copy routine.
 c     dlamch  LAPACK routine that determines machine constants.
@@ -144,13 +140,6 @@ c
      &   ( n, kev, np, shiftr, shifti, v, ldv, h, ldh, resid, q, ldq,
      &     workl, workd )
 c
-c     %----------------------------------------------------%
-c     | Include files for debugging and timing information |
-c     %----------------------------------------------------%
-c
-      include   'debug.h'
-      include   'stat.h'
-c
 c     %------------------%
 c     | Scalar Arguments |
 c     %------------------%
@@ -177,7 +166,7 @@ c     %------------------------%
 c     | Local Scalars & Arrays |
 c     %------------------------%
 c
-      integer    i, iend, ir, istart, j, jj, kplusp, msglvl, nr
+      integer    i, iend, ir, istart, j, jj, kplusp, nr
       logical    cconj, first
       Double precision
      &           c, f, g, h11, h12, h21, h22, h32, ovfl, r, s, sigmai,
@@ -189,7 +178,7 @@ c     | External Subroutines |
 c     %----------------------%
 c
       external   daxpy, dcopy, dscal, dlacpy, dlarfg, dlarf,
-     &           dlaset, dlabad, arscnd, dlartg
+     &           dlaset, dlabad, dlartg
 c
 c     %--------------------%
 c     | External Functions |
@@ -237,8 +226,6 @@ c     | Initialize timing statistics  |
 c     | & message level for debugging |
 c     %-------------------------------%
 c
-      call arscnd (t0)
-      msglvl = mnapps
       kplusp = kev + np
 c
 c     %--------------------------------------------%
@@ -264,15 +251,6 @@ c
       do 110 jj = 1, np
          sigmar = shiftr(jj)
          sigmai = shifti(jj)
-c
-         if (msglvl .gt. 2 ) then
-            call ivout (logfil, 1, [jj], ndigit,
-     &               '_napps: shift number.')
-            call dvout (logfil, 1, [sigmar], ndigit,
-     &               '_napps: The real part of the shift ')
-            call dvout (logfil, 1, [sigmai], ndigit,
-     &               '_napps: The imaginary part of the shift ')
-         end if
 c
 c        %-------------------------------------------------%
 c        | The following set of conditionals is necessary  |
@@ -334,14 +312,6 @@ c
             if( tst1.eq.zero )
      &         tst1 = dlanhs( '1', kplusp-jj+1, h, ldh, workl )
             if( abs( h( i+1,i ) ).le.max( ulp*tst1, smlnum ) ) then
-               if (msglvl .gt. 0) then
-                  call ivout (logfil, 1, [i], ndigit,
-     &                 '_napps: matrix splitting at row/column no.')
-                  call ivout (logfil, 1, [jj], ndigit,
-     &                 '_napps: matrix splitting with shift number.')
-                  call dvout (logfil, 1, h(i+1,i), ndigit,
-     &                 '_napps: off diagonal element.')
-               end if
                iend = i
                h(i+1,i) = zero
                go to 40
@@ -349,13 +319,6 @@ c
    30    continue
          iend = kplusp
    40    continue
-c
-         if (msglvl .gt. 2) then
-             call ivout (logfil, 1, [istart], ndigit,
-     &                   '_napps: Start of current block ')
-             call ivout (logfil, 1, [iend], ndigit,
-     &                   '_napps: End of current block ')
-         end if
 c
 c        %------------------------------------------------%
 c        | No reason to apply a shift to block of order 1 |
@@ -622,23 +585,7 @@ c
       if (h(kev+1,kev) .gt. zero)
      &   call daxpy (n, h(kev+1,kev), v(1,kev+1), 1, resid, 1)
 c
-      if (msglvl .gt. 1) then
-         call dvout (logfil, 1, q(kplusp,kev), ndigit,
-     &        '_napps: sigmak = (e_{kev+p}^T*Q)*e_{kev}')
-         call dvout (logfil, 1, h(kev+1,kev), ndigit,
-     &        '_napps: betak = e_{kev+1}^T*H*e_{kev}')
-         call ivout (logfil, 1, [kev], ndigit,
-     &               '_napps: Order of the final Hessenberg matrix ')
-         if (msglvl .gt. 2) then
-            call dmout (logfil, kev, kev, h, ldh, ndigit,
-     &      '_napps: updated Hessenberg matrix H for next iteration')
-         end if
-c
-      end if
-c
  9000 continue
-      call arscnd (t1)
-      tnapps = tnapps + (t1 - t0)
 c
       return
 c

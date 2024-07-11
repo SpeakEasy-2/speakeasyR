@@ -90,9 +90,6 @@ c     Restarted Arnoldi Iteration", Rice University Technical Report
 c     TR95-13, Department of Computational and Applied Mathematics.
 c
 c\Routines called:
-c     ivout   ARPACK utility routine that prints integers.
-c     arscnd  ARPACK utility routine for timing.
-c     dvout   ARPACK utility routine that prints vectors.
 c     dlamch  LAPACK routine that determines machine constants.
 c     dlartg  LAPACK Givens rotation construction routine.
 c     dlacpy  LAPACK matrix copy routine.
@@ -131,13 +128,6 @@ c
       subroutine dsapps
      &   ( n, kev, np, shift, v, ldv, h, ldh, resid, q, ldq, workd )
 c
-c     %----------------------------------------------------%
-c     | Include files for debugging and timing information |
-c     %----------------------------------------------------%
-c
-      include   'debug.h'
-      include   'stat.h'
-c
 c     %------------------%
 c     | Scalar Arguments |
 c     %------------------%
@@ -164,7 +154,7 @@ c     %---------------%
 c     | Local Scalars |
 c     %---------------%
 c
-      integer    i, iend, istart, itop, j, jj, kplusp, msglvl
+      integer    i, iend, istart, itop, j, jj, kplusp
       logical    first
       Double precision
      &           a1, a2, a3, a4, big, c, epsmch, f, g, r, s
@@ -175,8 +165,7 @@ c     %----------------------%
 c     | External Subroutines |
 c     %----------------------%
 c
-      external   daxpy, dcopy, dscal, dlacpy, dlartg, dlaset, dvout,
-     &           ivout, arscnd, dgemv
+      external   daxpy, dcopy, dscal, dlacpy, dlartg, dlaset, dgemv
 c
 c     %--------------------%
 c     | External Functions |
@@ -212,9 +201,6 @@ c     %-------------------------------%
 c     | Initialize timing statistics  |
 c     | & message level for debugging |
 c     %-------------------------------%
-c
-      call arscnd (t0)
-      msglvl = msapps
 c
       kplusp = kev + np
 c
@@ -260,14 +246,6 @@ c
          do 30 i = istart, kplusp-1
             big   = abs(h(i,2)) + abs(h(i+1,2))
             if (h(i+1,1) .le. epsmch*big) then
-               if (msglvl .gt. 0) then
-                  call ivout (logfil, 1, [i], ndigit,
-     &                 '_sapps: deflation at row/column no.')
-                  call ivout (logfil, 1, [jj], ndigit,
-     &                 '_sapps: occurred before shift number.')
-                  call dvout (logfil, 1, h(i+1,1), ndigit,
-     &                 '_sapps: the corresponding off diagonal element')
-               end if
                h(i+1,1) = zero
                iend = i
                go to 40
@@ -431,12 +409,6 @@ c
       do 100 i = itop, kplusp-1
          big   = abs(h(i,2)) + abs(h(i+1,2))
          if (h(i+1,1) .le. epsmch*big) then
-            if (msglvl .gt. 0) then
-               call ivout (logfil, 1, [i], ndigit,
-     &              '_sapps: deflation at row/column no.')
-               call dvout (logfil, 1, h(i+1,1), ndigit,
-     &              '_sapps: the corresponding off diagonal element')
-            end if
             h(i+1,1) = zero
          end if
  100  continue
@@ -492,21 +464,6 @@ c
       if (h(kev+1,1) .gt. zero)
      &   call daxpy (n, h(kev+1,1), v(1,kev+1), 1, resid, 1)
 c
-      if (msglvl .gt. 1) then
-         call dvout (logfil, 1, q(kplusp,kev), ndigit,
-     &      '_sapps: sigmak of the updated residual vector')
-         call dvout (logfil, 1, h(kev+1,1), ndigit,
-     &      '_sapps: betak of the updated residual vector')
-         call dvout (logfil, kev, h(1,2), ndigit,
-     &      '_sapps: updated main diagonal of H for next iteration')
-         if (kev .gt. 1) then
-         call dvout (logfil, kev-1, h(2,1), ndigit,
-     &      '_sapps: updated sub diagonal of H for next iteration')
-         end if
-      end if
-c
-      call arscnd (t1)
-      tsapps = tsapps + (t1 - t0)
 c
  9000 continue
       return

@@ -59,8 +59,6 @@ c\Routines called:
 c     dstqrb  ARPACK routine that computes the eigenvalues and the
 c             last components of the eigenvectors of a symmetric
 c             and tridiagonal matrix.
-c     arscnd  ARPACK utility routine for timing.
-c     dvout   ARPACK utility routine that prints vectors.
 c     dcopy   Level 1 BLAS that copies one vector to another.
 c
 c\Author
@@ -86,13 +84,6 @@ c-----------------------------------------------------------------------
 c
       subroutine dseigt
      &   ( rnorm, n, h, ldh, eig, bounds, workl, ierr )
-c
-c     %----------------------------------------------------%
-c     | Include files for debugging and timing information |
-c     %----------------------------------------------------%
-c
-      include   'debug.h'
-      include   'stat.h'
 c
 c     %------------------%
 c     | Scalar Arguments |
@@ -121,13 +112,13 @@ c     %---------------%
 c     | Local Scalars |
 c     %---------------%
 c
-      integer    i, k, msglvl
+      integer    i, k
 c
 c     %----------------------%
 c     | External Subroutines |
 c     %----------------------%
 c
-      external   dcopy, dstqrb, dvout, arscnd
+      external   dcopy, dstqrb
 c
 c     %-----------------------%
 c     | Executable Statements |
@@ -138,26 +129,10 @@ c     | Initialize timing statistics  |
 c     | & message level for debugging |
 c     %-------------------------------%
 c
-      call arscnd (t0)
-      msglvl = mseigt
-c
-      if (msglvl .gt. 0) then
-         call dvout (logfil, n, h(1,2), ndigit,
-     &              '_seigt: main diagonal of matrix H')
-         if (n .gt. 1) then
-         call dvout (logfil, n-1, h(2,1), ndigit,
-     &              '_seigt: sub diagonal of matrix H')
-         end if
-      end if
-c
       call dcopy  (n, h(1,2), 1, eig, 1)
       call dcopy  (n-1, h(2,1), 1, workl, 1)
       call dstqrb (n, eig, workl, bounds, workl(n+1), ierr)
       if (ierr .ne. 0) go to 9000
-      if (msglvl .gt. 1) then
-         call dvout (logfil, n, bounds, ndigit,
-     &              '_seigt: last row of the eigenvector matrix for H')
-      end if
 c
 c     %-----------------------------------------------%
 c     | Finally determine the error bounds associated |
@@ -167,9 +142,6 @@ c
       do 30 k = 1, n
          bounds(k) = rnorm*abs(bounds(k))
    30 continue
-c
-      call arscnd (t1)
-      tseigt = tseigt + (t1 - t0)
 c
  9000 continue
       return

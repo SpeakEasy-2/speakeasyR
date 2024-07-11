@@ -226,9 +226,6 @@ c     Real Matrices", Linear Algebra and its Applications, vol 88/89,
 c     pp 575-595, (1987).
 c
 c\Routines called:
-c     ivout   ARPACK utility routine that prints integers.
-c     dmout    ARPACK utility routine that prints matrices
-c     dvout    ARPACK utility routine that prints vectors.
 c     dgeqr2   LAPACK routine that computes the QR factorization of
 c             a matrix.
 c     dlacpy   LAPACK matrix copy routine.
@@ -305,13 +302,6 @@ c-----------------------------------------------------------------------
      &                   resid, ncv   , v     , ldv   , iparam,
      &                   ipntr, workd , workl , lworkl, info)
 c
-c     %----------------------------------------------------%
-c     | Include files for debugging and timing information |
-c     %----------------------------------------------------%
-c
-      include   'debug.h'
-      include   'stat.h'
-c
 c     %------------------%
 c     | Scalar Arguments |
 c     %------------------%
@@ -350,7 +340,7 @@ c
      &           iheigr, iheigi, iconj , nconv   ,
      &           invsub, iuptri, iwev  , iwork(1),
      &           j     , k     , ldh   , ldq     ,
-     &           mode  , msglvl, outncv, ritzr   ,
+     &           mode  , outncv, ritzr   ,
      &           ritzi , wri   , wrr   , irr     ,
      &           iri   , ibd   , ishift, numcnv  ,
      &           np    , jj    , nconv2
@@ -364,9 +354,8 @@ c     | External Subroutines |
 c     %----------------------%
 c
       external   dcopy  , dger   , dgeqr2 , dlacpy ,
-     &           dlahqr , dlaset , dmout  , dorm2r ,
-     &           dtrevc , dtrmm  , dtrsen , dscal  ,
-     &           dvout  , ivout
+     &           dlahqr , dlaset , dorm2r , dtrevc ,
+     &           dtrmm  , dtrsen , dscal
 c
 c     %--------------------%
 c     | External Functions |
@@ -390,7 +379,6 @@ c     %------------------------%
 c     | Set default parameters |
 c     %------------------------%
 c
-      msglvl = mneupd
       mode = iparam(7)
       nconv = iparam(5)
       info = 0
@@ -527,15 +515,6 @@ c
       rnorm = workl(ih+2)
       workl(ih+2) = zero
 c
-      if (msglvl .gt. 2) then
-         call dvout (logfil, ncv, workl(irr), ndigit,
-     &   '_neupd: Real part of Ritz values passed in from _NAUPD.')
-         call dvout (logfil, ncv, workl(iri), ndigit,
-     &   '_neupd: Imag part of Ritz values passed in from _NAUPD.')
-         call dvout (logfil, ncv, workl(ibd), ndigit,
-     &   '_neupd: Ritz estimates passed in from _NAUPD.')
-      end if
-c
       if (rvec) then
 c
          reord = .false.
@@ -566,15 +545,6 @@ c
      &                np           , workl(irr), workl(iri),
      &                workl(bounds), workl     , workl(np+1))
 c
-         if (msglvl .gt. 2) then
-            call dvout (logfil, ncv, workl(irr), ndigit,
-     &      '_neupd: Real part of Ritz values after calling _NGETS.')
-            call dvout (logfil, ncv, workl(iri), ndigit,
-     &      '_neupd: Imag part of Ritz values after calling _NGETS.')
-            call dvout (logfil, ncv, workl(bounds), ndigit,
-     &      '_neupd: Ritz value indices after calling _NGETS.')
-         end if
-c
 c        %-----------------------------------------------------%
 c        | Record indices of the converged wanted Ritz values  |
 c        | Mark the select array for possible reordering       |
@@ -599,13 +569,6 @@ c        | the number (nconv) reported by dnaupd.  If these two      |
 c        | are different then there has probably been an error       |
 c        | caused by incorrect passing of the dnaupd data.           |
 c        %-----------------------------------------------------------%
-c
-         if (msglvl .gt. 2) then
-             call ivout(logfil, 1, [numcnv], ndigit,
-     &            '_neupd: Number of specified eigenvalues')
-             call ivout(logfil, 1, [nconv], ndigit,
-     &            '_neupd: Number of "converged" eigenvalues')
-         end if
 c
          if (numcnv .ne. nconv) then
             info = -15
@@ -636,20 +599,6 @@ c
             go to 9000
          end if
 c
-         if (msglvl .gt. 1) then
-            call dvout (logfil, ncv, workl(iheigr), ndigit,
-     &           '_neupd: Real part of the eigenvalues of H')
-            call dvout (logfil, ncv, workl(iheigi), ndigit,
-     &           '_neupd: Imaginary part of the Eigenvalues of H')
-            call dvout (logfil, ncv, workl(ihbds), ndigit,
-     &           '_neupd: Last row of the Schur vector matrix')
-            if (msglvl .gt. 3) then
-               call dmout (logfil       , ncv, ncv   ,
-     &                     workl(iuptri), ldh, ndigit,
-     &              '_neupd: The upper quasi-triangular matrix ')
-            end if
-         end if
-c
          if (reord) then
 c
 c           %-----------------------------------------------------%
@@ -676,18 +625,6 @@ c
             end if
 c
 
-            if (msglvl .gt. 2) then
-                call dvout (logfil, ncv, workl(iheigr), ndigit,
-     &           '_neupd: Real part of the eigenvalues of H--reordered')
-                call dvout (logfil, ncv, workl(iheigi), ndigit,
-     &           '_neupd: Imag part of the eigenvalues of H--reordered')
-                if (msglvl .gt. 3) then
-                   call dmout (logfil       , ncv, ncv   ,
-     &                         workl(iuptri), ldq, ndigit,
-     &             '_neupd: Quasi-triangular matrix after re-ordering')
-                end if
-            end if
-c
          end if
 c
 c        %---------------------------------------%
@@ -855,17 +792,6 @@ c
                end if
  45         continue
 c
-            if (msglvl .gt. 2) then
-               call dcopy (ncv, workl(invsub+ncv-1), ldq,
-     &                    workl(ihbds), 1)
-               call dvout (logfil, ncv, workl(ihbds), ndigit,
-     &              '_neupd: Last row of the eigenvector matrix for T')
-               if (msglvl .gt. 3) then
-                  call dmout (logfil, ncv, ncv, workl(invsub), ldq,
-     &                 ndigit, '_neupd: The eigenvector matrix for T')
-               end if
-            end if
-c
 c           %---------------------------------------%
 c           | Copy Ritz estimates into workl(ihbds) |
 c           %---------------------------------------%
@@ -990,22 +916,6 @@ c
 c
          end if
 c
-      end if
-c
-      if (type .eq. 'SHIFTI' .and. msglvl .gt. 1) then
-         call dvout (logfil, nconv, dr, ndigit,
-     &   '_neupd: Untransformed real part of the Ritz values.')
-         call dvout  (logfil, nconv, di, ndigit,
-     &   '_neupd: Untransformed imag part of the Ritz values.')
-         call dvout (logfil, nconv, workl(ihbds), ndigit,
-     &   '_neupd: Ritz estimates of untransformed Ritz values.')
-      else if (type .eq. 'REGULR' .and. msglvl .gt. 1) then
-         call dvout (logfil, nconv, dr, ndigit,
-     &   '_neupd: Real parts of converged Ritz values.')
-         call dvout  (logfil, nconv, di, ndigit,
-     &   '_neupd: Imag parts of converged Ritz values.')
-         call dvout (logfil, nconv, workl(ihbds), ndigit,
-     &   '_neupd: Associated Ritz estimates.')
       end if
 c
 c     %-------------------------------------------------%

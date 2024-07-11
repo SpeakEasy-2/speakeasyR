@@ -181,8 +181,6 @@ c\Routines called:
 c     dsesrt   ARPACK routine that sorts an array X, and applies the
 c             corresponding permutation to a matrix A.
 c     dsortr   dsortr   ARPACK sorting routine.
-c     ivout   ARPACK utility routine that prints integers.
-c     dvout    ARPACK utility routine that prints vectors.
 c     dgeqr2   LAPACK routine that computes the QR factorization of
 c             a matrix.
 c     dlacpy   LAPACK matrix copy routine.
@@ -222,13 +220,6 @@ c-----------------------------------------------------------------------
      &                   iparam, ipntr , workd , workl,
      &                   lworkl, info )
 c
-c     %----------------------------------------------------%
-c     | Include files for debugging and timing information |
-c     %----------------------------------------------------%
-c
-      include   'debug.h'
-      include   'stat.h'
-c
 c     %------------------%
 c     | Scalar Arguments |
 c     %------------------%
@@ -264,7 +255,7 @@ c
       character  type*6
       integer    bounds , ierr   , ih    , ihb   , ihd   ,
      &           iq     , iw     , j     , k     , ldh   ,
-     &           ldq    , mode   , msglvl, nconv , next  ,
+     &           ldq    , mode   , nconv , next  ,
      &           ritz   , irz    , ibd   , np    , ishift,
      &           leftptr, rghtptr, numcnv, jj
       Double precision
@@ -276,7 +267,7 @@ c     | External Subroutines |
 c     %----------------------%
 c
       external   dcopy  , dger   , dgeqr2 , dlacpy , dorm2r , dscal ,
-     &           dsesrt , dsteqr , dswap  , dvout  , ivout , dsortr
+     &           dsesrt , dsteqr , dswap  , dsortr
 c
 c     %--------------------%
 c     | External Functions |
@@ -300,7 +291,6 @@ c     %------------------------%
 c     | Set default parameters |
 c     %------------------------%
 c
-      msglvl = mseupd
       mode = iparam(7)
       nconv = iparam(5)
       info = 0
@@ -444,13 +434,6 @@ c
          bnorm2 = dnrm2 (n, workd, 1)
       end if
 c
-      if (msglvl .gt. 2) then
-         call dvout (logfil, ncv, workl(irz), ndigit,
-     &   '_seupd: Ritz values passed in from _SAUPD.')
-         call dvout (logfil, ncv, workl(ibd), ndigit,
-     &   '_seupd: Ritz estimates passed in from _SAUPD.')
-      end if
-c
       if (rvec) then
 c
          reord = .false.
@@ -481,13 +464,6 @@ c
      &                np    , workl(irz)  , workl(bounds),
      &                workl)
 c
-         if (msglvl .gt. 2) then
-            call dvout (logfil, ncv, workl(irz), ndigit,
-     &      '_seupd: Ritz values after calling _SGETS.')
-            call dvout (logfil, ncv, workl(bounds), ndigit,
-     &      '_seupd: Ritz value indices after calling _SGETS.')
-         end if
-c
 c        %-----------------------------------------------------%
 c        | Record indices of the converged wanted Ritz values  |
 c        | Mark the select array for possible reordering       |
@@ -512,13 +488,6 @@ c        | are different then there has probably been an error       |
 c        | caused by incorrect passing of the _saupd data.           |
 c        %-----------------------------------------------------------%
 c
-         if (msglvl .gt. 2) then
-             call ivout(logfil, 1, [numcnv], ndigit,
-     &            '_seupd: Number of specified eigenvalues')
-             call ivout(logfil, 1, [nconv], ndigit,
-     &            '_seupd: Number of "converged" eigenvalues')
-         end if
-c
          if (numcnv .ne. nconv) then
             info = -17
             go to 9000
@@ -539,14 +508,6 @@ c
          if (ierr .ne. 0) then
             info = -8
             go to 9000
-         end if
-c
-         if (msglvl .gt. 1) then
-            call dcopy (ncv, workl(iq+ncv-1), ldq, workl(iw), 1)
-            call dvout (logfil, ncv, workl(ihd), ndigit,
-     &          '_seupd: NCV Ritz values of the final H matrix')
-            call dvout (logfil, ncv, workl(iw), ndigit,
-     &           '_seupd: last row of the eigenvector matrix for H')
          end if
 c
          if (reord) then
@@ -611,16 +572,11 @@ c
 c
           end if
 c
-  30      if (msglvl .gt. 2) then
-             call dvout  (logfil, ncv, workl(ihd), ndigit,
-     &       '_seupd: The eigenvalues of H--reordered')
-         end if
-c
 c        %----------------------------------------%
 c        | Load the converged Ritz values into D. |
 c        %----------------------------------------%
 c
-         call dcopy (nconv, workl(ihd), 1, d, 1)
+ 30       call dcopy (nconv, workl(ihd), 1, d, 1)
 c
       else
 c
@@ -817,18 +773,6 @@ c
 c
          end if
 c
-      end if
-c
-      if (type .ne. 'REGULR' .and. msglvl .gt. 1) then
-         call dvout (logfil, nconv, d, ndigit,
-     &          '_seupd: Untransformed converged Ritz values')
-         call dvout (logfil, nconv, workl(ihb), ndigit,
-     &     '_seupd: Ritz estimates of the untransformed Ritz values')
-      else if (msglvl .gt. 1) then
-         call dvout (logfil, nconv, d, ndigit,
-     &          '_seupd: Converged Ritz values')
-         call dvout (logfil, nconv, workl(ihb), ndigit,
-     &     '_seupd: Associated Ritz estimates')
       end if
 c
 c     %-------------------------------------------------%

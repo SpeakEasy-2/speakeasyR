@@ -378,9 +378,6 @@ c
 c     \Routines called:
 c     dnaup2   ARPACK routine that implements the Implicitly Restarted
 c     Arnoldi Iteration.
-c     ivout   ARPACK utility routine that prints integers.
-c     arscnd  ARPACK utility routine for timing.
-c     dvout    ARPACK utility routine that prints vectors.
 c     dlamch   LAPACK routine that determines machine constants.
 c
 c     \Author
@@ -406,10 +403,6 @@ c
       subroutine dnaupd
      &     ( ido, bmat, n, which, nev, tol, resid, ncv, v, ldv, iparam,
      &     ipntr, workd, workl, lworkl, info )
-c
-c     %----------------------------------------------------%
-c     | Include files for debugging and timing information |
-c     %----------------------------------------------------%
 c
 c     %------------------%
 c     | Scalar Arguments |
@@ -441,17 +434,17 @@ c     | Local Scalars |
 c     %---------------%
 c
       integer    bounds, ierr, ih, iq, ishift, iupd, iw,
-     &     ldh, ldq, levec, mode, msglvl, mxiter, nb,
+     &     ldh, ldq, mode, mxiter, nb,
      &     nev0, next, np, ritzi, ritzr, j
       save       bounds, ih, iq, ishift, iupd, iw, ldh, ldq,
-     &     levec, mode, msglvl, mxiter, nb, nev0, next,
+     &     mode, mxiter, nb, nev0, next,
      &     np, ritzi, ritzr
 c
 c     %----------------------%
 c     | External Subroutines |
 c     %----------------------%
 c
-      external   dnaup2 , dvout , ivout, arscnd, dstatn
+      external   dnaup2
 c
 c     %--------------------%
 c     | External Functions |
@@ -466,15 +459,6 @@ c     | Executable Statements |
 c     %-----------------------%
 c
       if (ido .eq. 0) then
-c
-c     %-------------------------------%
-c     | Initialize timing statistics  |
-c     | & message level for debugging |
-c     %-------------------------------%
-c
-         call dstatn
-         call arscnd (t0)
-         msglvl = mnaupd
 c
 c     %----------------%
 c     | Error checking |
@@ -623,20 +607,6 @@ c     %------------------------------------%
 c
       if (info .lt. 0) go to 9000
       if (info .eq. 2) info = 3
-c
-      if (msglvl .gt. 0) then
-      end if
-c
-      call arscnd (t1)
-      tnaupd = t1 - t0
-c
-      if (msglvl .gt. 0) then
-c
-c     %--------------------------------------------------------%
-c     | Version Number & Version Date are defined in version.h |
-c     %--------------------------------------------------------%
-c
-      end if
 c
  9000 continue
 c

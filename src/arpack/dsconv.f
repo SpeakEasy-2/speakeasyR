@@ -34,7 +34,6 @@ c
 c\BeginLib
 c
 c\Routines called:
-c     arscnd  ARPACK utility routine for timing.
 c     dlamch  LAPACK routine that determines machine constants.
 c
 c\Author
@@ -57,13 +56,6 @@ c
 c-----------------------------------------------------------------------
 c
       subroutine dsconv (n, ritz, bounds, tol, nconv)
-c
-c     %----------------------------------------------------%
-c     | Include files for debugging and timing information |
-c     %----------------------------------------------------%
-c
-      include   'debug.h'
-      include   'stat.h'
 c
 c     %------------------%
 c     | Scalar Arguments |
@@ -106,8 +98,6 @@ c     %-----------------------%
 c     | Executable Statements |
 c     %-----------------------%
 c
-      call arscnd (t0)
-c
       eps23 = dlamch('Epsilon-Machine')
       eps23 = eps23**(2.0D+0 / 3.0D+0)
 c
@@ -125,9 +115,6 @@ c
          end if
 c
    10 continue
-c
-      call arscnd (t1)
-      tsconv = tsconv + (t1 - t0)
 c
       return
 c
