@@ -85,7 +85,7 @@ dnl collect SE2 objects
 SE2_OBJECTS="${SE2_OBJECTS} $(collect_objs "${SE2}/src") ${IGRAPH_OBJS} $(collect_objs ${IGRAPH}/src/random) $(collect_objs ${IGRAPH}/vendor/cs) $(collect_objs ${IGRAPH}/vendor/pcg)"
 
 AC_ARG_ENABLE([parallel], AS_HELP_STRING([--disable-parallel], [disable running with parallel threads]))
-AS_IF([test "x$enable_parallel" != "xno" ], [
+AS_IF([test "x$enable_parallel" != "xno"], [
   AX_PTHREAD([SE2_CPPFLAGS="${SE2_CPPFLAGS} -DSE2PAR"
     AC_DEFINE([IGRAPH_F77_SAVE], [static __thread], Thread local storage.)
     AC_DEFINE([IGRAPH_THREAD_LOCAL], [__thread], Thread local storage.)
@@ -103,13 +103,19 @@ ARPACK_OBJECTS="$(collect_objs "$ARPACK")"
 AH_TEMPLATE([INTERNAL_BLAS], [Use internal blas library.])
 AH_TEMPLATE([INTERNAL_LAPACK], [Use internal lapack library.])
 AH_TEMPLATE([INTERNAL_ARPACK], [Use internal arpack library.])
+
+AC_ARG_ENABLE([system_arpack], AS_HELP_STRING([--disable-system-arpack],
+  [compile and use the internal arpack even if an external version is found.]))
 if [ test -n "${R_BLAS}" ] && [ test -n "${R_LAPACK}" ]; then
     SE2_LIBS="${SE2_LIBS} \$(LAPACK_LIBS) \$(BLAS_LIBS) \$(FLIBS)"
 
-    PKG_CHECK_MODULES([arpack], [arpack],[
-      SE2_LIBS="${SE2_LIBS} -larpack"],[
-      AC_MSG_NOTICE([arpack not found; compiling shipped arpack])
-      SE2_OBJECTS="${SE2_OBJECTS} ${ARPACK_OBJECTS}"])
+    AS_IF([test "x$enable_system_arpack" == "xno"], [
+      AC_MSG_NOTICE([using shipped arpack])
+      SE2_OBJECTS="${SE2_OBJECTS} ${ARPACK_OBJECTS}"], [
+      PKG_CHECK_MODULES([arpack], [arpack], [
+        SE2_LIBS="${SE2_LIBS} -larpack"], [
+        AC_MSG_NOTICE([arpack not found; using shipped arpack])
+        SE2_OBJECTS="${SE2_OBJECTS} ${ARPACK_OBJECTS}"])])
 else
     AC_MSG_ERROR([Linear algebra packages not found. Make sure blas, lapack, and arpack are installed.])
 fi

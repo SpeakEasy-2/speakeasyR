@@ -683,6 +683,7 @@ ac_subst_files=''
 ac_user_opts='
 enable_option_checking
 enable_parallel
+enable_system_arpack
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1321,6 +1322,8 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --disable-parallel      disable running with parallel threads
+  --disable-system-arpack compile and use the internal arpack even if an
+                          external version is found.
 
 Some influential environment variables:
   CC          C compiler command
@@ -4787,6 +4790,13 @@ ARPACK_OBJECTS="$(collect_objs "$ARPACK")"
 
 
 
+
+# Check whether --enable-system_arpack was given.
+if test ${enable_system_arpack+y}
+then :
+  enableval=$enable_system_arpack;
+fi
+
 if  test -n "${R_BLAS}"  &&  test -n "${R_LAPACK}" ; then
     SE2_LIBS="${SE2_LIBS} \$(LAPACK_LIBS) \$(BLAS_LIBS) \$(FLIBS)"
 
@@ -4922,6 +4932,14 @@ printf "%s\n" "no" >&6; }
 		PKG_CONFIG=""
 	fi
 fi
+if test "x$enable_system_arpack" == "xno"
+then :
+
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: using shipped arpack" >&5
+printf "%s\n" "$as_me: using shipped arpack" >&6;}
+      SE2_OBJECTS="${SE2_OBJECTS} ${ARPACK_OBJECTS}"
+else case e in #(
+  e)
 
 pkg_failed=no
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for arpack" >&5
@@ -4982,23 +5000,25 @@ fi
 	echo "$arpack_PKG_ERRORS" >&5
 
 
-      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: arpack not found; compiling shipped arpack" >&5
-printf "%s\n" "$as_me: arpack not found; compiling shipped arpack" >&6;}
-      SE2_OBJECTS="${SE2_OBJECTS} ${ARPACK_OBJECTS}"
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: arpack not found; using shipped arpack" >&5
+printf "%s\n" "$as_me: arpack not found; using shipped arpack" >&6;}
+        SE2_OBJECTS="${SE2_OBJECTS} ${ARPACK_OBJECTS}"
 elif test $pkg_failed = untried; then
         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf "%s\n" "no" >&6; }
 
-      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: arpack not found; compiling shipped arpack" >&5
-printf "%s\n" "$as_me: arpack not found; compiling shipped arpack" >&6;}
-      SE2_OBJECTS="${SE2_OBJECTS} ${ARPACK_OBJECTS}"
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: arpack not found; using shipped arpack" >&5
+printf "%s\n" "$as_me: arpack not found; using shipped arpack" >&6;}
+        SE2_OBJECTS="${SE2_OBJECTS} ${ARPACK_OBJECTS}"
 else
 	arpack_CFLAGS=$pkg_cv_arpack_CFLAGS
 	arpack_LIBS=$pkg_cv_arpack_LIBS
         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf "%s\n" "yes" >&6; }
 
-      SE2_LIBS="${SE2_LIBS} -larpack"
+        SE2_LIBS="${SE2_LIBS} -larpack"
+fi ;;
+esac
 fi
 else
     as_fn_error $? "Linear algebra packages not found. Make sure blas, lapack, and arpack are installed." "$LINENO" 5
