@@ -112,8 +112,9 @@ if [ test -n "${R_BLAS}" ] && [ test -n "${R_LAPACK}" ]; then
     AS_IF([test "x$enable_system_arpack" == "xno"], [
       AC_MSG_NOTICE([using shipped arpack])
       SE2_OBJECTS="${SE2_OBJECTS} ${ARPACK_OBJECTS}"], [
-      PKG_CHECK_MODULES([arpack], [arpack], [
-        SE2_LIBS="${SE2_LIBS} -larpack"], [
+      PKG_CHECK_MODULES([ARPACK], [arpack], [
+        SE2_CPPFLAGS="${SE2_CPPFLAGS} ${ARPACK_CFLAGS}"
+        SE2_LIBS="${SE2_LIBS} ${ARPACK_LIBS}"], [
         AC_MSG_NOTICE([arpack not found; using shipped arpack])
         SE2_OBJECTS="${SE2_OBJECTS} ${ARPACK_OBJECTS}"])])
 else

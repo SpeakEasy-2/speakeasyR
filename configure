@@ -613,8 +613,8 @@ SE2_FFLAGS
 SE2_CFLAGS
 SE2_LIBS
 SE2_CPPFLAGS
-arpack_LIBS
-arpack_CFLAGS
+ARPACK_LIBS
+ARPACK_CFLAGS
 PKG_CONFIG_LIBDIR
 PKG_CONFIG_PATH
 PKG_CONFIG
@@ -697,8 +697,8 @@ CPP
 PKG_CONFIG
 PKG_CONFIG_PATH
 PKG_CONFIG_LIBDIR
-arpack_CFLAGS
-arpack_LIBS'
+ARPACK_CFLAGS
+ARPACK_LIBS'
 
 
 # Initialize some variables set by options.
@@ -1339,9 +1339,9 @@ Some influential environment variables:
               directories to add to pkg-config's search path
   PKG_CONFIG_LIBDIR
               path overriding pkg-config's built-in search path
-  arpack_CFLAGS
-              C compiler flags for arpack, overriding pkg-config
-  arpack_LIBS linker flags for arpack, overriding pkg-config
+  ARPACK_CFLAGS
+              C compiler flags for ARPACK, overriding pkg-config
+  ARPACK_LIBS linker flags for ARPACK, overriding pkg-config
 
 Use these variables to override the choices made by 'configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -4945,8 +4945,8 @@ pkg_failed=no
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for arpack" >&5
 printf %s "checking for arpack... " >&6; }
 
-if test -n "$arpack_CFLAGS"; then
-    pkg_cv_arpack_CFLAGS="$arpack_CFLAGS"
+if test -n "$ARPACK_CFLAGS"; then
+    pkg_cv_ARPACK_CFLAGS="$ARPACK_CFLAGS"
  elif test -n "$PKG_CONFIG"; then
     if test -n "$PKG_CONFIG" && \
     { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"arpack\""; } >&5
@@ -4954,7 +4954,7 @@ if test -n "$arpack_CFLAGS"; then
   ac_status=$?
   printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_arpack_CFLAGS=`$PKG_CONFIG --cflags "arpack" 2>/dev/null`
+  pkg_cv_ARPACK_CFLAGS=`$PKG_CONFIG --cflags "arpack" 2>/dev/null`
 		      test "x$?" != "x0" && pkg_failed=yes
 else
   pkg_failed=yes
@@ -4962,8 +4962,8 @@ fi
  else
     pkg_failed=untried
 fi
-if test -n "$arpack_LIBS"; then
-    pkg_cv_arpack_LIBS="$arpack_LIBS"
+if test -n "$ARPACK_LIBS"; then
+    pkg_cv_ARPACK_LIBS="$ARPACK_LIBS"
  elif test -n "$PKG_CONFIG"; then
     if test -n "$PKG_CONFIG" && \
     { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"arpack\""; } >&5
@@ -4971,7 +4971,7 @@ if test -n "$arpack_LIBS"; then
   ac_status=$?
   printf "%s\n" "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_arpack_LIBS=`$PKG_CONFIG --libs "arpack" 2>/dev/null`
+  pkg_cv_ARPACK_LIBS=`$PKG_CONFIG --libs "arpack" 2>/dev/null`
 		      test "x$?" != "x0" && pkg_failed=yes
 else
   pkg_failed=yes
@@ -4992,12 +4992,12 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        arpack_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "arpack" 2>&1`
+	        ARPACK_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "arpack" 2>&1`
         else
-	        arpack_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "arpack" 2>&1`
+	        ARPACK_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "arpack" 2>&1`
         fi
 	# Put the nasty error message in config.log where it belongs
-	echo "$arpack_PKG_ERRORS" >&5
+	echo "$ARPACK_PKG_ERRORS" >&5
 
 
         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: arpack not found; using shipped arpack" >&5
@@ -5011,12 +5011,13 @@ printf "%s\n" "no" >&6; }
 printf "%s\n" "$as_me: arpack not found; using shipped arpack" >&6;}
         SE2_OBJECTS="${SE2_OBJECTS} ${ARPACK_OBJECTS}"
 else
-	arpack_CFLAGS=$pkg_cv_arpack_CFLAGS
-	arpack_LIBS=$pkg_cv_arpack_LIBS
+	ARPACK_CFLAGS=$pkg_cv_ARPACK_CFLAGS
+	ARPACK_LIBS=$pkg_cv_ARPACK_LIBS
         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf "%s\n" "yes" >&6; }
 
-        SE2_LIBS="${SE2_LIBS} -larpack"
+        SE2_CPPFLAGS="${SE2_CPPFLAGS} ${ARPACK_CFLAGS}"
+        SE2_LIBS="${SE2_LIBS} ${ARPACK_LIBS}"
 fi ;;
 esac
 fi
