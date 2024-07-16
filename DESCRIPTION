@@ -93,7 +93,7 @@ Description: A graph community detection algorithm that aims to be performant
     usage. SE2 can detect community structure across scales, making it a good
     choice for biological data, which often has hierarchical structure. Graphs
     can be passed to the algorithm as adjacency matrices using base 'R'
-    matrices, the 'Matrix' library, 'igraph' graphs, or any data that can
+    matrices, the 'Matrix' library, 'igraph' graphs, or any data that can be
     coerced into a matrix.
 License: GPL (>= 3)
 Encoding: UTF-8
