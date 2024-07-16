@@ -2,7 +2,7 @@ The speakeasyR package as a whole is distributed under the GPLv3+ license.
 The external C libraries are used to build the package use the following
 licenses.
 
-* igraph: GPLv2
+* igraph: GPLv2+
 * SpeakEasy2: GPLv3+
 * arpack-ng: BSD
 * PCG: See src/se2/vendor/igraph/vendor/pcg/LICENSE.txt
@@ -10,4 +10,4 @@ licenses.
 
 Additionally, m4 scripts are used to search for C external libraries.
 
-* ax_pthread: GPLv3
+* ax_pthread: GPLv3+
