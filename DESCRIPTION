@@ -30,6 +30,8 @@ Authors@R: c(
         comment = "Author of Mathlib."),
       person("The R Development Core Team", role = "cph",
         comment = "Copyright holder of Mathlib."),
+      person("Royal Statistical Society", role = "cph",
+        comment = "Copyright holder of Mathlib."),
       person("The R Core Team", role = "cph",
         comment = "Copyright holder of Mathlib."),
       person("The Regents of the University of California", role = "cph",
