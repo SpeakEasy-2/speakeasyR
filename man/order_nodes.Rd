@@ -46,7 +46,7 @@ if (require("igraph")) {
   mu <- 0.3
   pref <- matrix(mu, n_types, n_types)
   diag(pref) <- 1 - mu
-  g <- igraph::preference.game(n_nodes, types = n_types, pref.matrix = pref)
+  g <- igraph::sample_pref(n_nodes, types = n_types, pref.matrix = pref)
   # Use a dense matrix representation to easily apply index.
   adj <- as(g[], "matrix")
   memb <- speakeasyR::cluster(adj, seed = 222, max_threads = 2)
