@@ -6,6 +6,9 @@ ROOT=$(
 )
 
 [ -f "${ROOT}/src/Makevars" ] && rm "${ROOT}/src/Makevars"
+
 rm "${ROOT}/src/include/config.h"
 rm "${ROOT}"/config.*
+
 find "${ROOT}/src" -name '*.o' -not -path "*/tests/*" -exec rm {} \;
+find "${ROOT}/src" -name '*__genmod\.f90' -exec rm {} \;
