@@ -30,8 +30,6 @@ if test -z "${R_HOME}"; then
 fi
 RBIN="${R_HOME}/bin/R"
 : ${CC=$("${RBIN}" CMD config CC)}
-: ${R_BLAS=$("${RBIN}" CMD config BLAS_LIBS)}
-: ${R_LAPACK=$("${RBIN}" CMD config LAPACK_LIBS)}
 
 ROOT=$(
     cd "$(dirname "$0")" || exit
@@ -43,7 +41,7 @@ IGRAPH="${SE2}/vendor/igraph"
 ARPACK="${SRC}/arpack"
 REL_IGRAPH=".${IGRAPH#"$SRC"}"
 
-# Only collects C files. If C++ needed, extend patterns.
+# Collects C and fortran files. If C++ needed, extend patterns.
 collect_objs() {
     cd "$SRC" || exit
     obj_path="${1#"$SRC"}"
@@ -96,7 +94,6 @@ SE2_LIBS="$PTHREAD_LIBS ${SE2_LIBS}"
 
 SE2_CPPFLAGS="${SE2_CPPFLAGS}  -I\"${SRC}/include\" -I\"${SE2}/include\" -I\"${IGRAPH}/include\" -I\"${IGRAPH}/src\" -I\"${IGRAPH}/vendor\""
 
-# Explicitly track only needed files.
 ARPACK_OBJECTS="$(collect_objs "$ARPACK")"
 
 # Always false now.
@@ -104,22 +101,20 @@ AH_TEMPLATE([INTERNAL_BLAS], [Use internal blas library.])
 AH_TEMPLATE([INTERNAL_LAPACK], [Use internal lapack library.])
 AH_TEMPLATE([INTERNAL_ARPACK], [Use internal arpack library.])
 
+SE2_LIBS="${SE2_LIBS} \$(LAPACK_LIBS) \$(BLAS_LIBS) \$(FLIBS)"
 AC_ARG_ENABLE([system_arpack], AS_HELP_STRING([--disable-system-arpack],
   [compile and use the internal arpack even if an external version is found.]))
-if [ test -n "${R_BLAS}" ] && [ test -n "${R_LAPACK}" ]; then
-    SE2_LIBS="${SE2_LIBS} \$(LAPACK_LIBS) \$(BLAS_LIBS) \$(FLIBS)"
 
-    AS_IF([test "x$enable_system_arpack" == "xno"], [
-      AC_MSG_NOTICE([using shipped arpack])
-      SE2_OBJECTS="${SE2_OBJECTS} ${ARPACK_OBJECTS}"], [
-      PKG_CHECK_MODULES([ARPACK], [arpack], [
-        SE2_CPPFLAGS="${SE2_CPPFLAGS} ${ARPACK_CFLAGS}"
-        SE2_LIBS="${SE2_LIBS} ${ARPACK_LIBS}"], [
-        AC_MSG_NOTICE([arpack not found; using shipped arpack])
-        SE2_OBJECTS="${SE2_OBJECTS} ${ARPACK_OBJECTS}"])])
-else
-    AC_MSG_ERROR([Linear algebra packages not found. Make sure blas, lapack, and arpack are installed.])
-fi
+AS_IF([test "x$enable_system_arpack" == "xno"], [
+    AC_MSG_NOTICE([using shipped arpack])
+    SE2_OBJECTS="${SE2_OBJECTS} ${ARPACK_OBJECTS}"
+  ], [
+    PKG_CHECK_MODULES([ARPACK], [arpack], [
+    SE2_CPPFLAGS="${SE2_CPPFLAGS} ${ARPACK_CFLAGS}"
+    SE2_LIBS="${SE2_LIBS} ${ARPACK_LIBS}"], [
+    AC_MSG_NOTICE([arpack not found; using shipped arpack])
+    SE2_OBJECTS="${SE2_OBJECTS} ${ARPACK_OBJECTS}"])
+  ])
 
 dnl Respect user specified options.
 SE2_CPPFLAGS="${SE2_CPPFLAGS} ${CPPFLAGS}"
