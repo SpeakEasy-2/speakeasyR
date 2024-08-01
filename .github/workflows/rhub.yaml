@@ -25,7 +25,7 @@ jobs:
     # NO NEED TO CHECKOUT HERE
     - uses: r-hub/actions/setup@v1
       with:
-        config: "clang-asan"
+        config: "linux,macos,macos-arm64,windows,atlas,c23,clang-asan,clang16,clang17,clang18,clang19,donttest,gcc13,gcc14,intel,mkl,nold,nosuggests,rchk,ubuntu-clang,ubuntu-gcc12,ubuntu-next,ubuntu-release,valgrind"
       id: rhub-setup
 
   linux-containers:
@@ -83,6 +83,9 @@ jobs:
         with:
           job-config: ${{ matrix.config.job-config }}
           token: ${{ secrets.RHUB_TOKEN }}
+      - name: Fix line-endings
+        if: runner.os == 'Windows'
+        run: dos2unix configure.ac
       - uses: r-hub/actions/run-check@v1
         with:
           job-config: ${{ matrix.config.job-config }}
