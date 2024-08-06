@@ -85,7 +85,9 @@ jobs:
           token: ${{ secrets.RHUB_TOKEN }}
       - name: Fix line-endings
         if: runner.os == 'Windows'
-        run: dos2unix configure.ac
+        run: |
+          dos2unix configure.ac
+          dos2unix src/include/config.h.win
       - uses: r-hub/actions/run-check@v1
         with:
           job-config: ${{ matrix.config.job-config }}
