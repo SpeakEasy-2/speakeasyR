@@ -40,7 +40,7 @@ se2_as_matrix_i <- function(adj_like) {
     new_adj$se2_p <- -1
   }
 
-  new_adj$is_directed <- !Matrix::isSymmetric(adj_like)
+  new_adj$is_directed <- !Matrix::isTriangular(adj_like)
   new_adj$n_nodes <- ncol(adj_like)
 
   new_adj

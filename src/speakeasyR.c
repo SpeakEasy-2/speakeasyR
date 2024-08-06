@@ -1,23 +1,60 @@
 #include <R.h>
 #include <Rinternals.h>
 #include <R_ext/Visibility.h>
+#include <R_ext/Print.h>
 
 #include <config.h>
-
-#include <igraph_datatype.h>
-#include <igraph_vector.h>
-#include <igraph_matrix.h>
-#include <igraph_constructors.h>
-#include <igraph_interface.h>
 
 #include <speak_easy_2.h>
 
 #define R_MATRIX(mat, i, j, vcount) (mat)[(i) + ((j) * (vcount))]
+#define R_IGRAPH_CHECK(expr) \
+  do {                                               \
+    igraph_error_t se2_rs = (expr);                  \
+    if (IGRAPH_UNLIKELY(se2_rs != IGRAPH_SUCCESS)) { \
+      IGRAPH_ERROR_NO_RETURN("", se2_rs);            \
+      return;                                        \
+    }                                                \
+  } while (0)
+
+static void checkInterruptFn(void* dummy)
+{
+  R_CheckUserInterrupt();
+}
+
+static igraph_bool_t R_check_user_interrupt(void)
+{
+  return !(R_ToplevelExec(checkInterruptFn, NULL));
+}
+
+static void R_warning_handler(char const* reason, char const* file,
+                              int line)
+{
+  warning("At %s:%d\n\n%s", file, line, reason);
+}
+
+static void R_error_handler(char const* reason, char const* file,
+                            int line, igraph_error_t errorcode)
+{
+  IGRAPH_FINALLY_FREE();
+  error("At %s:%d\n\n%s %s", file, line, reason, igraph_strerror(errorcode));
+}
+
+// Initialize igraph and SE2 interfaces.
+static void se2_init(void)
+{
+  se2_set_void_printf_func(Rprintf);
+  se2_set_check_user_interrupt_func(R_check_user_interrupt);
+
+  igraph_set_warning_handler(R_warning_handler);
+  igraph_set_error_handler(R_error_handler);
+}
 
 // Convert a matrix to an igraph graph.
-static void se2_R_double_to_igraph(double* const mat, int const n_nodes,
-                                   igraph_t* graph, igraph_vector_t* weights,
-                                   igraph_bool_t const is_directed)
+static igraph_error_t se2_R_double_to_igraph(
+  double* const mat, int const n_nodes,
+  igraph_t* graph, igraph_vector_t* weights,
+  igraph_bool_t const is_directed)
 {
   igraph_vector_int_t edges;
 
@@ -28,8 +65,11 @@ static void se2_R_double_to_igraph(double* const mat, int const n_nodes,
     }
   }
 
-  igraph_vector_int_init( &edges, n_edges * 2);
-  igraph_vector_init(weights, n_edges);
+  IGRAPH_CHECK(igraph_vector_int_init( &edges, n_edges * 2));
+  IGRAPH_FINALLY(igraph_vector_int_destroy, &edges);
+
+  IGRAPH_CHECK(igraph_vector_init(weights, n_edges));
+  IGRAPH_FINALLY(igraph_vector_destroy, weights);
 
   n_edges = 0;
   for (int i = 0; i < n_nodes; i++) {
@@ -42,20 +82,28 @@ static void se2_R_double_to_igraph(double* const mat, int const n_nodes,
     }
   }
 
-  igraph_create(graph, &edges, n_nodes, is_directed);
+  IGRAPH_CHECK(igraph_create(graph, &edges, n_nodes, is_directed));
+
   igraph_vector_int_destroy( &edges);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  return IGRAPH_SUCCESS;
 }
 
-static void se2_R_sparse_to_igraph(int* const sp_i, int* const sp_p,
-                                   double* const values, int const n_nodes,
-                                   igraph_t* graph, igraph_vector_t* weights,
-                                   igraph_bool_t const is_directed)
+static igraph_error_t se2_R_sparse_to_igraph(
+  int* const sp_i, int* const sp_p,
+  double* const values, int const n_nodes,
+  igraph_t* graph, igraph_vector_t* weights,
+  igraph_bool_t const is_directed)
 {
   igraph_vector_int_t edges;
   igraph_integer_t n_edges = sp_p[n_nodes];
 
-  igraph_vector_int_init( &edges, n_edges * 2);
-  igraph_vector_init(weights, n_edges);
+  IGRAPH_CHECK(igraph_vector_int_init( &edges, n_edges * 2));
+  IGRAPH_FINALLY(igraph_vector_int_destroy, &edges);
+
+  IGRAPH_CHECK(igraph_vector_init(weights, n_edges));
+  IGRAPH_FINALLY(igraph_vector_destroy, weights);
 
   for (igraph_integer_t i = 0; i < n_nodes; i++) {
     for (igraph_integer_t j = sp_p[i]; j < sp_p[i + 1]; j++) {
@@ -65,36 +113,59 @@ static void se2_R_sparse_to_igraph(int* const sp_i, int* const sp_p,
     }
   }
 
-  igraph_create(graph, &edges, n_nodes, is_directed);
+  IGRAPH_CHECK(igraph_create(graph, &edges, n_nodes, is_directed));
   igraph_vector_int_destroy( &edges);
+
+  IGRAPH_FINALLY_CLEAN(2);
+
+  return IGRAPH_SUCCESS;
 }
 
-static void se2_R_adj_to_igraph(int* const sp_i, int* const sp_p,
-                                double* const values,
-                                int const n_nodes, igraph_t* graph,
-                                igraph_vector_t* weights,
-                                bool const is_directed)
+static igraph_error_t se2_R_adj_to_igraph(
+  int* const sp_i, int* const sp_p,
+  double* const values,
+  int const n_nodes, se2_neighs* graph,
+  bool const is_directed)
 {
+  igraph_t graph_i;
+  igraph_vector_t weights;
+
   if (* sp_i >= 0) {
-    se2_R_sparse_to_igraph(sp_i, sp_p, values, n_nodes, graph, weights,
-                           is_directed);
+    IGRAPH_CHECK(se2_R_sparse_to_igraph(sp_i, sp_p, values, n_nodes, &graph_i,
+                                        &weights, is_directed));
   } else {
-    se2_R_double_to_igraph(values, n_nodes, graph, weights, is_directed);
+    IGRAPH_CHECK(se2_R_double_to_igraph(values, n_nodes, &graph_i, &weights,
+                                        is_directed));
   }
+  IGRAPH_FINALLY(igraph_destroy, &graph_i);
+  IGRAPH_FINALLY(igraph_vector_destroy, &weights);
+
+  IGRAPH_CHECK(se2_igraph_to_neighbor_list( &graph_i, &weights, graph));
+
+  igraph_destroy( &graph_i);
+  igraph_vector_destroy( &weights);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  return IGRAPH_SUCCESS;
 }
 
-static void se2_R_integer_to_igraph(int* const mat_R, int const n_levels, int
-                                    const n_nodes,
-                                    igraph_matrix_int_t* mat_igraph,
-                                    bool const shift_idx)
+static igraph_error_t se2_R_integer_to_igraph(
+  int* const mat_R,
+  int const n_levels, int const n_nodes,
+  igraph_matrix_int_t* mat_igraph,
+  bool const shift_idx)
 {
-  igraph_matrix_int_init(mat_igraph, n_levels, n_nodes);
+  IGRAPH_CHECK(igraph_matrix_int_init(mat_igraph, n_levels, n_nodes));
+  IGRAPH_FINALLY(igraph_matrix_int_destroy, mat_igraph);
   for (int i = 0; i < n_levels; i++) {
     for (int j = 0; j < n_nodes; j++) {
       MATRIX(* mat_igraph, i, j) = R_MATRIX(mat_R, i, j, n_levels) -
                                    (int)shift_idx;
     }
   }
+
+  IGRAPH_FINALLY_CLEAN(1);
+  return IGRAPH_SUCCESS;
 }
 
 static void se2_igraph_int_to_R(igraph_matrix_int_t* const mat_igraph,
@@ -116,8 +187,9 @@ void c_speakeasy2(int* sp_i, int* sp_p, double* values, int* n_nodes,
                   int* target_partitions, int* subcluster, int* min_clust,
                   bool* verbose, bool* is_directed, int* membership)
 {
-  igraph_t graph;
-  igraph_vector_t weights;
+  se2_init();
+
+  se2_neighs graph;
   igraph_matrix_int_t membership_i;
 
   se2_options opts = {
@@ -132,36 +204,49 @@ void c_speakeasy2(int* sp_i, int* sp_p, double* values, int* n_nodes,
     .verbose = *verbose
   };
 
-  se2_R_adj_to_igraph(sp_i, sp_p, values, * n_nodes, &graph, &weights,
-                      *is_directed);
-  speak_easy_2( &graph, &weights, &opts, &membership_i);
+  R_IGRAPH_CHECK(se2_R_adj_to_igraph(sp_i, sp_p, values, * n_nodes, &graph,
+                                     * is_directed));
+  IGRAPH_FINALLY(se2_neighs_destroy, &graph);
+
+  R_IGRAPH_CHECK(speak_easy_2( &graph, &opts, &membership_i));
+  se2_neighs_destroy( &graph);
+  IGRAPH_FINALLY_CLEAN(1);
+  IGRAPH_FINALLY(igraph_matrix_int_destroy, &membership_i);
+
   se2_igraph_int_to_R( &membership_i, membership, /* inc index */ true);
 
   igraph_matrix_int_destroy( &membership_i);
-  igraph_vector_destroy( &weights);
-  igraph_destroy( &graph);
+  IGRAPH_FINALLY_CLEAN(1);
 }
 
 void c_order_nodes(int* sp_i, int* sp_p, double* values, int* n_nodes,
                    int* membership, int* n_levels, bool* is_directed,
                    int* ordering)
 {
-  igraph_t graph;
-  igraph_vector_t weights;
+  se2_init();
+
+  se2_neighs graph;
   igraph_matrix_int_t membership_i;
   igraph_matrix_int_t ordering_i;
 
-  se2_R_integer_to_igraph(membership, * n_levels, * n_nodes,
-                          &membership_i, /* dec idx */ true);
-  se2_R_adj_to_igraph(sp_i, sp_p, values, * n_nodes, &graph, &weights,
-                      *is_directed);
-  se2_order_nodes( &graph, &weights, &membership_i, &ordering_i);
+  R_IGRAPH_CHECK(se2_R_integer_to_igraph(membership, * n_levels, * n_nodes,
+                                         &membership_i, /* dec idx */ true));
+  IGRAPH_FINALLY(igraph_matrix_int_destroy, &membership_i);
+
+  R_IGRAPH_CHECK(se2_R_adj_to_igraph(sp_i, sp_p, values, * n_nodes, &graph,
+                                     * is_directed));
+  IGRAPH_FINALLY(se2_neighs_destroy, &graph);
+
+  R_IGRAPH_CHECK(se2_order_nodes( &graph, &membership_i, &ordering_i));
+  IGRAPH_FINALLY(igraph_matrix_int_destroy, &ordering_i);
+
   se2_igraph_int_to_R( &ordering_i, ordering, /* ind idx */ true);
 
   igraph_matrix_int_destroy( &membership_i);
+  se2_neighs_destroy( &graph);
   igraph_matrix_int_destroy( &ordering_i);
-  igraph_vector_destroy( &weights);
-  igraph_destroy( &graph);
+
+  IGRAPH_FINALLY_CLEAN(3);
 }
 
 static R_INLINE double se2_euclidean_dist(int const i, int const j,
