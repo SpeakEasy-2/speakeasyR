@@ -12,11 +12,14 @@ BUILD_FLAGS :=
 VERSION := $(shell \
 	grep -o "Version: [[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+" < DESCRIPTION | \
 	sed 's/Version: //')
-MAJOR_VERSION := $(shell echo "$(VERSION)" | sed -n 's/^\([0-9]\+\)\..*$$/\1/p')
-MINOR_VERSION := $(shell \
-	echo "$(VERSION)" | sed -n 's/^[0-9]\+\.\([0-9]\+\)\..*$$/\1/p')
-PATCH_VERSION := $(shell \
-	echo "$(VERSION)" | sed -n 's/^.*\.\([0-9]\+\)$$/\1/p')
+IGRAPH_VERSION := $(shell \
+	cd "$(SRC_DIR)/se2/vendor/igraph"; \
+	git describe --tags)
+MAJOR_IGRAPH_VERSION := $(shell echo "$(IGRAPH_VERSION)" | sed -n 's/^\([0-9]\+\)\..*$$/\1/p')
+MINOR_IGRAPH_VERSION := $(shell \
+	echo "$(IGRAPH_VERSION)" | sed -n 's/^[0-9]\+\.\([0-9]\+\)\..*$$/\1/p')
+PATCH_IGRAPH_VERSION := $(shell \
+	echo "$(IGRAPH_VERSION)" | sed -n 's/^.*\.\([0-9]\+\)$$/\1/p')
 
 .PHONY: all
 all: build
@@ -37,10 +40,10 @@ $(SRC_DIR)/include/config.h.in tools/config.sub tools/config.guess aclocal.m4:
 	autoreconf -i
 
 $(SRC_DIR)/include/igraph_version.h: $(SRC_DIR)/se2/vendor/igraph/include/igraph_version.h.in
-	sed -e "s/\@PACKAGE_VERSION\@/$(VERSION)/g" \
-	  -e "s/\@PACKAGE_VERSION_MAJOR\@/$(MAJOR_VERSION)/g" \
-	  -e "s/\@PACKAGE_VERSION_MINOR\@/$(MINOR_VERSION)/g" \
-	  -e "s/\@PACKAGE_VERSION_PATCH\@/$(PATCH_VERSION)/g" <$< >$@
+	sed -e "s/\@PACKAGE_VERSION\@/$(IGRAPH_VERSION)/g" \
+	  -e "s/\@PACKAGE_VERSION_MAJOR\@/$(MAJOR_IGRAPH_VERSION)/g" \
+	  -e "s/\@PACKAGE_VERSION_MINOR\@/$(MINOR_IGRAPH_VERSION)/g" \
+	  -e "s/\@PACKAGE_VERSION_PATCH\@/$(PATCH_IGRAPH_VERSION)/g" <$< >$@
 
 .PHONY: check
 check: build
