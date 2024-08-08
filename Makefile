@@ -10,8 +10,8 @@ HEADERS := $(wildcard $(ROOT_DIR)/src/include/*.h)
 ARPACK := $(wildcard $(ROOT_DIR)/src/arpack/*)
 BUILD_FLAGS :=
 VERSION := $(shell \
-	grep -o "Version: [[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+" < DESCRIPTION | \
-	sed 's/Version: //')
+	cd "$(SRC_DIR)/se2/vendor/igraph"; \
+	git describe --tags)
 MAJOR_VERSION := $(shell echo "$(VERSION)" | sed -n 's/^\([0-9]\+\)\..*$$/\1/p')
 MINOR_VERSION := $(shell \
 	echo "$(VERSION)" | sed -n 's/^[0-9]\+\.\([0-9]\+\)\..*$$/\1/p')
