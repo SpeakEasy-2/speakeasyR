@@ -1,3 +1,13 @@
+# speakeasyR 0.1.3
+
+## Add
+
+- Ability to interrupt speakeasy 2.
+
+## Changed
+
+- Update SE2 C library providing performance improvements.
+
 # speakeasyR 0.1.2
 
 ## Add

@@ -86,7 +86,9 @@ jobs:
       # LF line endings on Windows build.
       - name: Fix line-endings
         if: runner.os == 'Windows'
-        run: dos2unix configure.ac
+        run: |
+          dos2unix configure.ac
+          dos2unix src/include/config.h.win
 
       - uses: r-lib/actions/check-r-package@v2
         with:
