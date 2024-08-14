@@ -8,6 +8,10 @@
 
 - Update SE2 C library providing performance improvements.
 
+## Fixed
+
+- Clean up generated module files when compiling using intel's fortran compiler.
+
 # speakeasyR 0.1.2
 
 ## Add

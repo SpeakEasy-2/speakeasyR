@@ -8,4 +8,3 @@ ROOT=$(
 rm "${ROOT}"/src/include/config.h
 
 find "${ROOT}/src" -name '*.o' -not -path "*/tests/*" -exec rm {} \;
-find "${ROOT}/src" -name '*__genmod\.f90' -exec rm {} \;
