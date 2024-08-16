@@ -25,7 +25,7 @@ jobs:
     # NO NEED TO CHECKOUT HERE
     - uses: r-hub/actions/setup@v1
       with:
-        config: "linux,macos,macos-arm64,windows,atlas,c23,clang-asan,clang16,clang17,clang18,clang19,donttest,gcc13,gcc14,intel,mkl,nold,nosuggests,rchk,ubuntu-clang,ubuntu-gcc12,ubuntu-next,ubuntu-release,valgrind"
+        config: "linux,macos,macos-arm64,windows,atlas,c23,clang-asan,clang16,clang17,clang18,clang19,donttest,gcc13,gcc14,intel,mkl,nold,rchk,ubuntu-clang,ubuntu-gcc12,ubuntu-next,ubuntu-release,valgrind"
       id: rhub-setup
 
   linux-containers:
