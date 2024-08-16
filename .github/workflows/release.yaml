@@ -1,0 +1,42 @@
+name: Release packages
+
+on:
+  push:
+    branches:
+      - devel
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+permissions:
+  checks: write
+  contents: write
+  pull-requests: write
+
+jobs:
+  check-basic:
+    uses: ./.github/workflows/R-CMD-check.yaml
+
+  check-rhub:
+    uses: ./.github/workflows/rhub.yaml
+
+  release:
+    name: Release new packages
+    runs-on: ubuntu-latest
+    if: ${{ github.ref_type == 'tag' }}
+    needs: check
+
+    steps:
+      - name: Collect package
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Copy final packages to release
+        run: |
+          mkdir release
+          mv artifacts/speakeasyR-${{ github.sha }}/* release
+
+      - name: Upload assets to release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: release/*

@@ -3,6 +3,7 @@
 ## Add
 
 - Ability to interrupt speakeasy 2.
+- Release built tarball for manual installation.
 
 ## Changed
 

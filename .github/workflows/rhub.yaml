@@ -9,9 +9,7 @@
 name: R-hub
 
 on:
-  push:
-    branches:
-      - devel
+  - workflow_call
 
 jobs:
 

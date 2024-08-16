@@ -3,11 +3,7 @@
 name: R-CMD-check
 
 on:
-  push:
-    branches:
-      - devel
-    tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+'
+  - workflow_call
 
 permissions: read-all
 
@@ -94,3 +90,10 @@ jobs:
         with:
           upload-snapshots: true
           build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
+
+      - name: Upload build
+        if: ${{ github.ref_type == 'tag' && runner.os == 'Linux' && matrix.config.r == 'release' && matrix.config.arpack == 'external'}}
+        uses: actions/upload-artifact@v4
+        with:
+          name: speakeasyR-${{ github.sha }}
+          path: speakeasyR_*.tar.gz
