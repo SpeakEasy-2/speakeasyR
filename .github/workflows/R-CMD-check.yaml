@@ -5,8 +5,6 @@ name: R-CMD-check
 on:
   - workflow_call
 
-permissions: read-all
-
 jobs:
   R-CMD-check:
     runs-on: ${{ matrix.config.os }}

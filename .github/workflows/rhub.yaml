@@ -46,6 +46,12 @@ jobs:
         with:
           token: ${{ secrets.RHUB_TOKEN }}
           job-config: ${{ matrix.config.job-config }}
+      # Needed for igraph which is precompiled using openblas lib.
+      # This does not cause speakeasyR to build with openblas since it still
+      # uses the blas provided by R which is based on how R was compiled.
+      - name: install openblas for intel
+        if: ${{ matrix.config.container == 'intel' }}
+        run: sudo dnf install -y openblas-devel
       - uses: r-hub/actions/setup-deps@v1
         with:
           token: ${{ secrets.RHUB_TOKEN }}

@@ -23,7 +23,7 @@ jobs:
     name: Release new packages
     runs-on: ubuntu-latest
     if: ${{ github.ref_type == 'tag' }}
-    needs: check
+    needs: check-basic
 
     steps:
       - name: Collect package
