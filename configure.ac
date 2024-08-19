@@ -1,4 +1,4 @@
-AC_INIT([speakeasyR],[0.1.2])
+AC_INIT([speakeasyR],[0.1.3])
 
 AC_LANG(C)
 AC_CONFIG_AUX_DIR([tools])
