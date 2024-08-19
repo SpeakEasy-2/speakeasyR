@@ -26,6 +26,14 @@ It can also be installed using `devtools`:
 devtools::install_github("speakeasy-2/speakeasyR")
 ```
 
+Additionally, it's possible to download the latest release from the [release page](https://github.com/SpeakEasy-2/speakeasyR/releases) (the `speakeasyR_${release}.tar.gz` asset) and install it using `install.packages`:
+
+``` r
+install.packages("speakeasyR_${release}.tar.gz")
+```
+
+Where `${release}` must be replaced with the value in the tarball's name.
+
 ### Linux
 
 Installation with `devtools::install_github` has been tested in clean VMs running Ubuntu and Fedora.
