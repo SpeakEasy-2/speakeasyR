@@ -16,9 +16,6 @@ jobs:
   check-basic:
     uses: ./.github/workflows/R-CMD-check.yaml
 
-  check-rhub:
-    uses: ./.github/workflows/rhub.yaml
-
   release:
     name: Release new packages
     runs-on: ubuntu-latest
@@ -40,3 +37,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: release/*
+
+  check-rhub:
+    uses: ./.github/workflows/rhub.yaml
