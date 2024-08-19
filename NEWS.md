@@ -4,10 +4,12 @@
 
 - Ability to interrupt speakeasy 2.
 - Release built tarball for manual installation.
+- Add explicit test for reproducible results.
 
 ## Changed
 
 - Update SE2 C library providing performance improvements.
+- Tests to be based on quality of clustering instead of exact match to previous run. Since SE2 is stochastic, tweaking the underlying algorithm can change the resulting membership vector even when using a random seed. Even if the membership vector is not identical it should be similar based on normalized mutual information.
 
 ## Fixed
 
