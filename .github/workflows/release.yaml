@@ -21,6 +21,8 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.ref_type == 'tag' }}
     needs: check-basic
+    env:
+      TAG_NAME: ${{ github.ref_name }}
 
     steps:
       - name: Collect package
@@ -33,9 +35,20 @@ jobs:
           mkdir release
           mv artifacts/speakeasyR-${{ github.sha }}/* release
 
+      - name: Create release name
+        run: echo RELEASE_NAME=${TAG_NAME/v/speakeasyR } >> $GITHUB_ENV
+
+      - name: Create release notes
+        run: |
+          range=$(grep --max-count=2 --line-number "# speakeasyR" < NEWS.md |\
+            cut -f 1 -d: | tr '\n' ',' | sed -n 's/,$/p\n/p')
+          sed -n $range < NEWS.md | head -n-2 | tail -n+3 > release_notes.md
+
       - name: Upload assets to release
         uses: softprops/action-gh-release@v1
         with:
+          name: ${{ env.RELEASE_NAME }}
+          body_path: release_notes.md
           files: release/*
 
   check-rhub:
