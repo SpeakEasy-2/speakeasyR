@@ -16,7 +16,7 @@ c  call dsortc
 c     ( WHICH, APPLY, N, XREAL, XIMAG, Y )
 c
 c\Arguments
-c  WHICH   Character*2.  (Input)
+c  WHICH   Character(len=2).  (Input)
 c          'LM' -> sort XREAL,XIMAG into increasing order of magnitude.
 c          'SM' -> sort XREAL,XIMAG into decreasing order of magnitude.
 c          'LR' -> sort XREAL into increasing order of algebraic.
@@ -69,7 +69,7 @@ c     %------------------%
 c     | Scalar Arguments |
 c     %------------------%
 c
-      character*2 which
+      character(len=2) which
       logical    apply
       integer    n
 c

@@ -22,7 +22,7 @@ c          Method for selecting the implicit shifts at each iteration.
 c          ISHIFT = 0: user specified shifts
 c          ISHIFT = 1: exact shift with respect to the matrix H.
 c
-c  WHICH   Character*2.  (INPUT)
+c  WHICH   Character(len=2).  (INPUT)
 c          Shift selection criteria.
 c          'LM' -> KEV eigenvalues of largest magnitude are retained.
 c          'SM' -> KEV eigenvalues of smallest magnitude are retained.
@@ -93,7 +93,7 @@ c     %------------------%
 c     | Scalar Arguments |
 c     %------------------%
 c
-      character*2 which
+      character(len=2) which
       integer    ishift, kev, np
 c
 c     %-----------------%

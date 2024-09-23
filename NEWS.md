@@ -1,5 +1,9 @@
 # speakeasyR 0.1.4
 
+## Fixed
+
+- Replace deprecated use of `CHARACTER*len` in arpack.
+
 # speakeasyR 0.1.3
 
 ## Add

@@ -96,7 +96,7 @@ c                    placing the shifts. See remark 6 below.
 c          IDO = 99: done
 c          -------------------------------------------------------------
 c
-c  BMAT    Character*1.  (INPUT)
+c  BMAT    Character(len=1).  (INPUT)
 c          BMAT specifies the type of the matrix B that defines the
 c          semi-inner product for the operator OP.
 c          B = 'I' -> standard eigenvalue problem A*x = lambda*x
@@ -105,7 +105,7 @@ c
 c  N       Integer.  (INPUT)
 c          Dimension of the eigenproblem.
 c
-c  WHICH   Character*2.  (INPUT)
+c  WHICH   Character(len=2).  (INPUT)
 c          Specify which of the Ritz values of OP to compute.
 c
 c          'LA' - compute the NEV largest (algebraic) eigenvalues.

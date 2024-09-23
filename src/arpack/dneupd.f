@@ -51,7 +51,7 @@ c
 c             RVEC = .TRUE.      Compute the Ritz vectors or Schur vectors.
 c                                See Remarks below.
 c
-c  HOWMNY  Character*1  (INPUT)
+c  HOWMNY  Character(len=1)  (INPUT)
 c          Specifies the form of the basis for the invariant subspace
 c          corresponding to the converged Ritz values that is to be computed.
 c

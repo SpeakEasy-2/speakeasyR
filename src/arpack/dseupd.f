@@ -51,7 +51,7 @@ c             RVEC = .FALSE.     Compute Ritz values only.
 c
 c             RVEC = .TRUE.      Compute Ritz vectors.
 c
-c  HOWMNY  Character*1  (INPUT)
+c  HOWMNY  Character(len=1)  (INPUT)
 c          Specifies how many Ritz vectors are wanted and the form of Z
 c          the matrix of Ritz vectors. See remark 1 below.
 c          = 'A': compute NEV Ritz vectors;

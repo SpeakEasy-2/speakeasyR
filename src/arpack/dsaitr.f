@@ -46,7 +46,7 @@ c          When the routine is used in the "shift-and-invert" mode, the
 c          vector B * Q is already available and does not need to be
 c          recomputed in forming OP * Q.
 c
-c  BMAT    Character*1.  (INPUT)
+c  BMAT    Character(len=1).  (INPUT)
 c          BMAT specifies the type of matrix B that defines the
 c          semi-inner product for the operator OP.  See dsaupd.
 c          B = 'I' -> standard eigenvalue problem A*x = lambda*x

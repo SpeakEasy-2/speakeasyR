@@ -29,7 +29,7 @@ c                    IPNTR(2) is the pointer into WORKD for Y.
 c          IDO = 99: done
 c          -------------------------------------------------------------
 c
-c  BMAT    Character*1.  (INPUT)
+c  BMAT    Character(len=1).  (INPUT)
 c          BMAT specifies the type of the matrix B in the (generalized)
 c          eigenvalue problem A*x = lambda*B*x.
 c          B = 'I' -> standard eigenvalue problem A*x = lambda*x

@@ -12,7 +12,7 @@ c  call dsortr
 c     ( WHICH, APPLY, N, X1, X2 )
 c
 c\Arguments
-c  WHICH   Character*2.  (Input)
+c  WHICH   Character(len=2).  (Input)
 c          'LM' -> X1 is sorted into increasing order of magnitude.
 c          'SM' -> X1 is sorted into decreasing order of magnitude.
 c          'LA' -> X1 is sorted into increasing order of algebraic.
@@ -62,7 +62,7 @@ c     %------------------%
 c     | Scalar Arguments |
 c     %------------------%
 c
-      character*2 which
+      character(len=2) which
       logical    apply
       integer    n
 c
