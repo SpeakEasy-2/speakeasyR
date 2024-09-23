@@ -1,3 +1,5 @@
+# speakeasyR 0.1.4
+
 # speakeasyR 0.1.3
 
 ## Add
