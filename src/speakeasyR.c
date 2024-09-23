@@ -22,9 +22,10 @@ static void checkInterruptFn(void* dummy)
   R_CheckUserInterrupt();
 }
 
-static igraph_bool_t R_check_user_interrupt(void)
+static igraph_error_t R_interruption_handler(void* data)
 {
-  return !(R_ToplevelExec(checkInterruptFn, NULL));
+  return R_ToplevelExec(checkInterruptFn, NULL) ?
+         IGRAPH_SUCCESS : IGRAPH_INTERRUPTED;
 }
 
 static void R_warning_handler(char const* reason, char const* file,
@@ -40,14 +41,19 @@ static void R_error_handler(char const* reason, char const* file,
   error("At %s:%d\n\n%s %s", file, line, reason, igraph_strerror(errorcode));
 }
 
-// Initialize igraph and SE2 interfaces.
+static igraph_error_t R_status_handler(const char* message, void* data)
+{
+  Rprintf("%s\n", message);
+  return IGRAPH_SUCCESS;
+}
+
+// Initialize igraph handlers.
 static void se2_init(void)
 {
-  se2_set_void_printf_func(Rprintf);
-  se2_set_check_user_interrupt_func(R_check_user_interrupt);
-
+  igraph_set_interruption_handler(R_interruption_handler);
   igraph_set_warning_handler(R_warning_handler);
   igraph_set_error_handler(R_error_handler);
+  igraph_set_status_handler(R_status_handler);
 }
 
 // Convert a matrix to an igraph graph.

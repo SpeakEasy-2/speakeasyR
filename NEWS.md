@@ -1,5 +1,9 @@
 # speakeasyR 0.1.4
 
+## Changed
+
+- Update libSE2 to 0.1.8.
+
 ## Fixed
 
 - Replace deprecated use of `CHARACTER*len` in arpack.

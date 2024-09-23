@@ -54,21 +54,22 @@ SE2_LIBS="-lm"
 dnl speakeasyR object
 SE2_OBJECTS="speakeasyR.o"
 
-IGRAPH_OBJS="${REL_IGRAPH}/src/core/interruption.o \
-    ${REL_IGRAPH}/src/core/vector.o \
-    ${REL_IGRAPH}/src/core/memory.o \
+IGRAPH_OBJS="${REL_IGRAPH}/src/core/error.o \
     ${REL_IGRAPH}/src/core/indheap.o \
+    ${REL_IGRAPH}/src/core/interruption.o \
     ${REL_IGRAPH}/src/core/matrix.o \
-    ${REL_IGRAPH}/src/core/vector_ptr.o \
-    ${REL_IGRAPH}/src/core/vector_list.o \
+    ${REL_IGRAPH}/src/core/memory.o \
     ${REL_IGRAPH}/src/core/printing.o \
-    ${REL_IGRAPH}/src/core/error.o \
     ${REL_IGRAPH}/src/core/sparsemat.o \
-    ${REL_IGRAPH}/src/graph/type_indexededgelist.o \
+    ${REL_IGRAPH}/src/core/statusbar.o \
+    ${REL_IGRAPH}/src/core/vector.o \
+    ${REL_IGRAPH}/src/core/vector_list.o \
+    ${REL_IGRAPH}/src/core/vector_ptr.o \
+    ${REL_IGRAPH}/src/graph/attributes.o \
+    ${REL_IGRAPH}/src/graph/caching.o \
     ${REL_IGRAPH}/src/graph/iterators.o \
     ${REL_IGRAPH}/src/graph/type_common.o \
-    ${REL_IGRAPH}/src/graph/caching.o \
-    ${REL_IGRAPH}/src/graph/attributes.o \
+    ${REL_IGRAPH}/src/graph/type_indexededgelist.o \
     ${REL_IGRAPH}/src/internal/hacks.o \
     ${REL_IGRAPH}/src/internal/qsort.o \
     ${REL_IGRAPH}/src/internal/qsort_r.o \
