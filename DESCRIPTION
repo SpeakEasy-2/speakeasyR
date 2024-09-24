@@ -73,7 +73,9 @@ Authors@R: c(
       person("Jordi", "Hermoso", role = c("cph", "ctb"),
         comment = "Contributor to arpack."),
       person("Sébastien", "Fabbro", role = c("cph", "ctb"),
-        comment = "Contributor to arpack.")
+        comment = "Contributor to arpack."),
+      person("Shinya", "Tasaki", role = c("cph", "ctb"),
+        comment = "Provided code used in the gene clustering example.")
     )
 Description: A graph community detection algorithm that aims to be performant
     on large graphs and robust, returning consistent results across runs.

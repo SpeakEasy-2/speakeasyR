@@ -1,5 +1,9 @@
 # speakeasyR 0.1.4
 
+## Add
+
+- A high level function for clustering genes based on gene expression.
+
 ## Changed
 
 - Update libSE2 to 0.1.8.
