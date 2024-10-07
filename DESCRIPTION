@@ -1,6 +1,6 @@
 Package: speakeasyR
 Title: Fast and Robust Multi-Scale Graph Clustering
-Version: 0.1.4
+Version: 0.1.5
 Authors@R: c(
       person(
         "David", "Connell",

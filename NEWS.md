@@ -1,3 +1,9 @@
+# speakeasyR 0.1.5
+
+## Changed
+
+- Update libSE2 to 0.1.9. Improves performance on graphs with skewed weight distributions.
+
 # speakeasyR 0.1.4
 
 ## Add
