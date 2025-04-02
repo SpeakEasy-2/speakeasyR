@@ -106,7 +106,7 @@ SE2_LIBS="${SE2_LIBS} \$(LAPACK_LIBS) \$(BLAS_LIBS) \$(FLIBS)"
 AC_ARG_ENABLE([system_arpack], AS_HELP_STRING([--disable-system-arpack],
   [compile and use the internal arpack even if an external version is found.]))
 
-AS_IF([test "x$enable_system_arpack" == "xno"], [
+AS_IF([test "x$enable_system_arpack" = "xno"], [
     AC_MSG_NOTICE([using shipped arpack])
     SE2_OBJECTS="${SE2_OBJECTS} ${ARPACK_OBJECTS}"
   ], [

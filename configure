@@ -4929,7 +4929,7 @@ printf "%s\n" "no" >&6; }
 		PKG_CONFIG=""
 	fi
 fi
-if test "x$enable_system_arpack" == "xno"
+if test "x$enable_system_arpack" = "xno"
 then :
 
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: using shipped arpack" >&5
