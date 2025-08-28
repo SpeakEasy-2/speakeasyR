@@ -1,3 +1,9 @@
+# speakeasyR 0.1.6
+
+## Changed
+
+- Update libSE2 to 0.1.10. Performance imporvements.
+
 # speakeasyR 0.1.5
 
 ## Changed

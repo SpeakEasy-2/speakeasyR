@@ -22,6 +22,7 @@
 ^src/se2/CHANGELOG\.md$
 ^src/se2/flake\.
 ^src/se2/README\.org$
+^src/se2/Makefile$
 ^src/se2/vendor/igraph/doc$
 ^src/se2/vendor/igraph/etc$
 ^src/se2/vendor/igraph/examples$
