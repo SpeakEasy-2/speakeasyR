@@ -1,3 +1,9 @@
+# speakeasyR 0.1.7
+
+## Changed
+
+- Update libSE2 to 0.1.11. Fixes issue with subclustering.
+
 # speakeasyR 0.1.6
 
 ## Changed
