@@ -54,19 +54,19 @@ cluster <- function(graph, discard_transient = 3, independent_runs = 10,
     seed <- sample.int(9999, 1)
   }
 
-  if (subcluster > 1) {
-    membership <- matrix(as.integer(0), nrow = subcluster, ncol = adj$n_nodes)
-  } else {
-    membership <- integer(adj$n_nodes)
-  }
-
-  .C(
+  membership <- .Call(
     C_speakeasy2, as.integer(adj$se2_i), as.integer(adj$se2_p),
     as.double(adj$values), as.integer(adj$n_nodes),
     as.integer(discard_transient), as.integer(independent_runs),
     as.integer(max_threads), as.integer(seed), as.integer(target_clusters),
     as.integer(target_partitions), as.integer(subcluster),
     as.integer(min_clust), as.logical(verbose), as.logical(is_directed),
-    membership = membership
-  )$membership
+    PACKAGE = "speakeasyR"
+  )
+
+  if (subcluster > 1) {
+    matrix(membership, nrow = subcluster, ncol = adj$n_nodes)
+  } else {
+    membership
+  }
 }

@@ -187,31 +187,34 @@ static void se2_igraph_int_to_R(igraph_matrix_int_t* const mat_igraph,
   }
 }
 
-void c_speakeasy2(int* sp_i, int* sp_p, double* values, int* n_nodes,
-                  int* discard_transient, int* independent_runs,
-                  int* max_threads, int* seed, int* target_clusters,
-                  int* target_partitions, int* subcluster, int* min_clust,
-                  bool* verbose, bool* is_directed, int* membership)
+SEXP c_speakeasy2(SEXP sp_i, SEXP sp_p, SEXP values, SEXP n_nodes,
+                  SEXP discard_transient, SEXP independent_runs,
+                  SEXP max_threads, SEXP seed, SEXP target_clusters,
+                  SEXP target_partitions, SEXP subcluster, SEXP min_clust,
+                  SEXP verbose, SEXP is_directed)
 {
   se2_init();
 
   se2_neighs graph;
+  SEXP membership =
+    PROTECT(allocVector(INTSXP, INTEGER(n_nodes)[0] * INTEGER(subcluster)[0]));
   igraph_matrix_int_t membership_i;
 
   se2_options opts = {
-    .discard_transient = *discard_transient,
-    .independent_runs = *independent_runs,
-    .max_threads = *max_threads,
-    .minclust = *min_clust,
-    .subcluster = *subcluster,
-    .random_seed = *seed,
-    .target_clusters = *target_clusters,
-    .target_partitions = *target_partitions,
-    .verbose = *verbose
+    .discard_transient = INTEGER(discard_transient)[0],
+    .independent_runs = INTEGER(independent_runs)[0],
+    .max_threads = INTEGER(max_threads)[0],
+    .minclust = INTEGER(min_clust)[0],
+    .subcluster = INTEGER(subcluster)[0],
+    .random_seed = INTEGER(seed)[0],
+    .target_clusters = INTEGER(target_clusters)[0],
+    .target_partitions = INTEGER(target_partitions)[0],
+    .verbose = LOGICAL(verbose)[0]
   };
 
-  R_IGRAPH_CHECK(se2_R_adj_to_igraph(sp_i, sp_p, values, * n_nodes, &graph,
-                                     * is_directed));
+  R_IGRAPH_CHECK(se2_R_adj_to_igraph(INTEGER(sp_i), INTEGER(sp_p), REAL(values),
+                                     INTEGER(n_nodes)[0], &graph,
+                                     LOGICAL(is_directed)[0]));
   IGRAPH_FINALLY(se2_neighs_destroy, &graph);
 
   R_IGRAPH_CHECK(speak_easy_2( &graph, &opts, &membership_i));
@@ -219,10 +222,14 @@ void c_speakeasy2(int* sp_i, int* sp_p, double* values, int* n_nodes,
   IGRAPH_FINALLY_CLEAN(1);
   IGRAPH_FINALLY(igraph_matrix_int_destroy, &membership_i);
 
-  se2_igraph_int_to_R( &membership_i, membership, /* inc index */ true);
+  se2_igraph_int_to_R( &membership_i,
+                       INTEGER(membership), /* inc index */ true);
 
   igraph_matrix_int_destroy( &membership_i);
   IGRAPH_FINALLY_CLEAN(1);
+
+  UNPROTECT(1);
+  return membership;
 }
 
 void c_order_nodes(int* sp_i, int* sp_p, double* values, int* n_nodes,
@@ -355,11 +362,6 @@ void c_knn_graph(double* mat, int* k, int* n_nodes, int* n_rows, int* sp_p,
   }
 }
 
-static R_NativePrimitiveArgType se2_type[] = {
-  INTSXP, INTSXP, REALSXP, INTSXP, INTSXP, INTSXP, INTSXP, INTSXP, INTSXP,
-  INTSXP, INTSXP, INTSXP, LGLSXP, LGLSXP, INTSXP
-};
-
 static R_NativePrimitiveArgType order_type[] = {
   INTSXP, INTSXP, REALSXP, INTSXP, INTSXP, INTSXP, LGLSXP, INTSXP
 };
@@ -369,15 +371,19 @@ static R_NativePrimitiveArgType knn_type[] = {
 };
 
 static const R_CMethodDef cMethods[] = {
-  {"speakeasy2", (DL_FUNC) &c_speakeasy2, 15, se2_type},
   {"order_nodes", (DL_FUNC) &c_order_nodes, 8, order_type},
   {"knn_graph", (DL_FUNC) &c_knn_graph, 7, knn_type},
   {NULL, NULL, 0}
 };
 
+static const R_CallMethodDef callMethods[] = {
+  {"speakeasy2", (DL_FUNC) &c_speakeasy2, 14},
+  {NULL, NULL, 0}
+};
+
 void attribute_visible R_init_speakeasyR(DllInfo* info)
 {
-  R_registerRoutines(info, cMethods, NULL, NULL, NULL);
+  R_registerRoutines(info, cMethods, callMethods, NULL, NULL);
   R_useDynamicSymbols(info, FALSE);
   R_forceSymbols(info, TRUE);
 }
