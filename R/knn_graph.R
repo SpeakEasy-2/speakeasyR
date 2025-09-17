@@ -59,24 +59,26 @@ knn_graph <- function(mat, k, weighted = FALSE) {
     sp_x <- as.double(-1)
   }
 
-  components <- .C(C_knn_graph, as.double(mat), as.integer(k),
+  components <- .Call(C_knn_graph, as.double(mat), as.integer(k),
     as.integer(ncol(mat)), as.integer(nrow(mat)),
     sp_p = integer(ncol(mat) + 1), sp_i = integer(ncol(mat) * k),
     sp_x = sp_x
   )
 
+  p <- components[[1]]
+  i <- components[[2]]
+  x <- components[[3]]
+
   if (weighted) {
     Matrix::sparseMatrix(
-      i = components$sp_i, p = components$sp_p,
-      x = components$sp_x,
+      i = i, p = p, x = x,
       dims = c(ncol(mat), ncol(mat)),
       dimnames = list(colnames(mat), colnames(mat)),
       index1 = FALSE, repr = "C"
     )
   } else {
     Matrix::sparseMatrix(
-      i = components$sp_i, p = components$sp_p,
-      dims = c(ncol(mat), ncol(mat)),
+      i = i, p = p, dims = c(ncol(mat), ncol(mat)),
       dimnames = list(colnames(mat), colnames(mat)),
       index1 = FALSE, repr = "C"
     )

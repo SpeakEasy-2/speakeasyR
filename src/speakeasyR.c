@@ -232,38 +232,46 @@ SEXP c_speakeasy2(SEXP sp_i, SEXP sp_p, SEXP values, SEXP n_nodes,
   return membership;
 }
 
-void c_order_nodes(int* sp_i, int* sp_p, double* values, int* n_nodes,
-                   int* membership, int* n_levels, bool* is_directed,
-                   int* ordering)
+SEXP c_order_nodes(SEXP sp_i, SEXP sp_p, SEXP values, SEXP n_nodes,
+                   SEXP membership, SEXP n_levels, SEXP is_directed)
 {
   se2_init();
 
   se2_neighs graph;
   igraph_matrix_int_t membership_i;
   igraph_matrix_int_t ordering_i;
+  SEXP ordering =
+    PROTECT(allocVector(INTSXP, INTEGER(n_nodes)[0] * INTEGER(n_levels)[0]));
 
-  R_IGRAPH_CHECK(se2_R_integer_to_igraph(membership, * n_levels, * n_nodes,
-                                         &membership_i, /* dec idx */ true));
+  R_IGRAPH_CHECK(se2_R_integer_to_igraph(
+                   INTEGER(membership),
+                   INTEGER(n_levels)[0],
+                   INTEGER(n_nodes)[0], &membership_i,
+                   /* dec idx */ true));
   IGRAPH_FINALLY(igraph_matrix_int_destroy, &membership_i);
 
-  R_IGRAPH_CHECK(se2_R_adj_to_igraph(sp_i, sp_p, values, * n_nodes, &graph,
-                                     * is_directed));
+  R_IGRAPH_CHECK(se2_R_adj_to_igraph(INTEGER(sp_i), INTEGER(sp_p), REAL(values),
+                                     INTEGER(n_nodes)[0], &graph,
+                                     LOGICAL(is_directed)[0]));
   IGRAPH_FINALLY(se2_neighs_destroy, &graph);
 
   R_IGRAPH_CHECK(se2_order_nodes( &graph, &membership_i, &ordering_i));
   IGRAPH_FINALLY(igraph_matrix_int_destroy, &ordering_i);
 
-  se2_igraph_int_to_R( &ordering_i, ordering, /* ind idx */ true);
+  se2_igraph_int_to_R( &ordering_i, INTEGER(ordering), /* ind idx */ true);
 
   igraph_matrix_int_destroy( &membership_i);
   se2_neighs_destroy( &graph);
   igraph_matrix_int_destroy( &ordering_i);
 
   IGRAPH_FINALLY_CLEAN(3);
+
+  UNPROTECT(1);
+  return ordering;
 }
 
 static R_INLINE double se2_euclidean_dist(int const i, int const j,
-    double* mat, int const n_rows)
+    double const* mat, int const n_rows)
 {
   double out = 0;
   double* col_i = mat + (i* n_rows);
@@ -306,7 +314,7 @@ static R_INLINE void se2_insert_sim(double const d, double* similarities,
 }
 
 static void se2_closest_k(int const col, int const k, int const n_nodes,
-                          int const n_rows, double* mat, int* rows, double* vals)
+                          int const n_rows, double const* mat, int* rows, double* vals)
 {
   double* similarities = R_Calloc(k, double);
 
@@ -340,50 +348,56 @@ static void se2_closest_k(int const col, int const k, int const n_nodes,
   R_Free(similarities);
 }
 
-void c_knn_graph(double* mat, int* k, int* n_nodes, int* n_rows, int* sp_p,
-                 int* sp_i, double* sp_x)
+SEXP c_knn_graph(SEXP mat, SEXP k, SEXP n_nodes, SEXP n_rows, SEXP sp_p,
+                 SEXP sp_i, SEXP sp_x)
 {
-  if (* k < 1) {
+  SEXP res = PROTECT(allocVector(VECSXP, 3));
+
+  int const k_ = INTEGER(k)[0];
+  int const n_nodes_ = INTEGER(n_nodes)[0];
+  int const n_rows_ = INTEGER(n_rows)[0];
+  int* sp_i_ = INTEGER(sp_i);
+  int* sp_p_ = INTEGER(sp_p);
+  double* sp_x_ = REAL(sp_x);
+  double const* mat_ = REAL(mat);
+
+  if (k_ < 1) {
     Rf_error("The k must be at least 1.");
   }
 
-  if (* k >= *n_nodes) {
+  if (k_ >= n_nodes_) {
     Rf_error("The k must be less than the number of nodes.");
   }
 
-  for (int i = 0; i <= *n_nodes; i++) {
-    sp_p[i] = i** k;
+  for (int i = 0; i <= n_nodes_; i++) {
+    sp_p_[i] = i* k_;
   }
 
-  for (int i = 0; i < *n_nodes; i++) {
+  for (int i = 0; i < n_nodes_; i++) {
     R_CheckUserInterrupt();
-    se2_closest_k(i, * k, * n_nodes, * n_rows, mat, sp_i + sp_p[i],
-                  *sp_x < 0 ? sp_x : sp_x + sp_p[i]);
+    se2_closest_k(i, k_, n_nodes_, n_rows_,
+                  mat_, sp_i_ + sp_p_[i],
+                  *sp_x_ < 0 ? sp_x_ : sp_x_ + sp_p_[i]);
   }
+
+  SET_VECTOR_ELT(res, 0, sp_p);
+  SET_VECTOR_ELT(res, 1, sp_i);
+  SET_VECTOR_ELT(res, 2, sp_x);
+
+  UNPROTECT(1);
+  return res;
 }
-
-static R_NativePrimitiveArgType order_type[] = {
-  INTSXP, INTSXP, REALSXP, INTSXP, INTSXP, INTSXP, LGLSXP, INTSXP
-};
-
-static R_NativePrimitiveArgType knn_type[] = {
-  REALSXP, INTSXP, INTSXP, INTSXP, INTSXP, INTSXP, REALSXP
-};
-
-static const R_CMethodDef cMethods[] = {
-  {"order_nodes", (DL_FUNC) &c_order_nodes, 8, order_type},
-  {"knn_graph", (DL_FUNC) &c_knn_graph, 7, knn_type},
-  {NULL, NULL, 0}
-};
 
 static const R_CallMethodDef callMethods[] = {
   {"speakeasy2", (DL_FUNC) &c_speakeasy2, 14},
+  {"order_nodes", (DL_FUNC) &c_order_nodes, 7},
+  {"knn_graph", (DL_FUNC) &c_knn_graph, 7},
   {NULL, NULL, 0}
 };
 
 void attribute_visible R_init_speakeasyR(DllInfo* info)
 {
-  R_registerRoutines(info, cMethods, callMethods, NULL, NULL);
+  R_registerRoutines(info, NULL, callMethods, NULL, NULL);
   R_useDynamicSymbols(info, FALSE);
   R_forceSymbols(info, TRUE);
 }
