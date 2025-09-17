@@ -274,8 +274,8 @@ static R_INLINE double se2_euclidean_dist(int const i, int const j,
     double const* mat, int const n_rows)
 {
   double out = 0;
-  double* col_i = mat + (i* n_rows);
-  double* col_j = mat + (j* n_rows);
+  double const* col_i = mat + (i* n_rows);
+  double const* col_j = mat + (j* n_rows);
   for (int k = 0; k < n_rows; k++) {
     double el = col_i[k] - col_j[k];
     out += (el* el);
