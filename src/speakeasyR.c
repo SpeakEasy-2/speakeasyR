@@ -13,7 +13,7 @@
     igraph_error_t se2_rs = (expr);                  \
     if (IGRAPH_UNLIKELY(se2_rs != IGRAPH_SUCCESS)) { \
       IGRAPH_ERROR_NO_RETURN("", se2_rs);            \
-      return;                                        \
+      return R_NilValue;                             \
     }                                                \
   } while (0)
 
