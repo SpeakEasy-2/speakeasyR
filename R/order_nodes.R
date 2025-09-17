@@ -60,16 +60,15 @@ order_nodes <- function(graph, membership, is_directed = "detect") {
     n_nodes <- ncol(membership)
   }
 
-  if (n_levels > 1) {
-    ordering <- matrix(as.integer(0), nrow = n_levels, ncol = n_nodes)
-  } else {
-    ordering <- integer(n_nodes)
-  }
-
-  .C(
+  ordering <- .Call(
     C_order_nodes, as.integer(adj$se2_i), as.integer(adj$se2_p),
     as.double(adj$values), as.integer(n_nodes), as.integer(membership),
-    as.integer(n_levels), as.logical(is_directed),
-    ordering = ordering
-  )$ordering
+    as.integer(n_levels), as.logical(is_directed)
+  )
+
+  if (n_levels > 1) {
+    matrix(ordering, nrow = n_levels, ncol = n_nodes)
+  } else {
+    ordering
+  }
 }

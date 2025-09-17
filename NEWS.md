@@ -1,3 +1,9 @@
+# speakeasyR 0.1.8
+
+## Add
+
+- Support for `LongVector`s for graphs with more than 2 ^ 31 edges.
+
 # speakeasyR 0.1.7
 
 ## Changed
