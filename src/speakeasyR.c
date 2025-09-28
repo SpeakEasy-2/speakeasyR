@@ -22,10 +22,9 @@ static void checkInterruptFn(void* dummy)
   R_CheckUserInterrupt();
 }
 
-static igraph_error_t R_interruption_handler(void* data)
+static igraph_bool_t R_interruption_handler(void)
 {
-  return R_ToplevelExec(checkInterruptFn, NULL) ?
-         IGRAPH_SUCCESS : IGRAPH_INTERRUPTED;
+  return R_ToplevelExec(checkInterruptFn, NULL) == false;
 }
 
 static void R_warning_handler(char const* reason, char const* file,

@@ -4,6 +4,10 @@
 
 - Support for `LongVector`s for graphs with more than 2 ^ 31 edges.
 
+## Changed
+
+- Update libSE2 to 0.1.12 and subsequently igraph to 1.0.0
+
 # speakeasyR 0.1.7
 
 ## Changed

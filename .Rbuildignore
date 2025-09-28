@@ -45,6 +45,7 @@
 ^src/se2/vendor/igraph/src/CMakeLists\.txt$
 ^src/se2/vendor/igraph/tests
 ^src/se2/vendor/igraph/tools
+^src/se2/vendor/igraph/vendor/infomap/CITATION.cff
 ^src/se2/vendor/igraph/vendor/f2c
 ^src/se2/vendor/igraph/vendor/glpk
 ^src/se2/vendor/igraph/vendor/mini-gmp

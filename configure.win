@@ -28,6 +28,7 @@ IGRAPH_OBJS="${REL_IGRAPH}/src/core/error.o \
     ${REL_IGRAPH}/src/core/printing.o \
     ${REL_IGRAPH}/src/core/sparsemat.o \
     ${REL_IGRAPH}/src/core/statusbar.o \
+    ${REL_IGRAPH}/src/core/strvector.o \
     ${REL_IGRAPH}/src/core/vector.o \
     ${REL_IGRAPH}/src/core/vector_list.o \
     ${REL_IGRAPH}/src/core/vector_ptr.o \
