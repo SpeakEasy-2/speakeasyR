@@ -75,10 +75,8 @@ cluster_genes <- function(gene_expression, k = NULL, discard_transient = 3,
                           subcluster = 1, min_clust = 5, verbose = FALSE) {
   gcn <- stats::cor(t(gene_expression))
 
-  is_directed <- FALSE
   if (!is.null(k)) {
     gcn <- speakeasyR::knn_graph(gcn, k)
-    is_directed <- TRUE
   }
 
   speakeasyR::cluster(gcn,
@@ -86,6 +84,5 @@ cluster_genes <- function(gene_expression, k = NULL, discard_transient = 3,
     independent_runs = independent_runs, max_threads = max_threads, seed = seed,
     target_clusters = target_clusters, target_partitions = target_partitions,
     subcluster = subcluster, min_clust = min_clust, verbose = verbose,
-    is_directed = is_directed
   )
 }

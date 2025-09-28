@@ -8,6 +8,10 @@
 
 - Update libSE2 to 0.1.12 and subsequently igraph to 1.0.0
 
+## Fixed
+
+- In `cluster_genes` fix directedness of a symmetric correlation matrix.
+
 # speakeasyR 0.1.7
 
 ## Changed
