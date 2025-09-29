@@ -121,7 +121,7 @@ AS_IF([test "x$enable_system_arpack" = "xno"], [
 dnl Respect user specified options.
 SE2_CPPFLAGS="${SE2_CPPFLAGS} ${CPPFLAGS}"
 SE2_LIBS="${SE2_LIBS} ${LDFLAGS}"
-SE2_CFLAGS="${SE2_CFLAGS} ${CFLAGS}"
+SE2_CFLAGS="${SE2_CFLAGS} ${CFLAGS} -ffast-math"
 SE2_FFLAGS="${SE2_FFLAGS} ${FFLAGS}"
 
 AC_SUBST(SE2_CPPFLAGS)
