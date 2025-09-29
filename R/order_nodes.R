@@ -47,10 +47,7 @@
 #'   }
 #' }
 order_nodes <- function(graph, membership, is_directed = "detect") {
-  adj <- se2_as_matrix_i(graph)
-  if (is_directed == "detect") {
-    is_directed <- adj$is_directed
-  }
+  adj <- se2_as_matrix_i(graph, is_directed)
 
   if (is.vector(membership)) {
     n_levels <- 1
@@ -63,7 +60,7 @@ order_nodes <- function(graph, membership, is_directed = "detect") {
   ordering <- .Call(
     C_order_nodes, as.integer(adj$se2_i), as.integer(adj$se2_p),
     as.double(adj$values), as.integer(n_nodes), as.integer(membership),
-    as.integer(n_levels), as.logical(is_directed)
+    as.integer(n_levels), as.logical(adj$is_directed)
   )
 
   if (n_levels > 1) {

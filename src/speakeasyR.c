@@ -7,6 +7,11 @@
 
 #include <speak_easy_2.h>
 
+#define IS_WEIGHTED(g) ((g)->weights != NULL)
+
+#define N_NEIGHBORS(a, i)                                                     \
+  ((a).neigh_list ? VECTOR(*(a).sizes)[(i)] : (a).n_nodes)
+
 #define R_MATRIX(mat, i, j, vcount) (mat)[(i) + ((j) * (vcount))]
 #define R_IGRAPH_CHECK(expr) \
   do {                                               \
@@ -55,101 +60,224 @@ static void se2_init(void)
   igraph_set_status_handler(R_status_handler);
 }
 
-// Convert a matrix to an igraph graph.
-static igraph_error_t se2_R_double_to_igraph(
-  double* const mat, int const n_nodes,
-  igraph_t* graph, igraph_vector_t* weights,
-  igraph_bool_t const is_directed)
+static igraph_error_t se2_R_unweighted_double_to_graph(
+  double* const mat, se2_neighs* graph, igraph_bool_t const is_directed)
 {
-  igraph_vector_int_t edges;
-
-  igraph_integer_t n_edges = 0;
-  for (int i = 0; i < n_nodes; i++) {
-    for (int j = 0; j < n_nodes; j++) {
-      n_edges += R_MATRIX(mat, i, j, n_nodes) != 0;
+  igraph_integer_t const n_nodes = graph->n_nodes;
+  for (igraph_integer_t i = 0; i < n_nodes; i++) {
+    igraph_vector_int_t neighbors = VECTOR(* graph->neigh_list)[i];
+    igraph_integer_t n_neighs = 0;
+    for (igraph_integer_t j = 0; j < n_nodes; j++) {
+      n_neighs += R_MATRIX(mat, j, i, n_nodes);
     }
-  }
+    if (!is_directed) {
+      for (igraph_integer_t j = 0; j < n_nodes; j++) {
+        n_neighs += R_MATRIX(mat, i, j, n_nodes);
+      }
+    }
+    VECTOR(* graph->sizes)[i] = n_neighs;
 
-  IGRAPH_CHECK(igraph_vector_int_init( &edges, n_edges * 2));
-  IGRAPH_FINALLY(igraph_vector_int_destroy, &edges);
+    igraph_vector_int_init( &VECTOR(neighbors), n_neighs);
+    igraph_integer_t count = 0;
+    for (igraph_integer_t j = 0; j < n_nodes; j++) {
+      if (R_MATRIX(mat, j, i, n_nodes)) {
+        VECTOR(neighbors)[count++] = j;
+      }
+    }
 
-  IGRAPH_CHECK(igraph_vector_init(weights, n_edges));
-  IGRAPH_FINALLY(igraph_vector_destroy, weights);
+    if (is_directed) {
+      continue;
+    }
 
-  n_edges = 0;
-  for (int i = 0; i < n_nodes; i++) {
-    for (int j = 0; j < n_nodes; j++) {
-      if (R_MATRIX(mat, i, j, n_nodes) != 0) {
-        VECTOR(* weights)[n_edges / 2] = R_MATRIX(mat, i, j, n_nodes);
-        VECTOR(edges)[n_edges++] = i;
-        VECTOR(edges)[n_edges++] = j;
+    for (igraph_integer_t j = 0; j < n_nodes; j++) {
+      if (R_MATRIX(mat, i, j, n_nodes)) {
+        VECTOR(neighbors)[count++] = j;
       }
     }
   }
 
-  IGRAPH_CHECK(igraph_create(graph, &edges, n_nodes, is_directed));
-
-  igraph_vector_int_destroy( &edges);
-  IGRAPH_FINALLY_CLEAN(2);
-
   return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t se2_R_sparse_to_igraph(
-  int* const sp_i, int* const sp_p,
-  double* const values, int const n_nodes,
-  igraph_t* graph, igraph_vector_t* weights,
-  igraph_bool_t const is_directed)
+static igraph_error_t se2_R_weighted_double_to_graph(
+  double* const mat, se2_neighs* graph, igraph_bool_t const is_directed)
 {
-  igraph_vector_int_t edges;
-  igraph_integer_t n_edges = sp_p[n_nodes];
-
-  IGRAPH_CHECK(igraph_vector_int_init( &edges, n_edges * 2));
-  IGRAPH_FINALLY(igraph_vector_int_destroy, &edges);
-
-  IGRAPH_CHECK(igraph_vector_init(weights, n_edges));
-  IGRAPH_FINALLY(igraph_vector_destroy, weights);
+  igraph_integer_t const n_nodes = graph->n_nodes;
+  for (igraph_integer_t i = 0; i < n_nodes; i++) {
+    igraph_vector_init( &VECTOR(* graph->weights)[i], n_nodes);
+  }
 
   for (igraph_integer_t i = 0; i < n_nodes; i++) {
-    for (igraph_integer_t j = sp_p[i]; j < sp_p[i + 1]; j++) {
-      VECTOR(* weights)[j] = *values > -1 ? values[j] : 1;
-      VECTOR(edges)[(j * 2)] = i;
-      VECTOR(edges)[(j * 2) + 1] = (igraph_integer_t)sp_i[j];
+    igraph_vector_t w = VECTOR(* graph->weights)[i];
+    for (igraph_integer_t j = 0; j < n_nodes; j++) {
+      VECTOR(w)[j] = R_MATRIX(mat, j, i, n_nodes);
     }
   }
 
-  IGRAPH_CHECK(igraph_create(graph, &edges, n_nodes, is_directed));
-  igraph_vector_int_destroy( &edges);
+  if (is_directed) {
+    return IGRAPH_SUCCESS;
+  }
 
-  IGRAPH_FINALLY_CLEAN(2);
+  for (igraph_integer_t i = 0; i < n_nodes; i++) {
+    igraph_vector_t w = VECTOR(* graph->weights)[i];
+    for (igraph_integer_t j = 0; j < n_nodes; j++) {
+      VECTOR(w)[j] += R_MATRIX(mat, i, j, n_nodes);
+    }
+  }
 
   return IGRAPH_SUCCESS;
 }
 
-static igraph_error_t se2_R_adj_to_igraph(
+static igraph_error_t se2_R_directed_sparse_to_graph(
+  int* const sp_i, int* const sp_p, double* const values, se2_neighs* graph)
+{
+  igraph_integer_t const n_nodes = graph->n_nodes;
+  for (igraph_integer_t i = 0; i < n_nodes; i++) {
+    igraph_integer_t const n_neighs = sp_p[i + 1] - sp_p[i];
+    VECTOR(* graph->sizes)[i] = n_neighs;
+    igraph_vector_int_init( &VECTOR(* graph->neigh_list)[i], n_neighs);
+
+    if (IS_WEIGHTED(graph)) {
+      igraph_vector_init( &VECTOR(* graph->weights)[i], n_neighs);
+    }
+  }
+
+  for (igraph_integer_t i = 0; i < n_nodes; i++) {
+    for (igraph_integer_t j = sp_p[i]; j < sp_p[i + 1]; j++) {
+      VECTOR(VECTOR(* graph->neigh_list)[i])[j - sp_p[i]] = sp_i[j];
+
+      if (IS_WEIGHTED(graph)) {
+        VECTOR(VECTOR(* graph->weights)[i])[j - sp_p[i]] = values[j];
+      }
+    }
+  }
+
+  return IGRAPH_SUCCESS;
+}
+
+#define NEIGHBOR(a, i, j) (VECTOR(VECTOR(*(a).neigh_list)[(i)])[(j)])
+#define WEIGHT(a, i, j) (VECTOR(VECTOR(*(a).weights)[(i)])[(j)])
+
+static igraph_error_t se2_R_undirected_sparse_to_graph(
+  int* const sp_i, int* const sp_p, double* const values, se2_neighs* graph)
+{
+  igraph_integer_t const n_nodes = graph->n_nodes;
+  for (igraph_integer_t i = 0; i < n_nodes; i++) {
+    VECTOR(* graph->sizes)[i] = sp_p[i + 1] - sp_p[i];
+    for (igraph_integer_t j = sp_p[i]; j < sp_p[i + 1]; j++) {
+      VECTOR(* graph->sizes)[sp_i[i]] += 1;
+    }
+  }
+
+  for (igraph_integer_t i = 0; i < n_nodes; i++) {
+    igraph_integer_t n_neighs = N_NEIGHBORS(* graph, i);
+    igraph_vector_int_init( &VECTOR(* graph->neigh_list)[i], n_neighs);
+    if (IS_WEIGHTED(graph)) {
+      igraph_vector_init( &VECTOR(* graph->weights)[i], n_neighs);
+    }
+  }
+
+  igraph_vector_int_t pos;
+  IGRAPH_CHECK(igraph_vector_int_init( &pos, n_nodes));
+  IGRAPH_FINALLY(igraph_vector_int_destroy, &pos);
+
+  for (igraph_integer_t i = 0; i < n_nodes; i++) {
+    for (igraph_integer_t j = sp_p[i]; j < sp_p[i + 1]; j++) {
+      igraph_integer_t row = sp_i[j];
+      if (IS_WEIGHTED(graph)) {
+        WEIGHT(* graph, i, VECTOR(pos)[i]) = values[j];
+        WEIGHT(* graph, row, VECTOR(pos)[row]) = values[j];
+      }
+
+      NEIGHBOR(* graph, i, VECTOR(pos)[i]++) = row;
+      NEIGHBOR(* graph, row, VECTOR(pos)[row]++) = i;
+    }
+  }
+
+  igraph_vector_int_destroy( &pos);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  return IGRAPH_SUCCESS;
+}
+
+#undef NEIGHBOR
+#undef WEIGHT
+
+static igraph_error_t se2_R_sparse_to_graph(
+  int* const sp_i, int* const sp_p,
+  double* const values, se2_neighs* graph, igraph_bool_t const is_directed)
+{
+  if (is_directed) {
+    return se2_R_directed_sparse_to_graph(sp_i, sp_p, values, graph);
+  }
+
+  return se2_R_undirected_sparse_to_graph(sp_i, sp_p, values, graph);
+}
+
+static igraph_error_t se2_R_adj_to_graph(
   int* const sp_i, int* const sp_p,
   double* const values,
   int const n_nodes, se2_neighs* graph,
   bool const is_directed)
 {
-  igraph_t graph_i;
-  igraph_vector_t weights;
+  igraph_bool_t const is_weighted = values != NULL;
+  igraph_bool_t const is_sparse = sp_i != NULL;
 
-  if (* sp_i >= 0) {
-    IGRAPH_CHECK(se2_R_sparse_to_igraph(sp_i, sp_p, values, n_nodes, &graph_i,
-                                        &weights, is_directed));
+  graph->n_nodes = n_nodes;
+
+  /* NOTE: We don't actually have to calculate kin or total weights because it
+  will be done at the start of the SE2 algorithm. */
+  graph->total_weight = 0;
+  graph->kin = igraph_malloc(sizeof(* graph->kin));
+  IGRAPH_CHECK_OOM(graph->kin, "");
+  IGRAPH_FINALLY(igraph_free, graph->kin);
+  IGRAPH_CHECK(igraph_vector_init(graph->kin, n_nodes));
+  IGRAPH_FINALLY(igraph_vector_destroy, graph->kin);
+
+  if (is_sparse || !is_weighted) {
+    graph->neigh_list = igraph_malloc(sizeof(* graph->neigh_list));
+    IGRAPH_CHECK_OOM(graph->neigh_list, "");
+    IGRAPH_FINALLY(igraph_free, graph->neigh_list);
+    IGRAPH_CHECK(igraph_vector_int_list_init(graph->neigh_list, n_nodes));
+    IGRAPH_FINALLY(igraph_vector_int_list_destroy, graph->neigh_list);
+
+    graph->sizes = igraph_malloc(sizeof(* graph->sizes));
+    IGRAPH_CHECK_OOM(graph->sizes, "");
+    IGRAPH_FINALLY(igraph_free, graph->sizes);
+    IGRAPH_CHECK(igraph_vector_int_init(graph->sizes, n_nodes));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, graph->sizes);
   } else {
-    IGRAPH_CHECK(se2_R_double_to_igraph(values, n_nodes, &graph_i, &weights,
-                                        is_directed));
+    graph->neigh_list = NULL;
+    graph->sizes = NULL;
   }
-  IGRAPH_FINALLY(igraph_destroy, &graph_i);
-  IGRAPH_FINALLY(igraph_vector_destroy, &weights);
 
-  IGRAPH_CHECK(se2_igraph_to_neighbor_list( &graph_i, &weights, graph));
+  if (is_weighted) {
+    graph->weights = igraph_malloc(sizeof(* graph->weights));
+    IGRAPH_CHECK_OOM(graph->weights, "");
+    IGRAPH_FINALLY(igraph_free, graph->weights);
+    IGRAPH_CHECK(igraph_vector_list_init(graph->weights, n_nodes));
+    IGRAPH_FINALLY(igraph_vector_list_destroy, graph->weights);
+  } else {
+    graph->weights = NULL;
+  }
 
-  igraph_destroy( &graph_i);
-  igraph_vector_destroy( &weights);
+  if (is_sparse) {
+    IGRAPH_CHECK(se2_R_sparse_to_graph(sp_i, sp_p, values, graph, is_directed));
+  } else if (is_weighted) {
+    IGRAPH_CHECK(se2_R_weighted_double_to_graph(values, graph, is_directed));
+  } else {
+    IGRAPH_CHECK(se2_R_unweighted_double_to_graph(values, graph, is_directed));
+  }
+
   IGRAPH_FINALLY_CLEAN(2);
+
+  if (is_sparse || !is_weighted) {
+    IGRAPH_FINALLY_CLEAN(4);
+  }
+
+  if (is_weighted) {
+    IGRAPH_FINALLY_CLEAN(2);
+  }
 
   return IGRAPH_SUCCESS;
 }
@@ -211,9 +339,14 @@ SEXP c_speakeasy2(SEXP sp_i, SEXP sp_p, SEXP values, SEXP n_nodes,
     .verbose = LOGICAL(verbose)[0]
   };
 
-  R_IGRAPH_CHECK(se2_R_adj_to_igraph(INTEGER(sp_i), INTEGER(sp_p), REAL(values),
-                                     INTEGER(n_nodes)[0], &graph,
-                                     LOGICAL(is_directed)[0]));
+  igraph_bool_t const is_sparse = length(sp_i) > 1;
+  igraph_bool_t const is_weighted = length(values) > 1;
+
+  R_IGRAPH_CHECK(se2_R_adj_to_graph(is_sparse ? INTEGER(sp_i) : NULL,
+                                    is_weighted ? INTEGER(sp_p) : NULL,
+                                    REAL(values),
+                                    INTEGER(n_nodes)[0], &graph,
+                                    LOGICAL(is_directed)[0]));
   IGRAPH_FINALLY(se2_neighs_destroy, &graph);
 
   R_IGRAPH_CHECK(speak_easy_2( &graph, &opts, &membership_i));
@@ -249,9 +382,9 @@ SEXP c_order_nodes(SEXP sp_i, SEXP sp_p, SEXP values, SEXP n_nodes,
                    /* dec idx */ true));
   IGRAPH_FINALLY(igraph_matrix_int_destroy, &membership_i);
 
-  R_IGRAPH_CHECK(se2_R_adj_to_igraph(INTEGER(sp_i), INTEGER(sp_p), REAL(values),
-                                     INTEGER(n_nodes)[0], &graph,
-                                     LOGICAL(is_directed)[0]));
+  R_IGRAPH_CHECK(se2_R_adj_to_graph(INTEGER(sp_i), INTEGER(sp_p), REAL(values),
+                                    INTEGER(n_nodes)[0], &graph,
+                                    LOGICAL(is_directed)[0]));
   IGRAPH_FINALLY(se2_neighs_destroy, &graph);
 
   R_IGRAPH_CHECK(se2_order_nodes( &graph, &membership_i, &ordering_i));

@@ -18,6 +18,13 @@ if (require("igraph")) {
     expect_gt(igraph::compare(gt_membership, actual, "nmi"), 0.9)
   })
 
+  test_that("weighted matrix works", {
+    noise <- matrix(rnorm(n_nodes * n_nodes, mean = 0.25, 0.1), nrow = n_nodes)
+    graph_i <- as.matrix(as.matrix(graph)) + noise
+    actual <- speakeasyR::cluster(graph_i, seed = seed)
+    expect_gt(igraph::compare(gt_membership, actual, "nmi"), 0.9)
+  })
+
   test_that("sparse matrix works", {
     graph_i <- as.matrix(graph)
     actual <- speakeasyR::cluster(graph_i, seed = seed)

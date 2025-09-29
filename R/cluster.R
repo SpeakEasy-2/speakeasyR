@@ -44,11 +44,7 @@ cluster <- function(graph, discard_transient = 3, independent_runs = 10,
                     max_threads = 0, seed = 0, target_clusters = 0,
                     target_partitions = 5, subcluster = 1, min_clust = 5,
                     verbose = FALSE, is_directed = "detect") {
-  adj <- se2_as_matrix_i(graph)
-
-  if (is_directed == "detect") {
-    is_directed <- adj$is_directed
-  }
+  adj <- se2_as_matrix_i(graph, is_directed)
 
   if (seed == 0) {
     seed <- sample.int(9999, 1)
@@ -60,7 +56,7 @@ cluster <- function(graph, discard_transient = 3, independent_runs = 10,
     as.integer(discard_transient), as.integer(independent_runs),
     as.integer(max_threads), as.integer(seed), as.integer(target_clusters),
     as.integer(target_partitions), as.integer(subcluster),
-    as.integer(min_clust), as.logical(verbose), as.logical(is_directed),
+    as.integer(min_clust), as.logical(verbose), as.logical(adj$is_directed),
     PACKAGE = "speakeasyR"
   )
 

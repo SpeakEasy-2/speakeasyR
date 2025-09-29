@@ -6,7 +6,7 @@ se2_is_matrix_i <- function(obj) {
   class(obj)[[1]] %in% c("dgCMatrix", "ngCMatrix", "matrix")
 }
 
-se2_as_matrix_i <- function(adj_like) {
+se2_as_matrix_i <- function(adj_like, is_directed = "detect") {
   if (!se2_is_matrix_i(adj_like)) {
     adj_like <- as.matrix(adj_like)
   }
@@ -16,7 +16,7 @@ se2_as_matrix_i <- function(adj_like) {
       "Could not convert adj_like to an appropriate type. ",
       "'as.matrix' converted adj_like to \"", class(adj_like)[[0]],
       "\". Currently implemented classes are c(\"matrix\", \"dgCMatrix\"). ",
-      "Please open an issue on github to add support for new types."
+      "Please open an issue on GitHub to add support for new types."
     ))
   }
 
@@ -40,7 +40,17 @@ se2_as_matrix_i <- function(adj_like) {
     new_adj$se2_p <- -1
   }
 
-  new_adj$is_directed <- !Matrix::isTriangular(adj_like)
+  new_adj$is_directed <- is_directed
+  if (is_directed == "detect") {
+    new_adj$is_directed <- !Matrix::isTriangular(adj_like)
+  } else if (!is_directed && !Matrix::isTriangular(adj_like)) {
+    stop(paste(
+      "Undirected graphs must be triangular.",
+      "For symmetric graphs leave as directed.",
+      sep = " "
+    ))
+  }
+
   new_adj$n_nodes <- ncol(adj_like)
 
   new_adj
