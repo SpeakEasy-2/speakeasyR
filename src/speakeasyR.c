@@ -77,7 +77,7 @@ static igraph_error_t se2_R_unweighted_double_to_graph(
     }
     VECTOR(* graph->sizes)[i] = n_neighs;
 
-    igraph_vector_int_init( &VECTOR(neighbors), n_neighs);
+    IGRAPH_CHECK(igraph_vector_int_init( &neighbors, n_neighs));
     igraph_integer_t count = 0;
     for (igraph_integer_t j = 0; j < n_nodes; j++) {
       if (R_MATRIX(mat, j, i, n_nodes)) {
@@ -104,7 +104,7 @@ static igraph_error_t se2_R_weighted_double_to_graph(
 {
   igraph_integer_t const n_nodes = graph->n_nodes;
   for (igraph_integer_t i = 0; i < n_nodes; i++) {
-    igraph_vector_init( &VECTOR(* graph->weights)[i], n_nodes);
+    IGRAPH_CHECK(igraph_vector_init( &VECTOR(* graph->weights)[i], n_nodes));
   }
 
   for (igraph_integer_t i = 0; i < n_nodes; i++) {
@@ -135,10 +135,11 @@ static igraph_error_t se2_R_directed_sparse_to_graph(
   for (igraph_integer_t i = 0; i < n_nodes; i++) {
     igraph_integer_t const n_neighs = sp_p[i + 1] - sp_p[i];
     VECTOR(* graph->sizes)[i] = n_neighs;
-    igraph_vector_int_init( &VECTOR(* graph->neigh_list)[i], n_neighs);
+    IGRAPH_CHECK(igraph_vector_int_init( &VECTOR(* graph->neigh_list)[i],
+                                         n_neighs));
 
     if (IS_WEIGHTED(graph)) {
-      igraph_vector_init( &VECTOR(* graph->weights)[i], n_neighs);
+      IGRAPH_CHECK(igraph_vector_init( &VECTOR(* graph->weights)[i], n_neighs));
     }
   }
 
@@ -171,9 +172,10 @@ static igraph_error_t se2_R_undirected_sparse_to_graph(
 
   for (igraph_integer_t i = 0; i < n_nodes; i++) {
     igraph_integer_t n_neighs = N_NEIGHBORS(* graph, i);
-    igraph_vector_int_init( &VECTOR(* graph->neigh_list)[i], n_neighs);
+    IGRAPH_CHECK(igraph_vector_int_init( &VECTOR(* graph->neigh_list)[i],
+                                         n_neighs));
     if (IS_WEIGHTED(graph)) {
-      igraph_vector_init( &VECTOR(* graph->weights)[i], n_neighs);
+      IGRAPH_CHECK(igraph_vector_init( &VECTOR(* graph->weights)[i], n_neighs));
     }
   }
 
@@ -339,12 +341,12 @@ SEXP c_speakeasy2(SEXP sp_i, SEXP sp_p, SEXP values, SEXP n_nodes,
     .verbose = LOGICAL(verbose)[0]
   };
 
-  igraph_bool_t const is_sparse = length(sp_i) > 1;
-  igraph_bool_t const is_weighted = length(values) > 1;
+  igraph_bool_t const is_sparse = xlength(sp_i) > 1;
+  igraph_bool_t const is_weighted = xlength(values) > 1;
 
   R_IGRAPH_CHECK(se2_R_adj_to_graph(is_sparse ? INTEGER(sp_i) : NULL,
-                                    is_weighted ? INTEGER(sp_p) : NULL,
-                                    REAL(values),
+                                    INTEGER(sp_p),
+                                    is_weighted ? REAL(values) : NULL,
                                     INTEGER(n_nodes)[0], &graph,
                                     LOGICAL(is_directed)[0]));
   IGRAPH_FINALLY(se2_neighs_destroy, &graph);
@@ -382,7 +384,10 @@ SEXP c_order_nodes(SEXP sp_i, SEXP sp_p, SEXP values, SEXP n_nodes,
                    /* dec idx */ true));
   IGRAPH_FINALLY(igraph_matrix_int_destroy, &membership_i);
 
-  R_IGRAPH_CHECK(se2_R_adj_to_graph(INTEGER(sp_i), INTEGER(sp_p), REAL(values),
+  igraph_bool_t const is_sparse = xlength(sp_i) > 1;
+  igraph_bool_t const is_weighted = xlength(values) > 1;
+  R_IGRAPH_CHECK(se2_R_adj_to_graph(is_sparse ? INTEGER(sp_i) : NULL,
+                                    INTEGER(sp_p), is_weighted ? REAL(values) : NULL,
                                     INTEGER(n_nodes)[0], &graph,
                                     LOGICAL(is_directed)[0]));
   IGRAPH_FINALLY(se2_neighs_destroy, &graph);
