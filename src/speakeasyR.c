@@ -47,7 +47,7 @@ static void R_error_handler(char const* reason, char const* file,
 
 static igraph_error_t R_status_handler(const char* message, void* data)
 {
-  Rprintf("%s\n", message);
+  Rprintf("%s", message);
   return IGRAPH_SUCCESS;
 }
 

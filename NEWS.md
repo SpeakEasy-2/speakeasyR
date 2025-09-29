@@ -13,6 +13,7 @@
 ## Fixed
 
 - In `cluster_genes` fix directedness of a symmetric correlation matrix.
+- Printing in C files. Previously was adding extra linebreaks.
 
 # speakeasyR 0.1.7
 
