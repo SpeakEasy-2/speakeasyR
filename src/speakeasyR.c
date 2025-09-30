@@ -325,8 +325,6 @@ SEXP c_speakeasy2(SEXP sp_i, SEXP sp_p, SEXP values, SEXP n_nodes,
   se2_init();
 
   se2_neighs graph;
-  SEXP membership =
-    PROTECT(allocVector(INTSXP, INTEGER(n_nodes)[0] * INTEGER(subcluster)[0]));
   igraph_matrix_int_t membership_i;
 
   se2_options opts = {
@@ -356,6 +354,9 @@ SEXP c_speakeasy2(SEXP sp_i, SEXP sp_p, SEXP values, SEXP n_nodes,
   IGRAPH_FINALLY_CLEAN(1);
   IGRAPH_FINALLY(igraph_matrix_int_destroy, &membership_i);
 
+  SEXP membership =
+    PROTECT(allocVector(INTSXP, INTEGER(n_nodes)[0] * INTEGER(subcluster)[0]));
+
   se2_igraph_int_to_R( &membership_i,
                        INTEGER(membership), /* inc index */ true);
 
@@ -374,8 +375,6 @@ SEXP c_order_nodes(SEXP sp_i, SEXP sp_p, SEXP values, SEXP n_nodes,
   se2_neighs graph;
   igraph_matrix_int_t membership_i;
   igraph_matrix_int_t ordering_i;
-  SEXP ordering =
-    PROTECT(allocVector(INTSXP, INTEGER(n_nodes)[0] * INTEGER(n_levels)[0]));
 
   R_IGRAPH_CHECK(se2_R_integer_to_igraph(
                    INTEGER(membership),
@@ -395,13 +394,17 @@ SEXP c_order_nodes(SEXP sp_i, SEXP sp_p, SEXP values, SEXP n_nodes,
   R_IGRAPH_CHECK(se2_order_nodes( &graph, &membership_i, &ordering_i));
   IGRAPH_FINALLY(igraph_matrix_int_destroy, &ordering_i);
 
-  se2_igraph_int_to_R( &ordering_i, INTEGER(ordering), /* ind idx */ true);
-
   igraph_matrix_int_destroy( &membership_i);
   se2_neighs_destroy( &graph);
-  igraph_matrix_int_destroy( &ordering_i);
+  IGRAPH_FINALLY_CLEAN(2);
 
-  IGRAPH_FINALLY_CLEAN(3);
+  SEXP ordering =
+    PROTECT(allocVector(INTSXP, INTEGER(n_nodes)[0] * INTEGER(n_levels)[0]));
+
+  se2_igraph_int_to_R( &ordering_i, INTEGER(ordering), /* ind idx */ true);
+
+  igraph_matrix_int_destroy( &ordering_i);
+  IGRAPH_FINALLY_CLEAN(1);
 
   UNPROTECT(1);
   return ordering;
@@ -488,8 +491,6 @@ static void se2_closest_k(int const col, int const k, int const n_nodes,
 SEXP c_knn_graph(SEXP mat, SEXP k, SEXP n_nodes, SEXP n_rows, SEXP sp_p,
                  SEXP sp_i, SEXP sp_x)
 {
-  SEXP res = PROTECT(allocVector(VECSXP, 3));
-
   int const k_ = INTEGER(k)[0];
   int const n_nodes_ = INTEGER(n_nodes)[0];
   int const n_rows_ = INTEGER(n_rows)[0];
@@ -516,6 +517,8 @@ SEXP c_knn_graph(SEXP mat, SEXP k, SEXP n_nodes, SEXP n_rows, SEXP sp_p,
                   mat_, sp_i_ + sp_p_[i],
                   *sp_x_ < 0 ? sp_x_ : sp_x_ + sp_p_[i]);
   }
+
+  SEXP res = PROTECT(allocVector(VECSXP, 3));
 
   SET_VECTOR_ELT(res, 0, sp_p);
   SET_VECTOR_ELT(res, 1, sp_i);
