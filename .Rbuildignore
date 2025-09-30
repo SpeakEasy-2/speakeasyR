@@ -15,9 +15,10 @@
 \.all-contributorsrc$
 \.ccls-cache$
 \.clang-format$
-\.mergify.yml$
+\.mergify\.yml$
 ^aclocal\.m4$
 ^autom4te\.cache$
+^compile_commands\.json
 ^src/se2/examples$
 ^src/se2/CHANGELOG\.md$
 ^src/se2/flake\.
