@@ -77,7 +77,7 @@ static igraph_error_t se2_R_unweighted_double_to_graph(
     }
     VECTOR(* graph->sizes)[i] = n_neighs;
 
-    IGRAPH_CHECK(igraph_vector_int_init( &neighbors, n_neighs));
+    IGRAPH_CHECK(igraph_vector_int_resize( &neighbors, n_neighs));
     igraph_integer_t count = 0;
     for (igraph_integer_t j = 0; j < n_nodes; j++) {
       if (R_MATRIX(mat, j, i, n_nodes)) {
@@ -104,7 +104,7 @@ static igraph_error_t se2_R_weighted_double_to_graph(
 {
   igraph_integer_t const n_nodes = graph->n_nodes;
   for (igraph_integer_t i = 0; i < n_nodes; i++) {
-    IGRAPH_CHECK(igraph_vector_init( &VECTOR(* graph->weights)[i], n_nodes));
+    IGRAPH_CHECK(igraph_vector_resize( &VECTOR(* graph->weights)[i], n_nodes));
   }
 
   for (igraph_integer_t i = 0; i < n_nodes; i++) {
@@ -135,11 +135,11 @@ static igraph_error_t se2_R_directed_sparse_to_graph(
   for (igraph_integer_t i = 0; i < n_nodes; i++) {
     igraph_integer_t const n_neighs = sp_p[i + 1] - sp_p[i];
     VECTOR(* graph->sizes)[i] = n_neighs;
-    IGRAPH_CHECK(igraph_vector_int_init( &VECTOR(* graph->neigh_list)[i],
-                                         n_neighs));
+    IGRAPH_CHECK(igraph_vector_int_resize( &VECTOR(* graph->neigh_list)[i],
+                                           n_neighs));
 
     if (IS_WEIGHTED(graph)) {
-      IGRAPH_CHECK(igraph_vector_init( &VECTOR(* graph->weights)[i], n_neighs));
+      IGRAPH_CHECK(igraph_vector_resize( &VECTOR(* graph->weights)[i], n_neighs));
     }
   }
 
@@ -172,10 +172,10 @@ static igraph_error_t se2_R_undirected_sparse_to_graph(
 
   for (igraph_integer_t i = 0; i < n_nodes; i++) {
     igraph_integer_t n_neighs = N_NEIGHBORS(* graph, i);
-    IGRAPH_CHECK(igraph_vector_int_init( &VECTOR(* graph->neigh_list)[i],
-                                         n_neighs));
+    IGRAPH_CHECK(igraph_vector_int_resize( &VECTOR(* graph->neigh_list)[i],
+                                           n_neighs));
     if (IS_WEIGHTED(graph)) {
-      IGRAPH_CHECK(igraph_vector_init( &VECTOR(* graph->weights)[i], n_neighs));
+      IGRAPH_CHECK(igraph_vector_resize( &VECTOR(* graph->weights)[i], n_neighs));
     }
   }
 
